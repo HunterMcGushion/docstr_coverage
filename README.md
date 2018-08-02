@@ -86,7 +86,7 @@ Why Should I Use It?
 Installation
 ------------
 ```
-# TODO: Add `pip install docstr-coverage`
+pip install docstr-coverage
 ```
 If you like being on the cutting-edge, and you want all the latest developments, run:
 ```
