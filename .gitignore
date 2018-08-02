@@ -1,0 +1,44 @@
+# Byte-Compiled Files
+*.py[cod]
+
+# Environments
+.env
+env/
+env.bak/
+
+# Documentation
+docs/_build/
+docs/_static/
+docs/_templates/
+
+# Distribution/Packaging
+.Python
+build/
+dist/
+eggs/
+.eggs/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+
+# Unit Tests/Coverage
+htmlcov/
+.tox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
+.pytest_cache/
+
+# Jupyter Notebooks
+.ipynb_checkpoints
+
+# Miscellaneous
+.idea/
+.DS_Store

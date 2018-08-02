@@ -1,0 +1,9 @@
+- Alexey "DataGreed" Strelkov
+    - For creating the original `docstring-coverage` library (https://bitbucket.org/DataGreed/docstring-coverage)
+    - Support seems to have ended on 2012-08-14. Hopefully I'm not stepping on any toes by picking up where you left off
+    - Thank you for your excellent work, and just as you say you owe James Harlow a drink, I owe you one, as well
+- James Harlow
+    - For authoring the 2004 "Docstring Coverage Python Recipe" (http://code.activestate.com/recipes/355731/)
+    - Credited by Alexey Strelkov as being the basis of `docstring-coverage`
+    - Thank you. Obviously, I also owe you a drink
+    - Also on ActiveState's Recipes Repository (github.com/ActiveState/code/tree/master/recipes/Python/355731_Docstring_coverage)
