@@ -2,6 +2,7 @@ Docstr-Coverage
 ===============
 
 If the health of your documentation is in dire straits, `docstr-coverage` will see you now.
+
 `docstr-coverage` is a simple tool that lets you measure your Python source code's
 [docstring](http://www.python.org/dev/peps/pep-0257/#what-is-a-docstring) coverage. It can show you which of your functions,
 classes, methods, and modules don't have docstrings. It also provide statistics about overall docstring coverage for individual

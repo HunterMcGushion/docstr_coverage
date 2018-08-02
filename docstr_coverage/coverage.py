@@ -74,23 +74,25 @@ def get_docstring_coverage(filenames, skip_magic=False, skip_file_docstring=Fals
     -------
     Dict
         Links filename keys to a dict of stats for that filename. Example:
-        {
-            '<filename>': {
-                'missing': ['<method_or_class_name>', '...'],
-                'module_doc': Boolean,  # Has module docstring
-                'missing_count': <missing_count int>,
-                'needed_count': <needed_docstrings_count int>,
-                'coverage': <percent_of_coverage float>,
-                'empty': <Boolean>  # True if file is empty (no vars, funcs or classes)
-            }, ...
-        }
+
+        >>> {
+        ...     '<filename>': {
+        ...         'missing': ['<method_or_class_name>', '...'],
+        ...         'module_doc': '<Boolean>',
+        ...         'missing_count': '<missing_count int>',
+        ...         'needed_count': '<needed_docstrings_count int>',
+        ...         'coverage': '<percent_of_coverage float>',
+        ...         'empty': '<Boolean>'
+        ...     }, ...
+        ... }
     Dict
         Total summary stats for all files analyzed. Example:
-        {
-            'missing_count': <total_missing_count int>,
-            'needed_count': <total_needed_docstrings_count int>,
-            'coverage': <total_percent_of_coverage float>
-        }
+
+        >>> {
+        ...     'missing_count': '<total_missing_count int>',
+        ...     'needed_count': '<total_needed_docstrings_count int>',
+        ...     'coverage': '<total_percent_of_coverage float>'
+        ... }
     """
     verbose = int(verbose)
 
