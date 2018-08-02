@@ -162,7 +162,7 @@ def get_docstring_coverage(filenames, skip_magic=False, skip_file_docstring=Fals
     total_docs_needed = 0
     total_docs_covered = 0
     empty_files = 0
-    result_dict = {}
+    file_results = {}
 
     for filename in filenames:
         log('\nFile: "%s"' % filename, 2)
@@ -206,7 +206,7 @@ def get_docstring_coverage(filenames, skip_magic=False, skip_file_docstring=Fals
         else:
             coverage = 0
 
-        result_dict[filename] = {
+        file_results[filename] = {
             'missing': file_missing_list,
             'module_doc': bool(_tree[0]),
             'missing_count': file_docs_needed - file_docs_covered,
@@ -216,10 +216,10 @@ def get_docstring_coverage(filenames, skip_magic=False, skip_file_docstring=Fals
         }
 
         log(' Needed: %s; Found: %s; Missing: %s; Coverage: %.1f%%' % (
-            file_docs_needed, file_docs_covered, result_dict[filename]['missing_count'], result_dict[filename]['coverage']
+            file_docs_needed, file_docs_covered, file_results[filename]['missing_count'], file_results[filename]['coverage']
         ), 2)
 
-    total_result_dict = {
+    total_results = {
         'missing_count': total_docs_needed - total_docs_covered,
         'needed_count': total_docs_needed,
         'coverage': float(total_docs_covered) * 100 / float(total_docs_needed),
@@ -242,13 +242,13 @@ def get_docstring_coverage(filenames, skip_magic=False, skip_file_docstring=Fals
 
     log('Docstrings needed: %s;' % total_docs_needed, 1, append=True)
     log('Docstrings found: %s;' % total_docs_covered, 1, append=True)
-    log('Docstrings missing: %s' % (total_result_dict['missing_count']), 1)
-    log('Total docstring coverage: %.1f%%; ' % (total_result_dict['coverage']), 1, True)
+    log('Docstrings missing: %s' % (total_results['missing_count']), 1)
+    log('Total docstring coverage: %.1f%%; ' % (total_results['coverage']), 1, True)
 
     #################### Calculate Total Grade ####################
-    grade = next(_[0] for _ in GRADES if _[1] <= total_result_dict['coverage'])
+    grade = next(_[0] for _ in GRADES if _[1] <= total_results['coverage'])
     log('Grade: %s' % grade, 1)
-    return result_dict, total_result_dict
+    return file_results, total_results
 
 
 def _execute():
