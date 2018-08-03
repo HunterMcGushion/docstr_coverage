@@ -17,6 +17,7 @@ setup(
         'Lists missing docstrings, and calculates overall docstring coverage percentage rating'
     ]),
     long_description=readme(),
+    long_description_content_type='text/markdown',
     keywords='docstring coverage documentation audit source code statistics report',
     url='https://github.com/HunterMcGushion/docstr_coverage',
     author='Hunter McGushion',
