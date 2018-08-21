@@ -13,6 +13,7 @@ files, and for your entire project.
 
 Example
 -------
+
 ```
 >>> HunterMcGushion$ docstr-coverage /docstr_coverage/
 
@@ -42,13 +43,17 @@ How Do I Use It?
 General usage is: `docstr-coverage <path to dir or module> [options]`
 
 To test a single module, named `some_module.py`, run:
+
 ```
 $ docstr-coverage some_module.py
 ```
+
 To test a directory (recursively), just supply the directory `some_project/src` instead:
+
 ```
 $ docstr-coverage some_project/src
 ```
+
 ##### Options:
 * *--skipmagic, -m* - Ignore all magic methods (like `__init__`, and `__str__`)
 * *--skipfiledoc, -f* - Ignore module docstrings (at the top of files)
@@ -63,10 +68,12 @@ $ docstr-coverage some_project/src
 
 #### Package in Your Project
 You can also use `docstr-coverage` as a part of your project by importing it thusly:
+
 ```python
 from docstr_coverage import get_docstring_coverage
 my_coverage = get_docstring_coverage(['some_dir/file_0.py', 'some_dir/file_1.py'])
 ```
+
 ##### Arguments:
 * Required arg: `filenames` \<list of string filenames\>
 * Optional kwargs: `skip_magic` \<bool\>, `skip_file_docstring` \<bool\>, `verbose` \<int (0-3)\>
@@ -85,10 +92,13 @@ Why Should I Use It?
 
 Installation
 ------------
+
 ```
 pip install docstr-coverage
 ```
+
 If you like being on the cutting-edge, and you want all the latest developments, run:
+
 ```
 pip install git+https://github.com/HunterMcGushion/docstr_coverage.git
 ```
