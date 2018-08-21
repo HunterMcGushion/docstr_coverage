@@ -56,7 +56,9 @@ GRADES = (
 )
 
 
-def get_docstring_coverage(filenames, skip_magic=False, skip_file_docstring=False, verbose=0):
+def get_docstring_coverage(
+        filenames, skip_magic=False, skip_file_docstring=False, skip_init=False, skip_class_def=False, verbose=0
+):
     """Checks contents of `filenames` for missing docstrings, and produces a report detailing docstring status
 
     Parameters
@@ -64,9 +66,14 @@ def get_docstring_coverage(filenames, skip_magic=False, skip_file_docstring=Fals
     filenames: List
         List of filename strings that are absolute or relative paths
     skip_magic: Boolean, default=False
-        If True, skips all magic methods (double-underscore-prefixed) and does not include them in the report
+        If True, skips all magic methods (double-underscore-prefixed), except '__init__' and does not include them in the report
     skip_file_docstring: Boolean, default=False
         If True, skips check for a module-level docstring
+    skip_init: Boolean, default=False
+        If True, skips methods named '__init__' and does not include them in the report
+    skip_class_def: Boolean, default=False
+        If True, skips class definitions and does not include them in the report. If this is True, the class's methods will still
+        be checked
     verbose: Int in [0, 1, 2, 3], default=0
         0) No printing. 1) Print total stats only. 2) Print stats for all files. 3) Print missing docstrings for all files
 
@@ -144,7 +151,11 @@ def get_docstring_coverage(filenames, skip_magic=False, skip_file_docstring=Fals
         #################### Check Current Node ####################
         if not has_doc:
             # TODO: Add option to skip class definition docstrings (though one of class or magic methods should used)
-            if skip_magic and name.startswith('__') and name.endswith('__'):
+            if skip_init and name == '__init__':
+                docs_needed -= 1
+            elif skip_magic and name.startswith('__') and name.endswith('__') and name != '__init__':
+                docs_needed -= 1
+            elif skip_class_def and '_' not in name and (name[0] == name[0].upper()):
                 docs_needed -= 1
             else:
                 log(' - No docstring for `%s%s`' % (base, name), 3)
@@ -231,9 +242,13 @@ def get_docstring_coverage(filenames, skip_magic=False, skip_file_docstring=Fals
     if empty_files:
         postfix = ' (%s files are empty)' % empty_files
     if skip_magic:
-        postfix += ' (skipped all magic methods)'
+        postfix += ' (skipped all non-init magic methods)'
     if skip_file_docstring:
         postfix += ' (skipped file-level docstrings)'
+    if skip_init:
+        postfix += ' (skipped __init__ methods)'
+    if skip_class_def:
+        postfix += ' (skipped class definitions)'
 
     log('\n', 2)
 
@@ -271,10 +286,18 @@ def _execute():
         help='Verbosity level <0-3>, default=3', type='choice', choices=['0', '1', '2', '3']
     )
     parser.add_option(
-        '-m', '--skipmagic', action='store_true', dest='skip_magic', default=False, help='Ignore docstrings of magic methods'
+        '-m', '--skipmagic', action='store_true', dest='skip_magic', default=False,
+        help='Ignore docstrings of magic methods (except "__init__")'
     )
     parser.add_option(
         '-f', '--skipfiledoc', action='store_true', dest='skip_file_docstring', default=False, help='Ignore module docstrings'
+    )
+    parser.add_option(
+        '-i', '--skipinit', action='store_true', dest='skip_init', default=False, help='Ignore docstrings of "__init__" methods'
+    )
+    parser.add_option(
+        '-c', '--skipclassdef', action='store_true', dest='skip_class_def', default=False,
+        help='Ignore docstrings of class definitions'
     )
     parser.add_option(
         '-l', '--followlinks', action='store_true', dest='follow_links', default=False, help='Follow symlinks'
@@ -308,7 +331,8 @@ def _execute():
         sys.exit('No Python files found')
 
     get_docstring_coverage(
-        filenames, skip_magic=options.skip_magic, skip_file_docstring=options.skip_file_docstring, verbose=options.verbose
+        filenames, skip_magic=options.skip_magic, skip_file_docstring=options.skip_file_docstring, skip_init=options.skip_init,
+        skip_class_def=options.skip_class_def, verbose=options.verbose
     )
 
 
