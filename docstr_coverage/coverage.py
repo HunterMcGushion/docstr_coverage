@@ -17,7 +17,7 @@ class DocStringCoverageVisitor(NodeVisitor):
 
     def visit_Module(self, node):
         """Upon visiting a module, initialize :attr:`DocStringCoverageVisitor.tree` with module-wide node info"""
-        has_doc = get_docstring(node) is not None and get_docstring(node).strip() != ''
+        has_doc = get_docstring(node) is not None and get_docstring(node).strip() != ""
         is_empty = not len(node.body)
         self.tree.append((has_doc, is_empty, []))
         self.generic_visit(node)
@@ -34,7 +34,7 @@ class DocStringCoverageVisitor(NodeVisitor):
         """Helper method to update :attr:`DocStringCoverageVisitor.tree` with pertinent documentation information for `node`, then
         ensure all child nodes are also visited"""
         self.symbol_count += 1
-        has_doc = get_docstring(node) is not None and get_docstring(node).strip() != ''
+        has_doc = get_docstring(node) is not None and get_docstring(node).strip() != ""
         _node = (node.name, has_doc, [])
         self.tree[-1][-1].append(_node)
         self.tree.append(_node)
@@ -43,21 +43,26 @@ class DocStringCoverageVisitor(NodeVisitor):
 
 
 GRADES = (
-    ('AMAZING! Your docstrings are truly a wonder to behold!', 100),
-    ('Excellent', 92),
-    ('Great', 85),
-    ('Very good', 70),
-    ('Good', 60),
-    ('Not bad', 40),
-    ('Not good', 25),
-    ('Extremely poor', 10),
-    ('Not documented at all', 2),
-    ('Do you even docstring?', 1)
+    ("AMAZING! Your docstrings are truly a wonder to behold!", 100),
+    ("Excellent", 92),
+    ("Great", 85),
+    ("Very good", 70),
+    ("Good", 60),
+    ("Not bad", 40),
+    ("Not good", 25),
+    ("Extremely poor", 10),
+    ("Not documented at all", 2),
+    ("Do you even docstring?", 1),
 )
 
 
 def get_docstring_coverage(
-        filenames, skip_magic=False, skip_file_docstring=False, skip_init=False, skip_class_def=False, verbose=0
+    filenames,
+    skip_magic=False,
+    skip_file_docstring=False,
+    skip_init=False,
+    skip_class_def=False,
+    verbose=0,
 ):
     """Checks contents of `filenames` for missing docstrings, and produces a report detailing docstring status
 
@@ -118,7 +123,7 @@ def get_docstring_coverage(
             If True, print with an ending space, rather than a newline character"""
         if verbose >= level:
             if append:
-                print(text, end=' ')
+                print(text, end=" ")
             else:
                 print(text)
 
@@ -151,21 +156,25 @@ def get_docstring_coverage(
         #################### Check Current Node ####################
         if not has_doc:
             # TODO: Add option to skip class definition docstrings (though one of class or magic methods should used)
-            if skip_init and name == '__init__':
+            if skip_init and name == "__init__":
                 docs_needed -= 1
-            elif skip_magic and name.startswith('__') and name.endswith('__') and name != '__init__':
+            elif (
+                skip_magic and name.startswith("__") and name.endswith("__") and name != "__init__"
+            ):
                 docs_needed -= 1
-            elif skip_class_def and '_' not in name and (name[0] == name[0].upper()):
+            elif skip_class_def and "_" not in name and (name[0] == name[0].upper()):
                 docs_needed -= 1
             else:
-                log(' - No docstring for `%s%s`' % (base, name), 3)
+                log(" - No docstring for `%s%s`" % (base, name), 3)
                 _missing_list.append(base + name)
         else:
             docs_covered += 1
 
         #################### Check Child Nodes ####################
         for _symbol in child_nodes:
-            _temp_docs_needed, _temp_docs_covered, temp_missing_list = print_docstring('%s.' % name, _symbol)
+            _temp_docs_needed, _temp_docs_covered, temp_missing_list = print_docstring(
+                "%s." % name, _symbol
+            )
             docs_needed += _temp_docs_needed
             docs_covered += _temp_docs_covered
             _missing_list += temp_missing_list
@@ -185,7 +194,7 @@ def get_docstring_coverage(
         file_missing_list = []
 
         #################### Read and Parse Source ####################
-        with open(filename, 'r') as f:
+        with open(filename, "r") as f:
             source_tree = f.read()
 
         doc_visitor = DocStringCoverageVisitor()
@@ -196,17 +205,17 @@ def get_docstring_coverage(
         #################### Process Results ####################
         # _tree contains [<module docstring>, <is_empty: bool>, <symbols: classes and funcs>]
         if (not _tree[0]) and (not _tree[1]) and (not skip_file_docstring):
-            log(' - No module docstring', 3)
+            log(" - No module docstring", 3)
             file_docs_covered -= 1
         elif _tree[1]:
-            log(' - File is empty', 3)
+            log(" - File is empty", 3)
             file_docs_needed = 0
             file_docs_covered = 0
             empty_files += 1
 
         # Traverse through functions and classes
         for symbol in _tree[-1]:
-            temp_docs_needed, temp_docs_covered, missing_list = print_docstring('', symbol)
+            temp_docs_needed, temp_docs_covered, missing_list = print_docstring("", symbol)
             file_docs_needed += temp_docs_needed
             file_docs_covered += temp_docs_covered
             file_missing_list += missing_list
@@ -220,57 +229,65 @@ def get_docstring_coverage(
             coverage = 0
 
         file_results[filename] = {
-            'missing': file_missing_list,
-            'module_doc': bool(_tree[0]),
-            'missing_count': file_docs_needed - file_docs_covered,
-            'needed_count': file_docs_needed,
-            'coverage': coverage,
-            'empty': bool(_tree[1])
+            "missing": file_missing_list,
+            "module_doc": bool(_tree[0]),
+            "missing_count": file_docs_needed - file_docs_covered,
+            "needed_count": file_docs_needed,
+            "coverage": coverage,
+            "empty": bool(_tree[1]),
         }
 
-        log(' Needed: %s; Found: %s; Missing: %s; Coverage: %.1f%%' % (
-            file_docs_needed, file_docs_covered, file_results[filename]['missing_count'], file_results[filename]['coverage']
-        ), 2)
+        log(
+            " Needed: %s; Found: %s; Missing: %s; Coverage: %.1f%%"
+            % (
+                file_docs_needed,
+                file_docs_covered,
+                file_results[filename]["missing_count"],
+                file_results[filename]["coverage"],
+            ),
+            2,
+        )
 
     total_results = {
-        'missing_count': total_docs_needed - total_docs_covered,
-        'needed_count': total_docs_needed,
-        'coverage': float(total_docs_covered) * 100 / float(total_docs_needed),
+        "missing_count": total_docs_needed - total_docs_covered,
+        "needed_count": total_docs_needed,
+        "coverage": float(total_docs_covered) * 100 / float(total_docs_needed),
     }
 
-    postfix = ''
+    postfix = ""
     if empty_files:
-        postfix = ' (%s files are empty)' % empty_files
+        postfix = " (%s files are empty)" % empty_files
     if skip_magic:
-        postfix += ' (skipped all non-init magic methods)'
+        postfix += " (skipped all non-init magic methods)"
     if skip_file_docstring:
-        postfix += ' (skipped file-level docstrings)'
+        postfix += " (skipped file-level docstrings)"
     if skip_init:
-        postfix += ' (skipped __init__ methods)'
+        postfix += " (skipped __init__ methods)"
     if skip_class_def:
-        postfix += ' (skipped class definitions)'
+        postfix += " (skipped class definitions)"
 
-    log('\n', 2)
+    log("\n", 2)
 
     if len(filenames) > 1:
-        log('Overall statistics for %s files%s:' % (len(filenames), postfix), 1)
+        log("Overall statistics for %s files%s:" % (len(filenames), postfix), 1)
     else:
-        log('Overall statistics%s:' % postfix, 1)
+        log("Overall statistics%s:" % postfix, 1)
 
-    log('Docstrings needed: %s;' % total_docs_needed, 1, append=True)
-    log('Docstrings found: %s;' % total_docs_covered, 1, append=True)
-    log('Docstrings missing: %s' % (total_results['missing_count']), 1)
-    log('Total docstring coverage: %.1f%%; ' % (total_results['coverage']), 1, True)
+    log("Docstrings needed: %s;" % total_docs_needed, 1, append=True)
+    log("Docstrings found: %s;" % total_docs_covered, 1, append=True)
+    log("Docstrings missing: %s" % (total_results["missing_count"]), 1)
+    log("Total docstring coverage: %.1f%%; " % (total_results["coverage"]), 1, True)
 
     #################### Calculate Total Grade ####################
-    grade = next(_[0] for _ in GRADES if _[1] <= total_results['coverage'])
-    log('Grade: %s' % grade, 1)
+    grade = next(_[0] for _ in GRADES if _[1] <= total_results["coverage"])
+    log("Grade: %s" % grade, 1)
     return file_results, total_results
 
 
 def _execute():
     """Main command-line execution routine"""
     from optparse import OptionParser
+
     # TODO: Move away from optparse - Deprecated (https://pythonprogramminglanguage.com/command-line-arguments/)
 
     #################### Declare Options ####################
@@ -278,63 +295,101 @@ def _execute():
     # TODO: Add option to generate pretty coverage reports - Like Python's `coverage` module does for test coverage
     # TODO: Add option to sort report summaries by filename, coverage score... (ascending/descending)
     parser.add_option(
-        '-e', '--exclude', dest='exclude', default=None, type='string', help='Regex identifying filepaths to exclude'
+        "-e",
+        "--exclude",
+        dest="exclude",
+        default=None,
+        type="string",
+        help="Regex identifying filepaths to exclude",
     )
     # TODO: Add support for multiple `--exclude` regexes to lessen need for long regexes describing separate exclusion items
     parser.add_option(
-        '-v', '--verbose', dest='verbose', default='3', metavar='LEVEL',
-        help='Verbosity level <0-3>, default=3', type='choice', choices=['0', '1', '2', '3']
+        "-v",
+        "--verbose",
+        dest="verbose",
+        default="3",
+        metavar="LEVEL",
+        help="Verbosity level <0-3>, default=3",
+        type="choice",
+        choices=["0", "1", "2", "3"],
     )
     parser.add_option(
-        '-m', '--skipmagic', action='store_true', dest='skip_magic', default=False,
-        help='Ignore docstrings of magic methods (except "__init__")'
+        "-m",
+        "--skipmagic",
+        action="store_true",
+        dest="skip_magic",
+        default=False,
+        help='Ignore docstrings of magic methods (except "__init__")',
     )
     parser.add_option(
-        '-f', '--skipfiledoc', action='store_true', dest='skip_file_docstring', default=False, help='Ignore module docstrings'
+        "-f",
+        "--skipfiledoc",
+        action="store_true",
+        dest="skip_file_docstring",
+        default=False,
+        help="Ignore module docstrings",
     )
     parser.add_option(
-        '-i', '--skipinit', action='store_true', dest='skip_init', default=False, help='Ignore docstrings of "__init__" methods'
+        "-i",
+        "--skipinit",
+        action="store_true",
+        dest="skip_init",
+        default=False,
+        help='Ignore docstrings of "__init__" methods',
     )
     parser.add_option(
-        '-c', '--skipclassdef', action='store_true', dest='skip_class_def', default=False,
-        help='Ignore docstrings of class definitions'
+        "-c",
+        "--skipclassdef",
+        action="store_true",
+        dest="skip_class_def",
+        default=False,
+        help="Ignore docstrings of class definitions",
     )
     parser.add_option(
-        '-l', '--followlinks', action='store_true', dest='follow_links', default=False, help='Follow symlinks'
+        "-l",
+        "--followlinks",
+        action="store_true",
+        dest="follow_links",
+        default=False,
+        help="Follow symlinks",
     )
     # TODO: Separate above arg/option parsing into separate function - Document return values to describe allowed options
     options, args = parser.parse_args()
 
     if len(args) != 1:
-        print('Expected a single path argument. Received invalid argument(s): {}'.format(args[1:]))
+        print("Expected a single path argument. Received invalid argument(s): {}".format(args[1:]))
         sys.exit()
 
     #################### Collect Filenames ####################
-    exclude_re = re.compile(r'{}'.format(options.exclude)) if options.exclude else None
+    exclude_re = re.compile(r"{}".format(options.exclude)) if options.exclude else None
     filenames = []
 
-    if args[0].endswith('.py'):
+    if args[0].endswith(".py"):
         filenames = [args[0]]
     else:
         for root, dirs, f_names in os.walk(args[0], followlinks=options.follow_links):
             if exclude_re is not None:
                 dirs[:] = [_ for _ in dirs if not exclude_re.match(_)]
 
-            new_files = [os.path.join(root, _) for _ in f_names if _.endswith('.py')]
+            new_files = [os.path.join(root, _) for _ in f_names if _.endswith(".py")]
 
             if exclude_re is not None:
                 filenames.extend([_ for _ in new_files if not exclude_re.match(_)])
             else:
                 filenames.extend(new_files)
 
-    if (len(filenames) < 1):
-        sys.exit('No Python files found')
+    if len(filenames) < 1:
+        sys.exit("No Python files found")
 
     get_docstring_coverage(
-        filenames, skip_magic=options.skip_magic, skip_file_docstring=options.skip_file_docstring, skip_init=options.skip_init,
-        skip_class_def=options.skip_class_def, verbose=options.verbose
+        filenames,
+        skip_magic=options.skip_magic,
+        skip_file_docstring=options.skip_file_docstring,
+        skip_init=options.skip_init,
+        skip_class_def=options.skip_class_def,
+        verbose=options.verbose,
     )
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     _execute()
