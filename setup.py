@@ -6,7 +6,7 @@ def readme():
         return f.read()
 
 
-MAJOR, MINOR, MICRO = 1, 0, 2
+MAJOR, MINOR, MICRO = 1, 0, 3
 __VERSION__ = "{}.{}.{}".format(MAJOR, MINOR, MICRO)
 
 setup(
@@ -25,7 +25,7 @@ setup(
     author="Hunter McGushion",
     author_email="hunter@mcgushion.com",
     license="MIT",
-    packages=find_packages(),
+    packages=['docstr_coverage'],
     install_requires=[],
     include_package_data=True,
     zip_safe=False,
