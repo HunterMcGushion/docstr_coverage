@@ -2,6 +2,8 @@
 	<meta name="google-site-verification" content="kTxIhfrCaB4zUJibJTRjAKLHlkBLbPxR5EOMTCEj8sg" />
 </head>
 
+[![Analytics](https://ga-beacon.appspot.com/UA-135071110-2/docstr_coverage/readme?pixel)](https://github.com/igrigorik/ga-beacon)
+
 Docstr-Coverage
 ===============
 
