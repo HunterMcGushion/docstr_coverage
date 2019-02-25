@@ -1,4 +1,6 @@
-<meta name="google-site-verification" content="kTxIhfrCaB4zUJibJTRjAKLHlkBLbPxR5EOMTCEj8sg" />
+<head>
+	<meta name="google-site-verification" content="kTxIhfrCaB4zUJibJTRjAKLHlkBLbPxR5EOMTCEj8sg" />
+</head>
 
 Docstr-Coverage
 ===============
