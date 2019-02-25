@@ -1,3 +1,5 @@
+<meta name="google-site-verification" content="kTxIhfrCaB4zUJibJTRjAKLHlkBLbPxR5EOMTCEj8sg" />
+
 Docstr-Coverage
 ===============
 
