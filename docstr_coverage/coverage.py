@@ -63,6 +63,7 @@ def get_docstring_coverage(
     skip_init=False,
     skip_class_def=False,
     verbose=0,
+    ignore_names=(),
 ):
     """Checks contents of `filenames` for missing docstrings, and produces a report detailing docstring status
 
@@ -128,7 +129,7 @@ def get_docstring_coverage(
                 print(text)
 
     # TODO: Move :func:`print_docstring` to be a normal function outside of :func:`get_docstring_coverage`
-    def print_docstring(base, node):
+    def print_docstring(base, node, filename, ignore_names=()):
         """Log the existence of a docstring for `node`, and accumulate stats regarding expected and encountered docstrings for
         `node` and its children (if any)
 
@@ -139,6 +140,12 @@ def get_docstring_coverage(
         node: Tuple triple of (String, Boolean, List)
             Information describing a node. `node[0]` is the node's name. `node[1]` is True if the node was properly documented,
             else False. `node[3]` is a list containing the node's children as triples of the same form (if it had any)
+        ignore_names: tuple of lists ([String, String, [String...]]) where the first element is the regular expression
+            for matching filenames. All remaining arguments are regexes for matching names of functions/classes
+            to be excluded from checking for documentation. It will be excluded if and only if the first and at least
+            one of the remaining regexes hits a match.
+        filename: String
+            String containing a name of file.
 
         Returns
         -------
@@ -164,6 +171,20 @@ def get_docstring_coverage(
                 docs_needed -= 1
             elif skip_class_def and "_" not in name and (name[0] == name[0].upper()):
                 docs_needed -= 1
+            elif ignore_names:
+                filename = filename.split("\\")[-1].split(".")[0]
+                for line in ignore_names:
+                    file_regex = line[0]
+                    name_regex_list = list(line[1:])
+                    file_match = re.fullmatch(file_regex, filename)
+                    file_match = file_match.group() if file_match else None
+                    if file_match == filename:
+                        for name_regex in name_regex_list:
+                            name_match = re.fullmatch(name_regex, name)
+                            name_match = name_match.group() if name_match else None
+                            if name_match:
+                                docs_needed -= 1
+                                break
             else:
                 log(" - No docstring for `%s%s`" % (base, name), 3)
                 _missing_list.append(base + name)
@@ -173,7 +194,7 @@ def get_docstring_coverage(
         #################### Check Child Nodes ####################
         for _symbol in child_nodes:
             _temp_docs_needed, _temp_docs_covered, temp_missing_list = print_docstring(
-                "%s." % name, _symbol
+                "%s." % name, _symbol, filename, ignore_names
             )
             docs_needed += _temp_docs_needed
             docs_covered += _temp_docs_covered
@@ -215,7 +236,7 @@ def get_docstring_coverage(
 
         # Traverse through functions and classes
         for symbol in _tree[-1]:
-            temp_docs_needed, temp_docs_covered, missing_list = print_docstring("", symbol)
+            temp_docs_needed, temp_docs_covered, missing_list = print_docstring("", symbol, filename, ignore_names)
             file_docs_needed += temp_docs_needed
             file_docs_covered += temp_docs_covered
             file_missing_list += missing_list
@@ -353,6 +374,15 @@ def _execute():
         default=False,
         help="Follow symlinks",
     )
+
+    parser.add_option(
+        "-d",
+        "--docstr-ignore-file",
+        dest="ignore_names_file",
+        default=None,
+        type="string",
+        help="A path to filename where list of regexes (file name) occurs."
+    )
     # TODO: Separate above arg/option parsing into separate function - Document return values to describe allowed options
     options, args = parser.parse_args()
 
@@ -381,6 +411,10 @@ def _execute():
     if len(filenames) < 1:
         sys.exit("No Python files found")
 
+    ignore_names = ()
+    if options.ignore_names_file is not None:
+        ignore_names = tuple([line.split() for line in open(options.ignore_names_file).readlines() if ' ' in line])
+
     get_docstring_coverage(
         filenames,
         skip_magic=options.skip_magic,
@@ -388,6 +422,7 @@ def _execute():
         skip_init=options.skip_init,
         skip_class_def=options.skip_class_def,
         verbose=options.verbose,
+        ignore_names=ignore_names,
     )
 
 
