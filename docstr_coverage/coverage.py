@@ -194,7 +194,7 @@ def get_docstring_coverage(
         file_missing_list = []
 
         #################### Read and Parse Source ####################
-        with open(filename, "r") as f:
+        with open(filename, "r", encoding='utf-8') as f:
             source_tree = f.read()
 
         doc_visitor = DocStringCoverageVisitor()
