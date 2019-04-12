@@ -172,19 +172,20 @@ def get_docstring_coverage(
             elif skip_class_def and "_" not in name and (name[0] == name[0].upper()):
                 docs_needed -= 1
             elif ignore_names:
-                filename = filename.split("\\")[-1].split(".")[0]
+                filename = os.path.basename(filename).split(".")[0] if "." in filename else filename
                 for line in ignore_names:
                     file_regex = line[0]
                     name_regex_list = list(line[1:])
                     file_match = re.fullmatch(file_regex, filename)
                     file_match = file_match.group() if file_match else None
-                    if file_match == filename:
-                        for name_regex in name_regex_list:
-                            name_match = re.fullmatch(name_regex, name)
-                            name_match = name_match.group() if name_match else None
-                            if name_match:
-                                docs_needed -= 1
-                                break
+                    if file_match != filename:
+                        continue
+                    for name_regex in name_regex_list:
+                        name_match = re.fullmatch(name_regex, name)
+                        name_match = name_match.group() if name_match else None
+                        if name_match:
+                            docs_needed -= 1
+                            break
             else:
                 log(" - No docstring for `%s%s`" % (base, name), 3)
                 _missing_list.append(base + name)
