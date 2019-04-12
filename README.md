@@ -65,6 +65,10 @@ $ docstr-coverage some_project/src
 	* 1 - Print overall statistics
 	* 2 - Also print individual statistics for each file
 	* 3 - Also print missing docstrings (function names, class names, etc.)
+* *--docstr-ignore-file - Filepath to list of patterns to ignrore. Patterns are file-pattern name-pattern pairs. File content example:
+
+.* add_arguments handle
+detect_.* get_val.*
 
 #### Package in Your Project
 You can also use `docstr-coverage` as a part of your project by importing it thusly:
