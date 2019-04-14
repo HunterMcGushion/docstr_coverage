@@ -172,7 +172,7 @@ def get_docstring_coverage(
             elif skip_class_def and "_" not in name and (name[0] == name[0].upper()):
                 docs_needed -= 1
             elif ignore_names:
-                filename = os.path.basename(filename).split(".")[0] if "." in filename else filename
+                filename = os.path.basename(filename).split(".")[0]
                 for line in ignore_names:
                     file_regex = line[0]
                     name_regex_list = list(line[1:])
