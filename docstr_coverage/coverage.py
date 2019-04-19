@@ -173,6 +173,7 @@ def get_docstring_coverage(
                 docs_needed -= 1
             elif ignore_names:
                 filename = os.path.basename(filename).split(".")[0]
+                already_ignored = []
                 for line in ignore_names:
                     file_regex = line[0]
                     name_regex_list = list(line[1:])
@@ -183,7 +184,11 @@ def get_docstring_coverage(
                     for name_regex in name_regex_list:
                         name_match = re.fullmatch(name_regex, name)
                         name_match = name_match.group() if name_match else None
+                        ignore_tuple = (filename, name_match)
+                        if ignore_tuple in already_ignored:
+                            continue
                         if name_match:
+                            already_ignored.append(ignore_tuple)
                             docs_needed -= 1
                             break
             else:
@@ -418,7 +423,7 @@ def _execute():
 
     if options.ignore_names_file == '.docstr_coverage':
         options.ignore_names_file = Path(path, options.ignore_names_file)
-    
+
     if os.path.isfile(options.ignore_names_file):
         ignore_names = tuple([line.split() for line in open(options.ignore_names_file).readlines() if ' ' in line])
 
