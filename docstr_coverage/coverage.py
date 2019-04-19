@@ -6,7 +6,7 @@ import os
 from pprint import pprint as pp
 import re
 import sys
-
+from pathlib import Path
 
 class DocStringCoverageVisitor(NodeVisitor):
     """Class to visit nodes, determine whether a node requires a docstring, and to check for the existence of a docstring"""
@@ -380,7 +380,7 @@ def _execute():
         "-d",
         "--docstr-ignore-file",
         dest="ignore_names_file",
-        default=None,
+        default=".docstr_coverage",
         type="string",
         help="A path to filename where list of regexes (file name) occurs."
     )
@@ -395,10 +395,12 @@ def _execute():
     exclude_re = re.compile(r"{}".format(options.exclude)) if options.exclude else None
     filenames = []
 
-    if args[0].endswith(".py"):
-        filenames = [args[0]]
+    path = args[0]
+
+    if path.endswith(".py"):
+        filenames = [path]
     else:
-        for root, dirs, f_names in os.walk(args[0], followlinks=options.follow_links):
+        for root, dirs, f_names in os.walk(path, followlinks=options.follow_links):
             if exclude_re is not None:
                 dirs[:] = [_ for _ in dirs if not exclude_re.match(_)]
 
@@ -413,7 +415,11 @@ def _execute():
         sys.exit("No Python files found")
 
     ignore_names = ()
-    if options.ignore_names_file is not None:
+
+    if options.ignore_names_file == '.docstr_coverage':
+        options.ignore_names_file = Path(path, options.ignore_names_file)
+    
+    if os.path.isfile(options.ignore_names_file):
         ignore_names = tuple([line.split() for line in open(options.ignore_names_file).readlines() if ' ' in line])
 
     get_docstring_coverage(
