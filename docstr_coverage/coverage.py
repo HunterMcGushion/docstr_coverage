@@ -7,6 +7,7 @@ from pprint import pprint as pp
 import re
 import sys
 from pathlib import Path
+from pathlib import Path
 
 class DocStringCoverageVisitor(NodeVisitor):
     """Class to visit nodes, determine whether a node requires a docstring, and to check for the existence of a docstring"""
