@@ -73,13 +73,8 @@ $ docstr-coverage some_project/src
     FileWhereWeWantToIgnoreAllSpecialMethods __.+__
     .* method_to_ignore_in_all_files
     a_very_important_view_file ^get$ ^set$ ^post$
+    detect_.* get_val.*
     ```
-
-.* add_arguments handle
-detect_.* get_val.*
-^test_.* ^test.*
-
-(And after that all methods with "test" at the beginning of all "test_sth" files will be ignored.)
 
 #### Package in Your Project
 You can also use `docstr-coverage` as a part of your project by importing it thusly:
