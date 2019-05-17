@@ -420,7 +420,7 @@ def _execute():
 
     ignore_names = ()
 
-    if options.ignore_names_file == '.docstr_coverage':
+    if options.ignore_names_file == ".docstr_coverage":
         options.ignore_names_file = Path(path, options.ignore_names_file)
 
     if os.path.isfile(options.ignore_names_file):
