@@ -386,7 +386,7 @@ def _execute():
         dest="ignore_names_file",
         default=".docstr_coverage",
         type="string",
-        help="A path to filename where list of regexes (file name) occurs."
+        help="Filepath containing list of regex (file-pattern, name-pattern) pairs"
     )
     # TODO: Separate above arg/option parsing into separate function - Document return values to describe allowed options
     options, args = parser.parse_args()
