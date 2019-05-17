@@ -380,7 +380,6 @@ def _execute():
         default=False,
         help="Follow symlinks",
     )
-
     parser.add_option(
         "-d",
         "--docstr-ignore-file",
