@@ -403,6 +403,7 @@ def _execute():
 
     if path.endswith(".py"):
         filenames = [path]
+        path = "."
     else:
         for root, dirs, f_names in os.walk(path, followlinks=options.follow_links):
             if exclude_re is not None:
