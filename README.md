@@ -66,7 +66,14 @@ $ docstr-coverage some_project/src
 	* 2 - Also print individual statistics for each file
 	* 3 - Also print missing docstrings (function names, class names, etc.)
 * *--docstr-ignore-file=<filepath>, -d <filepath>* - Filepath containing list of patterns to ignore. Patterns are (file-pattern, name-pattern) pairs
-       * File content example:
+       
+    * File content example:
+    ```
+    SomeFile method_to_ignore1 method_to_ignore2 method_to_ignore3
+    FileWhereWeWantToIgnoreAllSpecialMethods __.+__
+    .* method_to_ignore_in_all_files
+    a_very_important_view_file ^get$ ^set$ ^post$
+    ```
 
 .* add_arguments handle
 detect_.* get_val.*
