@@ -140,12 +140,12 @@ def get_docstring_coverage(
         node: Tuple triple of (String, Boolean, List)
             Information describing a node. `node[0]` is the node's name. `node[1]` is True if the node was properly documented,
             else False. `node[3]` is a list containing the node's children as triples of the same form (if it had any)
+        filename: String
+            String containing a name of file.
         ignore_names: tuple of lists ([String, String, [String...]]) where the first element is the regular expression
             for matching filenames. All remaining arguments are regexes for matching names of functions/classes
             to be excluded from checking for documentation. It will be excluded if and only if the first and at least
             one of the remaining regexes hits a match.
-        filename: String
-            String containing a name of file.
 
         Returns
         -------
