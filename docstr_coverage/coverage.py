@@ -427,7 +427,7 @@ def _execute():
     if os.path.isfile(options.ignore_names_file):
         ignore_names = tuple([line.split() for line in open(options.ignore_names_file).readlines() if ' ' in line])
 
-    get_docstring_coverage(
+    file_results, total_results = get_docstring_coverage(
         filenames,
         skip_magic=options.skip_magic,
         skip_file_docstring=options.skip_file_docstring,
@@ -436,6 +436,11 @@ def _execute():
         verbose=options.verbose,
         ignore_names=ignore_names,
     )
+
+    if total_results['coverage'] != 100.0:
+        raise SystemExit(1)
+
+    raise SystemExit(0)
 
 
 if __name__ == "__main__":
