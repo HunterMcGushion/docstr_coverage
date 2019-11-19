@@ -21,7 +21,7 @@ copyright = "2018, Hunter McGushion"
 author = "Hunter McGushion"
 
 version = ""  # The short X.Y version
-release = "1.0.4"  # The full version, including alpha/beta/rc tags
+release = "1.0.5"  # The full version, including alpha/beta/rc tags
 
 ##################################################
 # General Configuration
