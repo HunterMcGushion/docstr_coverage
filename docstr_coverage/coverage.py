@@ -388,6 +388,15 @@ def _execute():
         type="string",
         help="Filepath containing list of regex (file-pattern, name-pattern) pairs"
     )
+    parser.add_option(
+        "-F",
+        "--failunder",
+        dest="fail_under",
+        type="float",
+        default=100.0,
+        metavar="FLOAT",
+        help="Fail when coverage % is less than a given amount (default: 100.0)",
+    )
     # TODO: Separate above arg/option parsing into separate function - Document return values to describe allowed options
     options, args = parser.parse_args()
 
@@ -437,7 +446,7 @@ def _execute():
         ignore_names=ignore_names,
     )
 
-    if total_results['coverage'] != 100.0:
+    if total_results['coverage'] < options.fail_under:
         raise SystemExit(1)
 
     raise SystemExit(0)
