@@ -6,20 +6,18 @@ def readme():
         return f.read()
 
 
-MAJOR, MINOR, MICRO = 1, 0, 5
+MAJOR, MINOR, MICRO = 1, 1, 0
 __VERSION__ = "{}.{}.{}".format(MAJOR, MINOR, MICRO)
 
 setup(
     name="docstr_coverage",
     version=__VERSION__,
-    description=" ".join(
-        [
-            "Utility for examining python source files to ensure proper documentation.",
-            "Lists missing docstrings, and calculates overall docstring coverage percentage rating",
-        ]
+    description=(
+        "Utility for examining python source files to ensure proper documentation. "
+        "Lists missing docstrings, and calculates overall docstring coverage percentage rating"
     ),
-    long_description=readme(),
     long_description_content_type="text/markdown",
+    long_description=readme(),
     keywords="docstring coverage documentation audit source code statistics report",
     url="https://github.com/HunterMcGushion/docstr_coverage",
     author="Hunter McGushion",

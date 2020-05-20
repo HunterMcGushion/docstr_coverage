@@ -1,6 +1,15 @@
 <a name="Unreleased"></a>
 ## [Unreleased]
 
+
+<a name="1.1.0"></a>
+## [1.1.0] (2020-05-20)
+
+### Features
+* Added `--failunder`/`-F` option to fail if coverage is below a given percentage ([econchick])
+    * Default=100.0
+
+
 <a name="1.0.5"></a>
 ## [1.0.5] (2019-11-18)
 
@@ -32,10 +41,12 @@
 
 
 [asergeant01]: https://github.com/asergeant01
+[econchick]: https://github.com/econchick
 [Redysz]: https://github.com/Redysz
 [sim0nx]: https://github.com/sim0nx
 
-[Unreleased]: https://github.com/HunterMcGushion/docstr_coverage/compare/v1.0.5...HEAD
+[Unreleased]: https://github.com/HunterMcGushion/docstr_coverage/compare/v1.1.0...HEAD
+[1.1.0]: https://github.com/HunterMcGushion/docstr_coverage/compare/v1.0.5...v1.1.0
 [1.0.5]: https://github.com/HunterMcGushion/docstr_coverage/compare/v1.0.4...v1.0.5
 [1.0.4]: https://github.com/HunterMcGushion/docstr_coverage/compare/v1.0.3...v1.0.4
 [1.0.3]: https://github.com/HunterMcGushion/docstr_coverage/compare/v1.0.2...v1.0.3
