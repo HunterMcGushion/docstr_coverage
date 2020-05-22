@@ -52,7 +52,7 @@ GRADES = (
     ("Not good", 25),
     ("Extremely poor", 10),
     ("Not documented at all", 2),
-    ("Do you even docstring?", 1),
+    ("Do you even docstring?", 0),
 )
 
 
@@ -221,7 +221,7 @@ def get_docstring_coverage(
         file_missing_list = []
 
         #################### Read and Parse Source ####################
-        with open(filename, "r", encoding='utf-8') as f:
+        with open(filename, "r", encoding="utf-8") as f:
             source_tree = f.read()
 
         doc_visitor = DocStringCoverageVisitor()
@@ -242,7 +242,9 @@ def get_docstring_coverage(
 
         # Traverse through functions and classes
         for symbol in _tree[-1]:
-            temp_docs_needed, temp_docs_covered, missing_list = print_docstring("", symbol, filename, ignore_names)
+            temp_docs_needed, temp_docs_covered, missing_list = print_docstring(
+                "", symbol, filename, ignore_names
+            )
             file_docs_needed += temp_docs_needed
             file_docs_covered += temp_docs_covered
             file_missing_list += missing_list
@@ -278,7 +280,9 @@ def get_docstring_coverage(
     total_results = {
         "missing_count": total_docs_needed - total_docs_covered,
         "needed_count": total_docs_needed,
-        "coverage": float(total_docs_covered) * 100 / float(total_docs_needed),
+        "coverage": (
+            float(total_docs_covered) * 100 / float(total_docs_needed) if total_docs_needed else 100
+        ),
     }
 
     postfix = ""
@@ -306,7 +310,11 @@ def get_docstring_coverage(
     log("Total docstring coverage: %.1f%%; " % (total_results["coverage"]), 1, True)
 
     #################### Calculate Total Grade ####################
-    grade = next(_[0] for _ in GRADES if _[1] <= total_results["coverage"])
+    grade = next(
+        message
+        for message, grade_threshold in GRADES
+        if grade_threshold <= total_results["coverage"]
+    )
     log("Grade: %s" % grade, 1)
     return file_results, total_results
 
@@ -386,7 +394,7 @@ def _execute():
         dest="ignore_names_file",
         default=".docstr_coverage",
         type="string",
-        help="Filepath containing list of regex (file-pattern, name-pattern) pairs"
+        help="Filepath containing list of regex (file-pattern, name-pattern) pairs",
     )
     parser.add_option(
         "-F",
@@ -434,7 +442,9 @@ def _execute():
         options.ignore_names_file = Path(path, options.ignore_names_file)
 
     if os.path.isfile(options.ignore_names_file):
-        ignore_names = tuple([line.split() for line in open(options.ignore_names_file).readlines() if ' ' in line])
+        ignore_names = tuple(
+            [line.split() for line in open(options.ignore_names_file).readlines() if " " in line]
+        )
 
     file_results, total_results = get_docstring_coverage(
         filenames,
@@ -446,7 +456,7 @@ def _execute():
         ignore_names=ignore_names,
     )
 
-    if total_results['coverage'] < options.fail_under:
+    if total_results["coverage"] < options.fail_under:
         raise SystemExit(1)
 
     raise SystemExit(0)
