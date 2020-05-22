@@ -114,6 +114,30 @@ If you like being on the cutting-edge, and you want all the latest developments,
 pip install git+https://github.com/HunterMcGushion/docstr_coverage.git
 ```
 
+## Contributing
+
+To install locally, run:
+
+```bash
+pip install -e .
+```
+
+You will need development dependencies:
+
+```bash
+python -m venv venv
+source venv/bin/activate
+pip install -r requirements-dev.txt
+```
+
+Make sure to run tests:
+
+```bash
+pytest
+```
+
+Be nice.
+
 ## Special Thanks
 
 Thank you to Alexey "DataGreed" Strelkov, and James Harlow for doing all the hard work.
