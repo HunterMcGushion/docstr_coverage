@@ -42,3 +42,4 @@ coverage.xml
 # Miscellaneous
 .idea/
 .DS_Store
+.vscode

@@ -1,4 +1,4 @@
-from setuptools import setup, find_packages
+from setuptools import setup
 
 
 def readme():
@@ -27,10 +27,8 @@ setup(
     install_requires=[],
     include_package_data=True,
     zip_safe=False,
-    test_suite="nose.collector",
-    tests_require=["nose"],
     entry_points=dict(console_scripts=["docstr-coverage=docstr_coverage.coverage:_execute"]),
-    classifiers=(
+    classifiers=[
         # TODO: Check Python 2 compatibility
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",
@@ -42,5 +40,5 @@ setup(
         "Topic :: Software Development :: Libraries :: Python Modules",
         "Topic :: Software Development :: Quality Assurance",
         "Topic :: Utilities",
-    ),
+    ],
 )
