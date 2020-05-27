@@ -1,6 +1,12 @@
 <a name="Unreleased"></a>
 ## [Unreleased]
 
+### Bug Fixes
+* Fixed bug where a total coverage of 0 would break everything ([killthekitten])
+
+### Changes
+* Addition of testing safety net ([killthekitten])
+
 
 <a name="1.1.0"></a>
 ## [1.1.0] (2020-05-20)
@@ -29,7 +35,7 @@
 <a name="1.0.3"></a>
 ## [1.0.3] (2019-01-28)
 
-### Bug-Fixes
+### Bug Fixes
 * Fixed bug preventing `docstr-coverage` from being properly installed via tox ([asergeant01])
 
 
@@ -42,6 +48,7 @@
 
 [asergeant01]: https://github.com/asergeant01
 [econchick]: https://github.com/econchick
+[killthekitten]: https://github.com/killthekitten
 [Redysz]: https://github.com/Redysz
 [sim0nx]: https://github.com/sim0nx
 
