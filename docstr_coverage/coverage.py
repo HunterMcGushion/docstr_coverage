@@ -3,10 +3,15 @@ and James Harlow (see "THANKS.txt" for details)"""
 
 # TODO: If Python 2, ```from __future__ import print_function```
 from ast import NodeVisitor, parse, get_docstring
+import logging
 import os
+from pathlib import Path
 import re
 import sys
-from pathlib import Path
+from typing import List, Tuple
+
+logger = logging.getLogger(__name__)
+logging.basicConfig(level=logging.INFO, format="%(message)s")
 
 
 class DocStringCoverageVisitor(NodeVisitor):
@@ -64,14 +69,64 @@ GRADES = (
 )
 
 
+def do_ignore_node(filename: str, base_name: str, node_name: str, ignore_names: tuple) -> bool:
+    """Determine whether a node (identified by its file, base, and own names) should be ignored
+
+    Parameters
+    ----------
+    filename: String
+        Name of the file containing `node_name`
+    base_name: String
+        Name of the node's parent node
+    node_name: String
+        Name of the node within the file. Usually a function name, class name, or a method name. In the case of method names,
+        `node_name` will be only the method's name, while `base_name` will be of the form "<class_name>."
+    ignore_names: Tuple[List[str], ...]
+        Patterns to ignore when checking documentation. Each list in `ignore_names` defines a different pattern to be ignored.
+        The first element in each list is the regular expression for matching filenames. All remaining arguments in each list
+        are regexes for matching names of functions/classes. A node is ignored if it matches the filename regex and at least
+        one of the remaining regexes
+
+    Returns
+    -------
+    Boolean
+        True if the node should be ignored, else False"""
+    filename = os.path.basename(filename).split(".")[0]
+
+    for (file_regex, *name_regexes) in ignore_names:
+        file_match = re.fullmatch(file_regex, filename)
+        file_match = file_match.group() if file_match else None
+
+        if file_match != filename:
+            continue
+
+        for name_regex in name_regexes:
+            # Match on node name only
+            name_match = re.fullmatch(name_regex, node_name)
+            name_match = name_match.group() if name_match else None
+
+            if name_match:
+                return True
+
+            # Match on node's period-delimited path: Its parent nodes (if any), plus the node name.
+            #   This enables targeting i.e. the `__init__` method of a particular class, whereas
+            #   the simple name match above would target `__init__` methods of all classes
+            full_name_match = re.fullmatch(name_regex, "{}{}".format(base_name, node_name))
+            full_name_match = full_name_match.group() if full_name_match else None
+
+            if full_name_match:
+                return True
+    return False
+
+
 def get_docstring_coverage(
-    filenames,
-    skip_magic=False,
-    skip_file_docstring=False,
-    skip_init=False,
-    skip_class_def=False,
-    verbose=0,
-    ignore_names=(),
+    filenames: list,
+    skip_magic: bool = False,
+    skip_file_docstring: bool = False,
+    skip_init: bool = False,
+    skip_class_def: bool = False,
+    verbose: int = 0,
+    ignore_names: Tuple[List[str], ...] = (),
 ):
     """Checks contents of `filenames` for missing docstrings, and produces a report
     detailing docstring status.
@@ -96,6 +151,11 @@ def get_docstring_coverage(
         1) Print total stats only.
         2) Print stats for all files.
         3) Print missing docstrings for all files.
+    ignore_names: Tuple[List[str], ...], default=()
+        Patterns to ignore when checking documentation. Each list in `ignore_names` defines a different pattern to be ignored.
+        The first element in each list is the regular expression for matching filenames. All remaining arguments in each list
+        are regexes for matching names of functions/classes. A node is ignored if it matches the filename regex and at least
+        one of the remaining regexes
 
     Returns
     -------
@@ -125,7 +185,7 @@ def get_docstring_coverage(
 
     # TODO: Switch to Python's `logging` module, and remove
     #       below nested `log` function definition
-    def log(text, level=1, append=False):
+    def log(text, level=1):
         """Prints `text` to log depending on `verbose`
 
         Parameters
@@ -134,14 +194,9 @@ def get_docstring_coverage(
             The text to print
         level: Int
             The verbosity level at which it becomes appropriate to print the content.
-            If `level` > `verbose`, nothing happens. Otherwise, `text` is printed.
-        append: Boolean, default=False
-            If True, print with an ending space, rather than a newline character"""
+            If `level` > `verbose`, nothing happens. Otherwise, `text` is printed."""
         if verbose >= level:
-            if append:
-                print(text, end=" ")
-            else:
-                print(text)
+            logger.info(text)
 
     # TODO: Move :func:`print_docstring` to be a normal function
     #       outside of :func:`get_docstring_coverage`
@@ -194,26 +249,8 @@ def get_docstring_coverage(
                 docs_needed -= 1
             elif skip_class_def and "_" not in name and (name[0] == name[0].upper()):
                 docs_needed -= 1
-            elif ignore_names:
-                filename = os.path.basename(filename).split(".")[0]
-                already_ignored = []
-                for line in ignore_names:
-                    file_regex = line[0]
-                    name_regex_list = list(line[1:])
-                    file_match = re.fullmatch(file_regex, filename)
-                    file_match = file_match.group() if file_match else None
-                    if file_match != filename:
-                        continue
-                    for name_regex in name_regex_list:
-                        name_match = re.fullmatch(name_regex, name)
-                        name_match = name_match.group() if name_match else None
-                        ignore_tuple = (filename, name_match)
-                        if ignore_tuple in already_ignored:
-                            continue
-                        if name_match:
-                            already_ignored.append(ignore_tuple)
-                            docs_needed -= 1
-                            break
+            elif ignore_names and do_ignore_node(filename, base, name, ignore_names):
+                docs_needed -= 1
             else:
                 log(" - No docstring for `%s%s`" % (base, name), 3)
                 _missing_list.append(base + name)
@@ -327,10 +364,12 @@ def get_docstring_coverage(
     else:
         log("Overall statistics%s:" % postfix, 1)
 
-    log("Docstrings needed: %s;" % total_docs_needed, 1, append=True)
-    log("Docstrings found: %s;" % total_docs_covered, 1, append=True)
-    log("Docstrings missing: %s" % (total_results["missing_count"]), 1)
-    log("Total docstring coverage: %.1f%%; " % (total_results["coverage"]), 1, True)
+    log(
+        "Needed: {}  -  Found: {}  -  Missing: {}".format(
+            total_docs_needed, total_docs_covered, total_results["missing_count"]
+        ),
+        1,
+    )
 
     #################### Calculate Total Grade ####################
     grade = next(
@@ -338,7 +377,9 @@ def get_docstring_coverage(
         for message, grade_threshold in GRADES
         if grade_threshold <= total_results["coverage"]
     )
-    log("Grade: %s" % grade, 1)
+
+    log("Total coverage: {:.1f}%  -  Grade: {}".format(total_results["coverage"], grade), 1)
+
     return file_results, total_results
 
 
