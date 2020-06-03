@@ -1,4 +1,7 @@
-"""This repository is based on the work of Alexey "DataGreed" Strelkov, and James Harlow (see "THANKS.txt" for details)"""
+"""
+This repository is based on the work of Alexey "DataGreed" Strelkov,
+and James Harlow (see "THANKS.txt" for details)
+"""
 
 # TODO: If Python 2, ```from __future__ import print_function```
 from ast import NodeVisitor, parse, get_docstring
@@ -9,14 +12,21 @@ from pathlib import Path
 
 
 class DocStringCoverageVisitor(NodeVisitor):
-    """Class to visit nodes, determine whether a node requires a docstring, and to check for the existence of a docstring"""
+    """
+    Class to visit nodes, determine whether a node requires a docstring,
+    and to check for the existence of a docstring
+    """
 
     def __init__(self):
         self.symbol_count = 0
         self.tree = []
 
     def visit_Module(self, node):
-        """Upon visiting a module, initialize :attr:`DocStringCoverageVisitor.tree` with module-wide node info"""
+        """
+        Upon visiting a module, initialize :attr:`DocStringCoverageVisitor.tree`
+        with module-wide node info.
+        """
+
         has_doc = get_docstring(node) is not None and get_docstring(node).strip() != ""
         is_empty = not len(node.body)
         self.tree.append((has_doc, is_empty, []))
@@ -31,8 +41,11 @@ class DocStringCoverageVisitor(NodeVisitor):
         self._visit_helper(node)
 
     def _visit_helper(self, node):
-        """Helper method to update :attr:`DocStringCoverageVisitor.tree` with pertinent documentation information for `node`, then
-        ensure all child nodes are also visited"""
+        """
+        Helper method to update :attr:`DocStringCoverageVisitor.tree` with pertinent
+        documentation information for `node`, then ensure all child nodes are
+        also visited
+        """
         self.symbol_count += 1
         has_doc = get_docstring(node) is not None and get_docstring(node).strip() != ""
         _node = (node.name, has_doc, [])
@@ -65,23 +78,30 @@ def get_docstring_coverage(
     verbose=0,
     ignore_names=(),
 ):
-    """Checks contents of `filenames` for missing docstrings, and produces a report detailing docstring status
+    """
+    Checks contents of `filenames` for missing docstrings, and produces a report
+    detailing docstring status.
 
     Parameters
     ----------
     filenames: List
         List of filename strings that are absolute or relative paths
     skip_magic: Boolean, default=False
-        If True, skips all magic methods (double-underscore-prefixed), except '__init__' and does not include them in the report
+        If True, skips all magic methods (double-underscore-prefixed),
+        except '__init__' and does not include them in the report
     skip_file_docstring: Boolean, default=False
         If True, skips check for a module-level docstring
     skip_init: Boolean, default=False
-        If True, skips methods named '__init__' and does not include them in the report
+        If True, skips methods named '__init__' and does not include
+        them in the report
     skip_class_def: Boolean, default=False
-        If True, skips class definitions and does not include them in the report. If this is True, the class's methods will still
-        be checked
+        If True, skips class definitions and does not include them in the report.
+        If this is True, the class's methods will still be checked
     verbose: Int in [0, 1, 2, 3], default=0
-        0) No printing. 1) Print total stats only. 2) Print stats for all files. 3) Print missing docstrings for all files
+        0) No printing.
+        1) Print total stats only.
+        2) Print stats for all files.
+        3) Print missing docstrings for all files.
 
     Returns
     -------
@@ -109,7 +129,8 @@ def get_docstring_coverage(
     """
     verbose = int(verbose)
 
-    # TODO: Switch to Python's `logging` module, and remove below nested `log` function definition
+    # TODO: Switch to Python's `logging` module, and remove
+    #       below nested `log` function definition
     def log(text, level=1, append=False):
         """Prints `text` to log depending on `verbose`
 
@@ -118,8 +139,8 @@ def get_docstring_coverage(
         text: String
             The text to print
         level: Int
-            The verbosity level at which it becomes appropriate to print the content. If `level` > `verbose`, nothing happens.
-            Otherwise, `text` is printed
+            The verbosity level at which it becomes appropriate to print the content.
+            If `level` > `verbose`, nothing happens. Otherwise, `text` is printed.
         append: Boolean, default=False
             If True, print with an ending space, rather than a newline character"""
         if verbose >= level:
@@ -128,33 +149,42 @@ def get_docstring_coverage(
             else:
                 print(text)
 
-    # TODO: Move :func:`print_docstring` to be a normal function outside of :func:`get_docstring_coverage`
+    # TODO: Move :func:`print_docstring` to be a normal function
+    #       outside of :func:`get_docstring_coverage`
     def print_docstring(base, node, filename, ignore_names=()):
-        """Log the existence of a docstring for `node`, and accumulate stats regarding expected and encountered docstrings for
-        `node` and its children (if any)
+        """
+        Log the existence of a docstring for `node`, and accumulate stats regarding
+        expected and encountered docstrings for `node` and its children (if any).
 
         Parameters
         ----------
         base: String
             The name of this node's parent node
         node: Tuple triple of (String, Boolean, List)
-            Information describing a node. `node[0]` is the node's name. `node[1]` is True if the node was properly documented,
-            else False. `node[3]` is a list containing the node's children as triples of the same form (if it had any)
+            Information describing a node. `node[0]` is the node's name.
+            `node[1]` is True if the node was properly documented,
+            else False. `node[3]` is a list containing the node's children
+            as triples of the same form (if it had any)
         filename: String
             String containing a name of file.
-        ignore_names: tuple of lists ([String, String, [String...]]) where the first element is the regular expression
-            for matching filenames. All remaining arguments are regexes for matching names of functions/classes
-            to be excluded from checking for documentation. It will be excluded if and only if the first and at least
-            one of the remaining regexes hits a match.
+        ignore_names: tuple of lists ([String, String, [String...]]) where the first
+            element is the regular expression for matching filenames. All remaining
+            arguments are regexes for matching names of functions/classes to be
+            excluded from checking for documentation. It will be excluded if and
+            only if the first and at least one of the remaining regexes hits a match.
 
         Returns
         -------
         docs_needed: Int
-            The number of docstrings expected for `node` and its children to achieve full documentation coverage
+            The number of docstrings expected for `node` and its children to achieve
+            full documentation coverage
         docs_covered: Int
             The number of docstrings found for `node` and its children
         _missing_list: List
-            Nodes that were expected to have docstrings but did not. Values are the concatenation of a node's base and its name"""
+            Nodes that were expected to have docstrings but did not.
+            Values are the concatenation of a node's base and its name
+        """
+
         _missing_list = []
         docs_needed = 1
         docs_covered = 0
@@ -162,7 +192,8 @@ def get_docstring_coverage(
 
         #################### Check Current Node ####################
         if not has_doc:
-            # TODO: Add option to skip class definition docstrings (though one of class or magic methods should used)
+            # TODO: Add option to skip class definition docstrings
+            #      (though one of class or magic methods should used)
             if skip_init and name == "__init__":
                 docs_needed -= 1
             elif (
@@ -323,12 +354,15 @@ def _execute():
     """Main command-line execution routine"""
     from optparse import OptionParser
 
-    # TODO: Move away from optparse - Deprecated (https://pythonprogramminglanguage.com/command-line-arguments/)
+    # TODO: Move away from optparse - Deprecated
+    #       (https://pythonprogramminglanguage.com/command-line-arguments/)
 
     #################### Declare Options ####################
     parser = OptionParser()
-    # TODO: Add option to generate pretty coverage reports - Like Python's `coverage` module does for test coverage
-    # TODO: Add option to sort report summaries by filename, coverage score... (ascending/descending)
+    # TODO: Add option to generate pretty coverage reports - Like Python's `coverage`
+    #       module does for test coverage
+    # TODO: Add option to sort report summaries by filename,
+    #       coverage score... (ascending/descending)
     parser.add_option(
         "-e",
         "--exclude",
@@ -337,7 +371,8 @@ def _execute():
         type="string",
         help="Regex identifying filepaths to exclude",
     )
-    # TODO: Add support for multiple `--exclude` regexes to lessen need for long regexes describing separate exclusion items
+    # TODO: Add support for multiple `--exclude` regexes to lessen need
+    #       for long regexes describing separate exclusion items
     parser.add_option(
         "-v",
         "--verbose",
@@ -405,7 +440,8 @@ def _execute():
         metavar="FLOAT",
         help="Fail when coverage % is less than a given amount (default: 100.0)",
     )
-    # TODO: Separate above arg/option parsing into separate function - Document return values to describe allowed options
+    # TODO: Separate above arg/option parsing into separate function;
+    #       Document return values to describe allowed options.
     options, args = parser.parse_args()
 
     if len(args) != 1:

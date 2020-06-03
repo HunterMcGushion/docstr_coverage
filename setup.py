@@ -14,7 +14,8 @@ setup(
     version=__VERSION__,
     description=(
         "Utility for examining python source files to ensure proper documentation. "
-        "Lists missing docstrings, and calculates overall docstring coverage percentage rating"
+        "Lists missing docstrings, and calculates overall docstring coverage "
+        "percentage rating."
     ),
     long_description_content_type="text/markdown",
     long_description=readme(),

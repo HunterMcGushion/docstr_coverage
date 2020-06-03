@@ -4,5 +4,5 @@
 from .coverage import get_docstring_coverage
 
 __all__ = [
-    'get_docstring_coverage',
+    "get_docstring_coverage",
 ]

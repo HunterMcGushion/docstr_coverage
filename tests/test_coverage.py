@@ -85,7 +85,11 @@ def test_should_report_for_multiple_files():
             "empty": True,
         },
     }
-    assert total_results == {"missing_count": 4, "needed_count": 14, "coverage": 71.42857142857143}
+    assert total_results == {
+        "missing_count": 4,
+        "needed_count": 14,
+        "coverage": 71.42857142857143,
+    }
 
 
 def test_should_report_when_no_docs_in_a_file():
