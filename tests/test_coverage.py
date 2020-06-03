@@ -209,3 +209,21 @@ def test_logging_partially_documented_file(caplog, expected, verbose, ignore_nam
         )
 
     assert caplog.messages == expected
+
+
+def test_should_not_track_coverage_for_ignored_names():
+    file_results, total_results = get_docstring_coverage(
+        [PARTLY_DOCUMENTED_FILE_PATH],
+        ignore_names=[[".*", "foo"], [".*", "bar"], [".*", "__init__"]],
+    )
+    assert file_results == {
+        PARTLY_DOCUMENTED_FILE_PATH: {
+            "missing": [],
+            "module_doc": False,
+            "missing_count": 0,
+            "needed_count": 2,
+            "coverage": 100.0,
+            "empty": False,
+        }
+    }
+    assert total_results == {"missing_count": 0, "needed_count": 2, "coverage": 100}
