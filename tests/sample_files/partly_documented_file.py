@@ -1,7 +1,5 @@
 class FooBar:
-    """
-    This is a class-level docstring
-    """
+    """This is a class-level docstring"""
 
     def __init__(self):
         pass

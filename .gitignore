@@ -5,6 +5,7 @@
 .env
 env/
 env.bak/
+venv/
 
 # Documentation
 docs/_build/
@@ -23,6 +24,7 @@ sdist/
 var/
 wheels/
 *.egg-info/
+pip-wheel-metadata/
 
 # Unit Tests/Coverage
 htmlcov/

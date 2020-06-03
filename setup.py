@@ -14,7 +14,8 @@ setup(
     version=__VERSION__,
     description=(
         "Utility for examining python source files to ensure proper documentation. "
-        "Lists missing docstrings, and calculates overall docstring coverage percentage rating"
+        "Lists missing docstrings, and calculates overall docstring coverage "
+        "percentage rating."
     ),
     long_description_content_type="text/markdown",
     long_description=readme(),
@@ -25,6 +26,7 @@ setup(
     license="MIT",
     packages=["docstr_coverage"],
     install_requires=[],
+    extras_require={"lint": ["flake8==3.8.2", "black==19.10b0"], "test": ["pytest==5.4.2"]},
     include_package_data=True,
     zip_safe=False,
     entry_points=dict(console_scripts=["docstr-coverage=docstr_coverage.coverage:_execute"]),

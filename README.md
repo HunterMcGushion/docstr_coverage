@@ -1,5 +1,7 @@
 # Docstr-Coverage
 
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+
 If the health of your documentation is in dire straits, `docstr-coverage` will see you now.
 
 `docstr-coverage` is a simple tool that lets you measure your Python source code's
@@ -122,12 +124,12 @@ To install locally, run:
 pip install -e .
 ```
 
-You will need development dependencies:
+You will need to install the development dependencies:
 
 ```bash
 python -m venv venv
 source venv/bin/activate
-pip install -r requirements-dev.txt
+pip install -e ".[test,lint]"
 ```
 
 Make sure to run tests:
