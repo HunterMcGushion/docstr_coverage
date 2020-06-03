@@ -129,7 +129,7 @@ You will need to install the development dependencies:
 ```bash
 python -m venv venv
 source venv/bin/activate
-pip install -r requirements-test.txt -r requirements-lint.txt
+pip install -e ".[test,lint]"
 ```
 
 Make sure to run tests:
