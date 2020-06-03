@@ -1,7 +1,5 @@
-"""
-This repository is based on the work of Alexey "DataGreed" Strelkov,
-and James Harlow (see "THANKS.txt" for details)
-"""
+"""This repository is based on the work of Alexey "DataGreed" Strelkov,
+and James Harlow (see "THANKS.txt" for details)"""
 
 # TODO: If Python 2, ```from __future__ import print_function```
 from ast import NodeVisitor, parse, get_docstring
@@ -12,20 +10,16 @@ from pathlib import Path
 
 
 class DocStringCoverageVisitor(NodeVisitor):
-    """
-    Class to visit nodes, determine whether a node requires a docstring,
-    and to check for the existence of a docstring
-    """
+    """Class to visit nodes, determine whether a node requires a docstring,
+    and to check for the existence of a docstring"""
 
     def __init__(self):
         self.symbol_count = 0
         self.tree = []
 
     def visit_Module(self, node):
-        """
-        Upon visiting a module, initialize :attr:`DocStringCoverageVisitor.tree`
-        with module-wide node info.
-        """
+        """Upon visiting a module, initialize :attr:`DocStringCoverageVisitor.tree`
+        with module-wide node info."""
 
         has_doc = get_docstring(node) is not None and get_docstring(node).strip() != ""
         is_empty = not len(node.body)
@@ -34,18 +28,19 @@ class DocStringCoverageVisitor(NodeVisitor):
 
     def visit_ClassDef(self, node):
         """Collect information regarding class declaration nodes"""
+
         self._visit_helper(node)
 
     def visit_FunctionDef(self, node):
         """Collect information regarding function/method declaration nodes"""
+
         self._visit_helper(node)
 
     def _visit_helper(self, node):
-        """
-        Helper method to update :attr:`DocStringCoverageVisitor.tree` with pertinent
+        """Helper method to update :attr:`DocStringCoverageVisitor.tree` with pertinent
         documentation information for `node`, then ensure all child nodes are
-        also visited
-        """
+        also visited"""
+
         self.symbol_count += 1
         has_doc = get_docstring(node) is not None and get_docstring(node).strip() != ""
         _node = (node.name, has_doc, [])
@@ -78,8 +73,7 @@ def get_docstring_coverage(
     verbose=0,
     ignore_names=(),
 ):
-    """
-    Checks contents of `filenames` for missing docstrings, and produces a report
+    """Checks contents of `filenames` for missing docstrings, and produces a report
     detailing docstring status.
 
     Parameters
@@ -125,8 +119,8 @@ def get_docstring_coverage(
         ...     'missing_count': '<total_missing_count int>',
         ...     'needed_count': '<total_needed_docstrings_count int>',
         ...     'coverage': '<total_percent_of_coverage float>'
-        ... }
-    """
+        ... }"""
+
     verbose = int(verbose)
 
     # TODO: Switch to Python's `logging` module, and remove
@@ -152,8 +146,7 @@ def get_docstring_coverage(
     # TODO: Move :func:`print_docstring` to be a normal function
     #       outside of :func:`get_docstring_coverage`
     def print_docstring(base, node, filename, ignore_names=()):
-        """
-        Log the existence of a docstring for `node`, and accumulate stats regarding
+        """Log the existence of a docstring for `node`, and accumulate stats regarding
         expected and encountered docstrings for `node` and its children (if any).
 
         Parameters
@@ -182,8 +175,7 @@ def get_docstring_coverage(
             The number of docstrings found for `node` and its children
         _missing_list: List
             Nodes that were expected to have docstrings but did not.
-            Values are the concatenation of a node's base and its name
-        """
+            Values are the concatenation of a node's base and its name"""
 
         _missing_list = []
         docs_needed = 1
