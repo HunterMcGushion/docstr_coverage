@@ -79,13 +79,15 @@ def do_ignore_node(filename: str, base_name: str, node_name: str, ignore_names: 
     base_name: String
         Name of the node's parent node
     node_name: String
-        Name of the node within the file. Usually a function name, class name, or a method name. In the case of method names,
-        `node_name` will be only the method's name, while `base_name` will be of the form "<class_name>."
+        Name of the node within the file. Usually a function name, class name, or a method name. In
+        the case of method names, `node_name` will be only the method's name, while `base_name` will
+        be of the form "<class_name>."
     ignore_names: Tuple[List[str], ...]
-        Patterns to ignore when checking documentation. Each list in `ignore_names` defines a different pattern to be ignored.
-        The first element in each list is the regular expression for matching filenames. All remaining arguments in each list
-        are regexes for matching names of functions/classes. A node is ignored if it matches the filename regex and at least
-        one of the remaining regexes
+        Patterns to ignore when checking documentation. Each list in `ignore_names` defines a
+        different pattern to be ignored. The first element in each list is the regular expression
+        for matching filenames. All remaining arguments in each list are regexes for matching names
+        of functions/classes. A node is ignored if it matches the filename regex and at least one
+        of the remaining regexes
 
     Returns
     -------
@@ -152,10 +154,11 @@ def get_docstring_coverage(
         2) Print stats for all files.
         3) Print missing docstrings for all files.
     ignore_names: Tuple[List[str], ...], default=()
-        Patterns to ignore when checking documentation. Each list in `ignore_names` defines a different pattern to be ignored.
-        The first element in each list is the regular expression for matching filenames. All remaining arguments in each list
-        are regexes for matching names of functions/classes. A node is ignored if it matches the filename regex and at least
-        one of the remaining regexes
+        Patterns to ignore when checking documentation. Each list in `ignore_names` defines a
+        different pattern to be ignored. The first element in each list is the regular expression
+        for matching filenames. All remaining arguments in each list are regexes for matching names
+        of functions/classes. A node is ignored if it matches the filename regex and at least one
+        of the remaining regexes
 
     Returns
     -------
