@@ -77,6 +77,7 @@ docstr-coverage some_project/src
   a_very_important_view_file ^get$ ^set$ ^post$
   detect_.* get_val.*
   ```
+- _--badge=\<filepath\>, -b \<filepath\>_ - Generate a docstring coverage percent badge as an SVG saved to a given filepath
 
 #### Package in Your Project
 
