@@ -1,6 +1,10 @@
 <a name="Unreleased"></a>
 ## [Unreleased]
 
+### Features
+* Added `--badge`/`-b` option to generate a docstring coverage percent badge as an SVG image saved 
+  to a given filepath. [#22] by [HunterMcGushion].
+
 ### Bug Fixes
 * Fixed bug where a total coverage of 0 would break everything. [#16] by [killthekitten].
 * Fixed bug where the `-d`/`--docstr-ignore-file` CLI option to provide an `ignore_names_file` 
@@ -70,3 +74,4 @@
 [#11]: https://github.com/HunterMcGushion/docstr_coverage/pull/11
 [#16]: https://github.com/HunterMcGushion/docstr_coverage/pull/16
 [#19]: https://github.com/HunterMcGushion/docstr_coverage/pull/19
+[#22]: https://github.com/HunterMcGushion/docstr_coverage/pull/22
