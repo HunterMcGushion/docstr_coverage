@@ -2,7 +2,6 @@
 import os
 import pytest
 
-from docstr_coverage import badge
 from docstr_coverage.badge import Badge
 
 
