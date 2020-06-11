@@ -10,6 +10,8 @@ import re
 import sys
 from typing import List, Tuple
 
+from docstr_coverage.badge import Badge
+
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO, format="%(message)s")
 
@@ -476,6 +478,14 @@ def _execute():
         metavar="FLOAT",
         help="Fail when coverage % is less than a given amount (default: 100.0)",
     )
+    parser.add_option(
+        "-b",
+        "--badge",
+        dest="badge_path",
+        type="string",
+        default=None,
+        help="Generate a docstring coverage percent badge as an SVG saved to a given filepath",
+    )
     # TODO: Separate above arg/option parsing into separate function;
     #       Document return values to describe allowed options.
     options, args = parser.parse_args()
@@ -527,6 +537,11 @@ def _execute():
         verbose=options.verbose,
         ignore_names=ignore_names,
     )
+
+    if options.badge_path:
+        badge = Badge(options.badge_path, total_results["coverage"])
+        badge.save()
+        print("Docstring coverage badge saved to {!r}".format(badge.path))
 
     if total_results["coverage"] < options.fail_under:
         raise SystemExit(1)
