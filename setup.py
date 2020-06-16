@@ -26,7 +26,10 @@ setup(
     license="MIT",
     packages=["docstr_coverage"],
     install_requires=[],
-    extras_require={"lint": ["flake8==3.8.2", "black==19.10b0"], "test": ["pytest==5.4.2"]},
+    extras_require={
+        "lint": ["flake8==3.8.2", "black==19.10b0"],
+        "test": ["pytest==5.4.2", "pytest-mock"],
+    },
     include_package_data=True,
     zip_safe=False,
     entry_points=dict(console_scripts=["docstr-coverage=docstr_coverage.coverage:_execute"]),

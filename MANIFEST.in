@@ -1,1 +1,6 @@
 include README.md
+include LICENSE.txt
+
+# Badges
+include docstr_coverage/templates/*.svg
+include tests/sample_files/badges/*.svg
