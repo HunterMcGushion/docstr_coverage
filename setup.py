@@ -32,7 +32,7 @@ setup(
     },
     include_package_data=True,
     zip_safe=False,
-    entry_points=dict(console_scripts=["docstr-coverage=docstr_coverage.coverage:_execute"]),
+    entry_points=dict(console_scripts=["docstr-coverage=docstr_coverage.cli:_execute"]),
     classifiers=[
         # TODO: Check Python 2 compatibility
         "Programming Language :: Python :: 3",
