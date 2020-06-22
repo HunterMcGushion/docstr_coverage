@@ -1,8 +1,6 @@
 """This module is the CLI entry point for `docstr_coverage` in which CLI arguments are defined and
 passed on to other modules"""
-from optparse import OptionParser
-
-# TODO: Replace deprecated optparse: https://pythonprogramminglanguage.com/command-line-arguments/
+import click
 import os
 from pathlib import Path
 import re
@@ -91,145 +89,148 @@ def parse_ignore_names_file(ignore_names_file: str) -> tuple:
     return ignore_names
 
 
-def _execute():
+@click.command()
+@click.option(
+    # TODO: Use counting instead: https://click.palletsprojects.com/en/7.x/options/#counting
+    "-v",
+    "--verbose",
+    type=click.Choice(["0", "1", "2", "3"]),
+    default="3",
+    help="Verbosity level",
+    show_default=True,
+)
+@click.option(
+    "-e",
+    "--exclude",
+    type=str,
+    default=None,
+    help="Regex identifying filepaths to exclude",
+    show_default=False,
+    # TODO: Add support for multiple `--exclude` regex invocations
+)
+@click.option(
+    "-m",
+    "--skipmagic",
+    "skip_magic",  # TODO: Remove after deprecating/renaming to "--skip-magic"
+    type=bool,
+    is_flag=True,
+    default=False,
+    help="Ignore docstrings of magic methods (except `__init__`)",
+    show_default=True,
+)
+@click.option(
+    "-f",
+    "--skipfiledoc",
+    "skip_file_docstring",  # TODO: Remove after deprecating/renaming to "--skip-file-doc"
+    type=bool,
+    is_flag=True,
+    default=False,
+    help="Ignore module docstrings",
+    show_default=True,
+)
+@click.option(
+    "-i",
+    "--skipinit",
+    "skip_init",  # TODO: Remove after deprecating/renaming to "--skip-init"
+    type=bool,
+    is_flag=True,
+    default=False,
+    help="Ignore docstrings of `__init__` methods",
+    show_default=True,
+)
+@click.option(
+    "-c",
+    "--skipclassdef",
+    "skip_class_def",  # TODO: Remove after deprecating/renaming to "--skip-class-def"
+    type=bool,
+    is_flag=True,
+    default=False,
+    help="Ignore docstrings of class definitions",
+    show_default=True,
+)
+@click.option(
+    "-l",
+    "--followlinks",
+    "follow_links",  # TODO: Remove after deprecating/renaming to "--follow-links"
+    type=bool,
+    is_flag=True,
+    default=False,
+    help="Follow symlinks",
+    show_default=True,
+)
+@click.option(
+    "-d",
+    "--docstr-ignore-file",
+    "ignore_names_file",  # TODO: Remove after deprecating in favor of pyproject.toml `blacklist`
+    type=click.Path(exists=False, resolve_path=True),
+    default=".docstr_coverage",
+    help="Filepath containing list of regex (file-pattern, name-pattern) pairs",
+    show_default=True,
+)
+@click.option(
+    "-F",
+    "--failunder",
+    "fail_under",  # TODO: Remove after deprecating/renaming to "--fail-under"
+    type=float,
+    default=100.0,
+    help="Fail when coverage % is less than a given amount",
+    show_default=True,
+    metavar="NUMBER",
+)
+@click.option(
+    "-b",
+    "--badge",
+    type=click.Path(exists=False, resolve_path=True),
+    default=None,
+    help="Generate a docstring coverage percent badge as an SVG saved to a given filepath",
+    show_default=False,
+)
+@click.help_option("-h", "--help")
+@click.argument(
+    "paths",
+    type=click.Path(exists=True, file_okay=True, dir_okay=True, readable=True, resolve_path=True),
+    nargs=-1,
+)
+def execute(paths, **kwargs):
     """Main command-line execution routine"""
+    # TODO: Add option to generate pretty coverage reports - Like Python's test `coverage`
+    # TODO: Add option to sort reports by filename, coverage score... (ascending/descending)
+    all_paths = []
 
-    #################### Declare Options ####################
-    parser = OptionParser()
-    # TODO: Add option to generate pretty coverage reports - Like Python's `coverage`
-    #       module does for test coverage
-    # TODO: Add option to sort report summaries by filename,
-    #       coverage score... (ascending/descending)
-    parser.add_option(
-        "-e",
-        "--exclude",
-        dest="exclude",
-        default=None,
-        type="string",
-        help="Regex identifying filepaths to exclude",
-    )
-    # TODO: Add support for multiple `--exclude` regexes to lessen need
-    #       for long regexes describing separate exclusion items
-    parser.add_option(
-        "-v",
-        "--verbose",
-        dest="verbose",
-        default="3",
-        metavar="LEVEL",
-        help="Verbosity level <0-3>, default=3",
-        type="choice",
-        choices=["0", "1", "2", "3"],
-    )
-    parser.add_option(
-        "-m",
-        "--skipmagic",
-        action="store_true",
-        dest="skip_magic",
-        default=False,
-        help='Ignore docstrings of magic methods (except "__init__")',
-    )
-    parser.add_option(
-        "-f",
-        "--skipfiledoc",
-        action="store_true",
-        dest="skip_file_docstring",
-        default=False,
-        help="Ignore module docstrings",
-    )
-    parser.add_option(
-        "-i",
-        "--skipinit",
-        action="store_true",
-        dest="skip_init",
-        default=False,
-        help='Ignore docstrings of "__init__" methods',
-    )
-    parser.add_option(
-        "-c",
-        "--skipclassdef",
-        action="store_true",
-        dest="skip_class_def",
-        default=False,
-        help="Ignore docstrings of class definitions",
-    )
-    parser.add_option(
-        "-l",
-        "--followlinks",
-        action="store_true",
-        dest="follow_links",
-        default=False,
-        help="Follow symlinks",
-    )
-    parser.add_option(
-        "-d",
-        "--docstr-ignore-file",
-        dest="ignore_names_file",
-        default=".docstr_coverage",
-        type="string",
-        help="Filepath containing list of regex (file-pattern, name-pattern) pairs",
-    )
-    parser.add_option(
-        "-F",
-        "--failunder",
-        dest="fail_under",
-        type="float",
-        default=100.0,
-        metavar="FLOAT",
-        help="Fail when coverage % is less than a given amount (default: 100.0)",
-    )
-    parser.add_option(
-        "-b",
-        "--badge",
-        dest="badge_path",
-        type="string",
-        default=None,
-        help="Generate a docstring coverage percent badge as an SVG saved to a given filepath",
-    )
-    # TODO: Separate above arg/option parsing into separate function;
-    #       Document return values to describe allowed options.
-    options, args = parser.parse_args()
+    for path in paths:
+        all_paths.extend(
+            collect_filepaths(path, follow_links=kwargs["follow_links"], exclude=kwargs["exclude"])
+        )
 
-    if len(args) != 1:
-        print("Expected a single path argument. Received invalid argument(s): {}".format(args[1:]))
-        sys.exit()
-
-    path = args[0]
-    filenames = collect_filepaths(path, follow_links=options.follow_links, exclude=options.exclude)
-
-    if len(filenames) < 1:
+    if len(all_paths) < 1:
         sys.exit("No Python files found")
 
-    # Resolve path to ignore names file and parse contents
-    if options.ignore_names_file == ".docstr_coverage":
-        if path.endswith(".py"):
-            path = "."
-        options.ignore_names_file = Path(path, options.ignore_names_file)
-
-    ignore_names = parse_ignore_names_file(options.ignore_names_file)
+    # Parse ignore names file
+    ignore_names = parse_ignore_names_file(kwargs["ignore_names_file"])
 
     # Calculate docstring coverage
     file_results, total_results = get_docstring_coverage(
-        filenames,
-        skip_magic=options.skip_magic,
-        skip_file_docstring=options.skip_file_docstring,
-        skip_init=options.skip_init,
-        skip_class_def=options.skip_class_def,
-        verbose=options.verbose,
+        all_paths,
+        skip_magic=kwargs["skip_magic"],
+        skip_file_docstring=kwargs["skip_file_docstring"],
+        skip_init=kwargs["skip_init"],
+        skip_class_def=kwargs["skip_class_def"],
+        verbose=kwargs["verbose"],
         ignore_names=ignore_names,
     )
 
     # Save badge
-    if options.badge_path:
-        badge = Badge(options.badge_path, total_results["coverage"])
+    if kwargs["badge"]:
+        badge = Badge(kwargs["badge"], total_results["coverage"])
         badge.save()
         print("Docstring coverage badge saved to {!r}".format(badge.path))
 
     # Exit
-    if total_results["coverage"] < options.fail_under:
+    if total_results["coverage"] < kwargs["fail_under"]:
         raise SystemExit(1)
 
     raise SystemExit(0)
 
 
 if __name__ == "__main__":
-    _execute()
+    execute()

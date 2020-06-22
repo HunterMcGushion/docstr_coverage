@@ -25,7 +25,7 @@ setup(
     author_email="hunter@mcgushion.com",
     license="MIT",
     packages=["docstr_coverage"],
-    install_requires=[],
+    install_requires=["click"],
     extras_require={
         "lint": ["flake8==3.8.2", "black==19.10b0"],
         "test": ["pytest==5.4.2", "pytest-mock"],
