@@ -2,7 +2,6 @@
 passed on to other modules"""
 import click
 import os
-from pathlib import Path
 import re
 import sys
 from typing import List, Optional
