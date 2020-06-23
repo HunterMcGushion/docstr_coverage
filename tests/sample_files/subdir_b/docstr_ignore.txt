@@ -1,0 +1,5 @@
+SomeFile method_to_ignore1 method_to_ignore2 method_to_ignore3
+FileWhereWeWantToIgnoreAllSpecialMethods __.+__
+.* method_to_ignore_in_all_files
+a_very_important_view_file ^get$ ^set$ ^post$
+detect_.* get_val.*

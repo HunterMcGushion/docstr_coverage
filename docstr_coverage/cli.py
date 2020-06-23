@@ -32,16 +32,16 @@ def do_include_filepath(filepath: str, exclude_re: Optional["re.Pattern"]) -> bo
 
 
 def collect_filepaths(
-    path: str, follow_links: bool = False, exclude: Optional[str] = None
+    *paths: str, follow_links: bool = False, exclude: Optional[str] = None
 ) -> List[str]:
-    """Collect filepaths under a given `path` that are not `exclude`-d
+    """Collect filepaths under given `paths` that are not `exclude`-d
 
     Parameters
     ----------
-    path: String
-        Path to a directory/file from which filepaths will be collected
+    *paths: String
+        Path(s) to a directory/file from which filepaths will be collected
     follow_links: Boolean, default=False
-        Whether to follow symbolic links when traversing directories in `path`
+        Whether to follow symbolic links when traversing directories in `paths`
     exclude: String (optional)
         If not None, used as a regex Pattern to exclude filepaths during collection. If a full
         filepath matches the `exclude` pattern, it is skipped
@@ -49,18 +49,19 @@ def collect_filepaths(
     Returns
     -------
     List
-        List of string filepaths found under `path` that are not excluded. If `path` is a ".py"
-        file, result will be [`path`]. Otherwise, the contents of `path` that are not `exclude`-d
-        will comprise the result"""
+        List of string filepaths found under `paths` that are not excluded. If `paths` is a single
+        ".py" file, result will be [`paths`]. Otherwise, the contents of `paths` that are not
+        `exclude`-d will comprise the result"""
     exclude_re = re.compile(r"{}".format(exclude)) if exclude else None
     filepaths = []
 
-    if path.endswith(".py"):
-        return [path]
-
-    for (dirpath, dirnames, filenames) in os.walk(path, followlinks=follow_links):
-        candidates = [os.path.join(dirpath, _) for _ in filenames]
-        filepaths.extend([_ for _ in candidates if do_include_filepath(_, exclude_re)])
+    for path in paths:
+        if path.endswith(".py"):
+            filepaths.append(path)
+        else:
+            for (dirpath, dirnames, filenames) in os.walk(path, followlinks=follow_links):
+                candidates = [os.path.join(dirpath, _) for _ in filenames]
+                filepaths.extend([_ for _ in candidates if do_include_filepath(_, exclude_re)])
 
     return sorted(filepaths)
 
@@ -194,12 +195,9 @@ def execute(paths, **kwargs):
     """Main command-line execution routine"""
     # TODO: Add option to generate pretty coverage reports - Like Python's test `coverage`
     # TODO: Add option to sort reports by filename, coverage score... (ascending/descending)
-    all_paths = []
-
-    for path in paths:
-        all_paths.extend(
-            collect_filepaths(path, follow_links=kwargs["follow_links"], exclude=kwargs["exclude"])
-        )
+    all_paths = collect_filepaths(
+        *paths, follow_links=kwargs["follow_links"], exclude=kwargs["exclude"]
+    )
 
     if len(all_paths) < 1:
         sys.exit("No Python files found")
