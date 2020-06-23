@@ -2,7 +2,7 @@
 import os
 import pytest
 import re
-from typing import List, Optional, Union
+from typing import List, Optional
 
 from docstr_coverage.cli import collect_filepaths, do_include_filepath, parse_ignore_names_file
 
