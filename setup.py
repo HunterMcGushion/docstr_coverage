@@ -32,9 +32,8 @@ setup(
     },
     include_package_data=True,
     zip_safe=False,
-    entry_points=dict(console_scripts=["docstr-coverage=docstr_coverage.cli:_execute"]),
+    entry_points=dict(console_scripts=["docstr-coverage=docstr_coverage.cli:execute"]),
     classifiers=[
-        # TODO: Check Python 2 compatibility
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
