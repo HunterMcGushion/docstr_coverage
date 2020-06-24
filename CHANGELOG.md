@@ -2,6 +2,7 @@
 ## [Unreleased]
 
 ### Features
+* Added ability to pass multiple paths to CLI for docstring inspection. [#24] by [HunterMcGushion].
 * Added `--badge`/`-b` option to generate a docstring coverage percent badge as an SVG image saved 
   to a given filepath. [#22] by [HunterMcGushion].
 
@@ -11,7 +12,7 @@
   would not work with `-v 3`/`--verbose=3`. [#19] by [HunterMcGushion].
 
 ### Changes
-* Addition of testing safety net. [#16] by [killthekitten].
+* Added testing safety net. [#16] by [killthekitten].
 
 
 <a name="1.1.0"></a>
@@ -75,3 +76,4 @@
 [#16]: https://github.com/HunterMcGushion/docstr_coverage/pull/16
 [#19]: https://github.com/HunterMcGushion/docstr_coverage/pull/19
 [#22]: https://github.com/HunterMcGushion/docstr_coverage/pull/22
+[#24]: https://github.com/HunterMcGushion/docstr_coverage/pull/24

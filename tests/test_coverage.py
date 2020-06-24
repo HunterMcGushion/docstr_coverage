@@ -5,7 +5,7 @@ import pytest
 from docstr_coverage import get_docstring_coverage
 from docstr_coverage.coverage import GRADES
 
-SAMPLES_DIRECTORY = os.path.join("tests", "sample_files")
+SAMPLES_DIRECTORY = os.path.join("tests", "sample_files", "subdir_a")
 EMPTY_FILE_PATH = os.path.join(SAMPLES_DIRECTORY, "empty_file.py")
 DOCUMENTED_FILE_PATH = os.path.join(SAMPLES_DIRECTORY, "documented_file.py")
 PARTLY_DOCUMENTED_FILE_PATH = os.path.join(SAMPLES_DIRECTORY, "partly_documented_file.py")
@@ -88,11 +88,7 @@ def test_should_report_for_multiple_files():
             "empty": True,
         },
     }
-    assert total_results == {
-        "missing_count": 4,
-        "needed_count": 14,
-        "coverage": 71.42857142857143,
-    }
+    assert total_results == {"missing_count": 4, "needed_count": 14, "coverage": 71.42857142857143}
 
 
 def test_should_report_when_no_docs_in_a_file():
@@ -118,7 +114,7 @@ def test_should_report_when_no_docs_in_a_file():
     [
         (
             [
-                '\nFile: "tests/sample_files/empty_file.py"',
+                '\nFile: "tests/sample_files/subdir_a/empty_file.py"',
                 " - File is empty",
                 " Needed: 0; Found: 0; Missing: 0; Coverage: 0.0%",
                 "\n",
@@ -141,7 +137,7 @@ def test_logging_empty_file(caplog, expected):
     [
         (
             [
-                '\nFile: "tests/sample_files/partly_documented_file.py"',
+                '\nFile: "tests/sample_files/subdir_a/partly_documented_file.py"',
                 " - No module docstring",
                 " - No docstring for `foo`",
                 " - No docstring for `bar`",
@@ -156,7 +152,7 @@ def test_logging_empty_file(caplog, expected):
         ),
         (
             [
-                '\nFile: "tests/sample_files/partly_documented_file.py"',
+                '\nFile: "tests/sample_files/subdir_a/partly_documented_file.py"',
                 " - No module docstring",
                 " - No docstring for `FooBar.__init__`",
                 " - No docstring for `foo`",
@@ -172,7 +168,7 @@ def test_logging_empty_file(caplog, expected):
         ),
         (
             [
-                '\nFile: "tests/sample_files/partly_documented_file.py"',
+                '\nFile: "tests/sample_files/subdir_a/partly_documented_file.py"',
                 " Needed: 5; Found: 1; Missing: 4; Coverage: 20.0%",
                 "\n",
                 "Overall statistics:",

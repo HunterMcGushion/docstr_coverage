@@ -25,16 +25,15 @@ setup(
     author_email="hunter@mcgushion.com",
     license="MIT",
     packages=["docstr_coverage"],
-    install_requires=[],
+    install_requires=["click"],
     extras_require={
         "lint": ["flake8==3.8.2", "black==19.10b0"],
         "test": ["pytest==5.4.2", "pytest-mock"],
     },
     include_package_data=True,
     zip_safe=False,
-    entry_points=dict(console_scripts=["docstr-coverage=docstr_coverage.coverage:_execute"]),
+    entry_points=dict(console_scripts=["docstr-coverage=docstr_coverage.cli:execute"]),
     classifiers=[
-        # TODO: Check Python 2 compatibility
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
