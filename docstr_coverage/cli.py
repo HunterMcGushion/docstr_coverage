@@ -192,7 +192,7 @@ def parse_ignore_names_file(ignore_names_file: str) -> tuple:
     nargs=-1,
 )
 def execute(paths, **kwargs):
-    """Main command-line execution routine"""
+    """Measure docstring coverage for `PATHS`"""
     # TODO: Add option to generate pretty coverage reports - Like Python's test `coverage`
     # TODO: Add option to sort reports by filename, coverage score... (ascending/descending)
     all_paths = collect_filepaths(
