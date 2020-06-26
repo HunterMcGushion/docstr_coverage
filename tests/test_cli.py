@@ -234,7 +234,7 @@ def test_cli_collect_filepaths(
         Mock to check arguments passed to :func:`docstr_coverage.cli.collect_filepaths`"""
     mock_collect_filepaths = mocker.patch("docstr_coverage.cli.collect_filepaths")
 
-    _result = runner.invoke(execute, follow_links_flag + exclude_flag + paths)
+    _ = runner.invoke(execute, follow_links_flag + exclude_flag + paths)
 
     mock_collect_filepaths.assert_called_once_with(
         *[os.path.abspath(_) for _ in paths], follow_links=follow_links_value, exclude=exclude_value
