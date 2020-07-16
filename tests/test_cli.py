@@ -1,10 +1,16 @@
 """Tests for :mod:`docstr_coverage.cli`"""
+from click.testing import CliRunner
 import os
 import pytest
 import re
 from typing import List, Optional
 
-from docstr_coverage.cli import collect_filepaths, do_include_filepath, parse_ignore_names_file
+from docstr_coverage.cli import (
+    collect_filepaths,
+    do_include_filepath,
+    execute,
+    parse_ignore_names_file,
+)
 
 
 class Samples:
@@ -27,9 +33,20 @@ class Samples:
         return [self.documented, self.empty, self.partial, self.undocumented]
 
 
-SAMPLES_DIR = os.path.join("tests", "sample_files")
+CWD = os.path.abspath(os.path.dirname(__file__))
+SAMPLES_DIR = os.path.abspath(os.path.join(CWD, "sample_files"))
 SAMPLES_A = Samples(os.path.join(SAMPLES_DIR, "subdir_a"))
 SAMPLES_B = Samples(os.path.join(SAMPLES_DIR, "subdir_b"))
+
+
+@pytest.fixture(autouse=False, scope="function")
+def cd_tests_dir_fixture():
+    """Fixture to change current working directory to "docstr_coverage/tests" for the test's
+    duration before returning to the original current working directory"""
+    original_cwd = os.getcwd()
+    os.chdir(CWD)
+    yield
+    os.chdir(original_cwd)
 
 
 @pytest.fixture
@@ -144,3 +161,81 @@ def test_parse_ignore_names_file(path: str, expected: tuple):
         Expected parsed patterns from `path`"""
     actual = parse_ignore_names_file(path)
     assert actual == expected
+
+
+##################################################
+# Click Tests
+##################################################
+@pytest.fixture
+def runner() -> CliRunner:
+    """Click CliRunner fixture"""
+    runner = CliRunner()
+    return runner
+
+
+@pytest.mark.parametrize(
+    "paths",
+    [
+        pytest.param([SAMPLES_DIR], id="samples_dir_x1"),
+        pytest.param([SAMPLES_A.documented], id="files_x1"),
+        pytest.param([SAMPLES_A.empty, SAMPLES_A.partial], id="files_x2"),
+        pytest.param([SAMPLES_A.dirpath, SAMPLES_B.dirpath], id="dirs_x2"),
+        pytest.param([SAMPLES_A.empty, SAMPLES_A.partial, SAMPLES_B.dirpath], id="files_x2+dir_x1"),
+        pytest.param([os.path.join("sample_files", "subdir_a")], id="rel_dir_x1"),
+    ],
+)
+@pytest.mark.parametrize(
+    ["follow_links_flag", "follow_links_value"],
+    [
+        pytest.param([], False, id="no_follow_links"),
+        pytest.param(["-l"], True, id="short_follow_links"),
+        pytest.param(["--followlinks"], True, id="long_follow_links"),
+    ],
+)
+@pytest.mark.parametrize(
+    ["exclude_flag", "exclude_value"],
+    [
+        pytest.param([], None, id="no_exclude"),
+        pytest.param(["-e", ".*"], ".*", id="short_exclude_x1"),
+        pytest.param(["--exclude", "foo"], "foo", id="long_exclude_x1"),
+        pytest.param(["--exclude", "foo"], "foo", id="long_exclude_x1_2"),
+        # TODO: Add cases with multiple short and long patterns, and combinations of short/long
+    ],
+)
+@pytest.mark.usefixtures("cd_tests_dir_fixture")
+def test_cli_collect_filepaths(
+    paths: List[str],
+    follow_links_flag: List[str],
+    follow_links_value: bool,
+    exclude_flag: List[str],
+    exclude_value: Optional[str],
+    runner: CliRunner,
+    mocker,
+):
+    """Test that CLI inputs are correctly interpreted and passed along to
+    :func:`docstr_coverage.cli.collect_filepaths`
+
+    Parameters
+    ----------
+    paths: List[str]
+        Path arguments provided to CLI. These should be made absolute before they are passed to
+        :func:`docstr_coverage.cli.collect_filepaths`
+    follow_links_flag: List[str]
+        CLI option input for whether symbolic links should be followed
+    follow_links_value: Boolean
+        Processed value of `follow_links_flag` expected by function call
+    exclude_flag: List[str]
+        CLI option input for paths to exclude from search
+    exclude_value: String, or None
+        Processed value of `exclude_flag` expected by function call
+    runner: CliRunner
+        Click utility to invoke command line scripts
+    mocker: pytest_mock.MockFixture
+        Mock to check arguments passed to :func:`docstr_coverage.cli.collect_filepaths`"""
+    mock_collect_filepaths = mocker.patch("docstr_coverage.cli.collect_filepaths")
+
+    _ = runner.invoke(execute, follow_links_flag + exclude_flag + paths)
+
+    mock_collect_filepaths.assert_called_once_with(
+        *[os.path.abspath(_) for _ in paths], follow_links=follow_links_value, exclude=exclude_value
+    )
