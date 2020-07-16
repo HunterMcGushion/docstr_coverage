@@ -185,6 +185,15 @@ def parse_ignore_names_file(ignore_names_file: str) -> tuple:
     help="Generate a docstring coverage percent badge as an SVG saved to a given filepath",
     show_default=False,
 )
+@click.option(
+    "-p",
+    "--percentage-only",
+    type=bool,
+    is_flag=True,
+    default=False,
+    help="Output only the overall coverage percentage as a number, silencing all other logging",
+    show_default=True,
+)
 @click.help_option("-h", "--help")
 @click.argument(
     "paths",
@@ -195,6 +204,10 @@ def execute(paths, **kwargs):
     """Measure docstring coverage for `PATHS`"""
     # TODO: Add option to generate pretty coverage reports - Like Python's test `coverage`
     # TODO: Add option to sort reports by filename, coverage score... (ascending/descending)
+    if kwargs["percentage_only"] is True:
+        # Override verbosity to ensure only the overall percentage is printed
+        kwargs["verbose"] = 0
+
     all_paths = collect_filepaths(
         *paths, follow_links=kwargs["follow_links"], exclude=kwargs["exclude"]
     )
@@ -220,7 +233,12 @@ def execute(paths, **kwargs):
     if kwargs["badge"]:
         badge = Badge(kwargs["badge"], total_results["coverage"])
         badge.save()
-        print("Docstring coverage badge saved to {!r}".format(badge.path))
+
+        if kwargs["verbose"]:
+            print("Docstring coverage badge saved to {!r}".format(badge.path))
+
+    if kwargs["percentage_only"] is True:
+        print(round(total_results["coverage"]))
 
     # Exit
     if total_results["coverage"] < kwargs["fail_under"]:
