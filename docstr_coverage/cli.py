@@ -191,7 +191,7 @@ def parse_ignore_names_file(ignore_names_file: str) -> tuple:
     type=bool,
     is_flag=True,
     default=False,
-    help="Output only the overall coverage percentage as a number, silencing all other logging",
+    help="Output only the overall coverage percentage as a float, silencing all other logging",
     show_default=True,
 )
 @click.help_option("-h", "--help")
@@ -238,7 +238,7 @@ def execute(paths, **kwargs):
             print("Docstring coverage badge saved to {!r}".format(badge.path))
 
     if kwargs["percentage_only"] is True:
-        print(round(total_results["coverage"]))
+        print(total_results["coverage"])
 
     # Exit
     if total_results["coverage"] < kwargs["fail_under"]:
