@@ -39,6 +39,13 @@ SAMPLES_A = Samples(os.path.join(SAMPLES_DIR, "subdir_a"))
 SAMPLES_B = Samples(os.path.join(SAMPLES_DIR, "subdir_b"))
 
 
+@pytest.fixture
+def runner() -> CliRunner:
+    """Click CliRunner fixture"""
+    runner = CliRunner()
+    return runner
+
+
 @pytest.fixture(autouse=False, scope="function")
 def cd_tests_dir_fixture():
     """Fixture to change current working directory to "docstr_coverage/tests" for the test's
@@ -163,16 +170,40 @@ def test_parse_ignore_names_file(path: str, expected: tuple):
     assert actual == expected
 
 
+@pytest.mark.parametrize(
+    ["paths", "expected_output"],
+    [
+        [[SAMPLES_A.dirpath], "62.5"],
+        [[SAMPLES_A.partial], "20.0"],
+        [[SAMPLES_A.documented], "100.0"],
+        [[SAMPLES_A.undocumented], "0.0"],
+        [[SAMPLES_A.undocumented, SAMPLES_A.documented], "81.81818181818181"],
+    ],
+)
+@pytest.mark.parametrize("verbose_flag", [["-v", "0"], ["-v", "1"], ["-v", "2"], ["-v", "3"]])
+def test_percentage_only(
+    paths: List[str], expected_output: str, verbose_flag: List[str], runner: CliRunner
+):
+    """Test that using the `--percentage-only` CLI option works correctly
+
+    Parameters
+    ----------
+    paths: List[str]
+        Path arguments provided to CLI
+    expected_output: String
+        Expected stdout output of invoking the CLI command
+    verbose_flag: List[str]
+        Verbosity option with which to execute the command. `--percentage-only` should function the
+        same regardless of verbosity, so this should basically be ignored
+    runner: CliRunner
+        Click utility to invoke command line scripts"""
+    actual_output = runner.invoke(execute, ["--percentage-only"] + verbose_flag + paths)
+    assert actual_output.stdout == "{}\n".format(expected_output)  # `print`'s default `end`="\n"
+
+
 ##################################################
 # Click Tests
 ##################################################
-@pytest.fixture
-def runner() -> CliRunner:
-    """Click CliRunner fixture"""
-    runner = CliRunner()
-    return runner
-
-
 @pytest.mark.parametrize(
     "paths",
     [
