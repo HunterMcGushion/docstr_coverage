@@ -1,6 +1,10 @@
 <a name="Unreleased"></a>
 ## [Unreleased]
 
+
+<a name="1.2.0"></a>
+## [1.2.0] (2020-07-21)
+
 ### Features
 * Added ability to pass multiple paths to CLI for docstring inspection. [#24] by [HunterMcGushion].
 * Added `--badge`/`-b` option to generate a docstring coverage percent badge as an SVG image saved 
@@ -53,7 +57,8 @@
 * Initial release
 
 
-[Unreleased]: https://github.com/HunterMcGushion/docstr_coverage/compare/v1.1.0...HEAD
+[Unreleased]: https://github.com/HunterMcGushion/docstr_coverage/compare/v1.2.0...HEAD
+[1.2.0]: https://github.com/HunterMcGushion/docstr_coverage/compare/v1.1.0...v1.2.0
 [1.1.0]: https://github.com/HunterMcGushion/docstr_coverage/compare/v1.0.5...v1.1.0
 [1.0.5]: https://github.com/HunterMcGushion/docstr_coverage/compare/v1.0.4...v1.0.5
 [1.0.4]: https://github.com/HunterMcGushion/docstr_coverage/compare/v1.0.3...v1.0.4
