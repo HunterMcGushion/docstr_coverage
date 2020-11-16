@@ -149,6 +149,15 @@ def parse_ignore_names_file(ignore_names_file: str) -> tuple:
     show_default=True,
 )
 @click.option(
+    "-r",
+    "--skip-private",
+    type=bool,
+    is_flag=True,
+    default=False,
+    help="Ignore docstrings of functions starting with an underscore",
+    show_default=True,
+)
+@click.option(
     "-l",
     "--followlinks",
     "follow_links",  # TODO: Remove after deprecating/renaming to "--follow-links"
@@ -225,6 +234,7 @@ def execute(paths, **kwargs):
         skip_file_docstring=kwargs["skip_file_docstring"],
         skip_init=kwargs["skip_init"],
         skip_class_def=kwargs["skip_class_def"],
+        skip_private=kwargs["skip_private"],
         verbose=kwargs["verbose"],
         ignore_names=ignore_names,
     )
