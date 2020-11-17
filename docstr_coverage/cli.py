@@ -154,7 +154,7 @@ def parse_ignore_names_file(ignore_names_file: str) -> tuple:
     type=bool,
     is_flag=True,
     default=False,
-    help="Ignore docstrings of functions starting with an underscore",
+    help="Ignore docstrings of functions starting with a single underscore",
     show_default=True,
 )
 @click.option(
