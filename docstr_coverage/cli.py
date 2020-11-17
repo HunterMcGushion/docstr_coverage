@@ -149,7 +149,7 @@ def parse_ignore_names_file(ignore_names_file: str) -> tuple:
     show_default=True,
 )
 @click.option(
-    "-r",
+    "-P",
     "--skip-private",
     type=bool,
     is_flag=True,
