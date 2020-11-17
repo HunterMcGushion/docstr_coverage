@@ -324,6 +324,8 @@ def get_docstring_coverage(
         postfix += " (skipped __init__ methods)"
     if skip_class_def:
         postfix += " (skipped class definitions)"
+    if skip_private:
+        postfix += " (skipped private methods)"
 
     log("\n", 2)
 
