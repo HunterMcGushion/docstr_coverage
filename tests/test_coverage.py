@@ -211,11 +211,11 @@ def test_logging_partially_documented_file(caplog, expected, verbose, ignore_nam
 def test_skip_private():
     file_results, total_results = get_docstring_coverage([PRIVATE_NO_DOCS_PATH], skip_private=True)
     assert file_results[PRIVATE_NO_DOCS_PATH] == {
-        "missing": ["__dunder", "__trunder", "____quadrunder"],
-        "module_doc": False,
-        "missing_count": 3,
-        "needed_count": 4,
-        "coverage": 25.0,
+        "missing": ["__dunder"],
+        "module_doc": True,
+        "missing_count": 1,
+        "needed_count": 2,
+        "coverage": 50.0,
         "empty": False,
     }
-    assert total_results == {"missing_count": 3, "needed_count": 4, "coverage": 25.0}
+    assert total_results == {"missing_count": 1, "needed_count": 2, "coverage": 50.0}

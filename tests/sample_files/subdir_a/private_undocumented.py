@@ -1,13 +1,8 @@
+"""Test file for undocumented private methods."""
+
 def _foo():
     pass
 
 
 def __dunder():
-    pass
-
-
-def ___trunder():
-    pass
-
-def ____quadrunder():
     pass
