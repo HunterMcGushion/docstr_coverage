@@ -215,7 +215,7 @@ def get_docstring_coverage(
                 docs_needed -= 1
             elif skip_class_def and "_" not in name and (name[0] == name[0].upper()):
                 docs_needed -= 1
-            elif skip_private and name.startswith("_"):
+            elif skip_private and name.startswith("_") and not name.startswith('__'):
                 docs_needed -= 1
             elif ignore_names and do_ignore_node(filename, base, name, ignore_names):
                 docs_needed -= 1
