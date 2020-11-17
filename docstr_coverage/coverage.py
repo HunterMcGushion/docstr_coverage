@@ -109,7 +109,7 @@ def get_docstring_coverage(
         If True, skips class definitions and does not include them in the report.
         If this is True, the class's methods will still be checked
     skip_private: Boolean, default=False
-        If True, skips function definitions beginning with an underscore and does
+        If True, skips function definitions beginning with a single underscore and does
         not include them in the report.
     verbose: Int in [0, 1, 2, 3], default=0
         0) No printing.
