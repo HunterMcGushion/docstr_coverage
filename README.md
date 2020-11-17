@@ -58,6 +58,7 @@ docstr-coverage some_project/src
 
 - _--skipmagic, -m_ - Ignore all magic methods (like `__init__`, and `__str__`)
 - _--skipfiledoc, -f_ - Ignore module docstrings (at the top of files)
+- _--skip-private, -P_ - Ignore private functions (starting with a single underscore)
 - _--exclude=\<regex\>, -e \<regex\>_ - Filepath pattern to exclude from analysis
   _ To exclude the contents of a virtual environment `env` and your `tests` directory, run:
   <br>```\$ docstr-coverage some_project/ -e "env/_|tests/\*"```
@@ -91,7 +92,7 @@ my_coverage = get_docstring_coverage(['some_dir/file_0.py', 'some_dir/file_1.py'
 ##### Arguments
 
 - Required arg: `filenames` \<list of string filenames\>
-- Optional kwargs: `skip_magic` \<bool\>, `skip_file_docstring` \<bool\>, `verbose` \<int (0-3)\> \* For more info on `get_docstring_coverage` and its parameters, please see its [documentation](https://docstr-coverage.readthedocs.io/en/latest/api_essentials.html#get-docstring-coverage)
+- Optional kwargs: `skip_magic` \<bool\>, `skip_file_docstring` \<bool\>, `skip_private` \<bool\>, `verbose` \<int (0-3)\> \* For more info on `get_docstring_coverage` and its parameters, please see its [documentation](https://docstr-coverage.readthedocs.io/en/latest/api_essentials.html#get-docstring-coverage)
 
 ##### Results
 
