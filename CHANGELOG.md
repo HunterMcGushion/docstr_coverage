@@ -2,6 +2,13 @@
 ## [Unreleased]
 
 
+<a name="1.3.0"></a>
+## [1.3.0] (2020-11-17)
+
+### Features
+* Add ability to skip private functions. [#32] by [cthoyt].
+
+
 <a name="1.2.0"></a>
 ## [1.2.0] (2020-07-21)
 
@@ -57,7 +64,8 @@
 * Initial release
 
 
-[Unreleased]: https://github.com/HunterMcGushion/docstr_coverage/compare/v1.2.0...HEAD
+[Unreleased]: https://github.com/HunterMcGushion/docstr_coverage/compare/v1.3.0...HEAD
+[1.3.0]: https://github.com/HunterMcGushion/docstr_coverage/compare/v1.2.0...v1.3.0
 [1.2.0]: https://github.com/HunterMcGushion/docstr_coverage/compare/v1.1.0...v1.2.0
 [1.1.0]: https://github.com/HunterMcGushion/docstr_coverage/compare/v1.0.5...v1.1.0
 [1.0.5]: https://github.com/HunterMcGushion/docstr_coverage/compare/v1.0.4...v1.0.5
@@ -66,6 +74,7 @@
 
 
 [asergeant01]: https://github.com/asergeant01
+[cthoyt]: https://github.com/cthoyt
 [econchick]: https://github.com/econchick
 [HunterMcGushion]: https://github.com/HunterMcGushion
 [killthekitten]: https://github.com/killthekitten
@@ -82,3 +91,4 @@
 [#19]: https://github.com/HunterMcGushion/docstr_coverage/pull/19
 [#22]: https://github.com/HunterMcGushion/docstr_coverage/pull/22
 [#24]: https://github.com/HunterMcGushion/docstr_coverage/pull/24
+[#32]: https://github.com/HunterMcGushion/docstr_coverage/pull/32
