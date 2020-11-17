@@ -11,7 +11,7 @@ DOCUMENTED_FILE_PATH = os.path.join(SAMPLES_DIRECTORY, "documented_file.py")
 PARTLY_DOCUMENTED_FILE_PATH = os.path.join(SAMPLES_DIRECTORY, "partly_documented_file.py")
 SOME_CODE_NO_DOCS_FILE_PATH = os.path.join(SAMPLES_DIRECTORY, "some_code_no_docs.py")
 
-SAMPLES_C_DIRECTORY = os.path.join("tests", "sample_files", "subdir_c")
+SAMPLES_C_DIRECTORY = os.path.join("tests", "extra_samples")
 PRIVATE_NO_DOCS_PATH = os.path.join(SAMPLES_C_DIRECTORY, "private_undocumented.py")
 
 
