@@ -10,7 +10,9 @@ EMPTY_FILE_PATH = os.path.join(SAMPLES_DIRECTORY, "empty_file.py")
 DOCUMENTED_FILE_PATH = os.path.join(SAMPLES_DIRECTORY, "documented_file.py")
 PARTLY_DOCUMENTED_FILE_PATH = os.path.join(SAMPLES_DIRECTORY, "partly_documented_file.py")
 SOME_CODE_NO_DOCS_FILE_PATH = os.path.join(SAMPLES_DIRECTORY, "some_code_no_docs.py")
-PRIVATE_NO_DOCS_PATH = os.path.join(SAMPLES_DIRECTORY, "private_undocumented.py")
+
+SAMPLES_C_DIRECTORY = os.path.join("tests", "sample_files", "subdir_c")
+PRIVATE_NO_DOCS_PATH = os.path.join(SAMPLES_C_DIRECTORY, "private_undocumented.py")
 
 
 def test_should_report_for_an_empty_file():
