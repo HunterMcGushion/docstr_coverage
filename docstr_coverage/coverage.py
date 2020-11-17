@@ -86,6 +86,7 @@ def get_docstring_coverage(
     skip_file_docstring: bool = False,
     skip_init: bool = False,
     skip_class_def: bool = False,
+    skip_private: bool = False,
     verbose: int = 0,
     ignore_names: Tuple[List[str], ...] = (),
 ):
@@ -107,6 +108,9 @@ def get_docstring_coverage(
     skip_class_def: Boolean, default=False
         If True, skips class definitions and does not include them in the report.
         If this is True, the class's methods will still be checked
+    skip_private: Boolean, default=False
+        If True, skips function definitions beginning with a single underscore and does
+        not include them in the report.
     verbose: Int in [0, 1, 2, 3], default=0
         0) No printing.
         1) Print total stats only.
@@ -210,6 +214,8 @@ def get_docstring_coverage(
             ):
                 docs_needed -= 1
             elif skip_class_def and "_" not in name and (name[0] == name[0].upper()):
+                docs_needed -= 1
+            elif skip_private and name.startswith("_") and not name.startswith("__"):
                 docs_needed -= 1
             elif ignore_names and do_ignore_node(filename, base, name, ignore_names):
                 docs_needed -= 1
@@ -318,6 +324,8 @@ def get_docstring_coverage(
         postfix += " (skipped __init__ methods)"
     if skip_class_def:
         postfix += " (skipped class definitions)"
+    if skip_private:
+        postfix += " (skipped private methods)"
 
     log("\n", 2)
 

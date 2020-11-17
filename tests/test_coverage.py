@@ -11,6 +11,9 @@ DOCUMENTED_FILE_PATH = os.path.join(SAMPLES_DIRECTORY, "documented_file.py")
 PARTLY_DOCUMENTED_FILE_PATH = os.path.join(SAMPLES_DIRECTORY, "partly_documented_file.py")
 SOME_CODE_NO_DOCS_FILE_PATH = os.path.join(SAMPLES_DIRECTORY, "some_code_no_docs.py")
 
+SAMPLES_C_DIRECTORY = os.path.join("tests", "extra_samples")
+PRIVATE_NO_DOCS_PATH = os.path.join(SAMPLES_C_DIRECTORY, "private_undocumented.py")
+
 
 def test_should_report_for_an_empty_file():
     file_results, total_results = get_docstring_coverage([EMPTY_FILE_PATH])
@@ -205,3 +208,16 @@ def test_logging_partially_documented_file(caplog, expected, verbose, ignore_nam
         )
 
     assert caplog.messages == expected
+
+
+def test_skip_private():
+    file_results, total_results = get_docstring_coverage([PRIVATE_NO_DOCS_PATH], skip_private=True)
+    assert file_results[PRIVATE_NO_DOCS_PATH] == {
+        "missing": ["__dunder"],
+        "module_doc": True,
+        "missing_count": 1,
+        "needed_count": 2,
+        "coverage": 50.0,
+        "empty": False,
+    }
+    assert total_results == {"missing_count": 1, "needed_count": 2, "coverage": 50.0}
