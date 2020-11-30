@@ -4,8 +4,8 @@ import tokenize
 from ast import NodeVisitor, get_docstring, FunctionDef, ClassDef, Module
 
 ACCEPTED_EXCUSE_PATTERNS = (
-    re.compile("#\s*docstr(ing)?_cov(erage)?\s*:\s*inherit(ed)?\s*"),
-    re.compile("#\s*docstr(ing)?_cov(erage)?\s*:\s*excuse\s* [\"\'].*[\"\']\s*")
+    re.compile(r"#\s*docstr(ing)?_cov(erage)?\s*:\s*inherit(ed)?\s*"),
+    re.compile(r"#\s*docstr(ing)?_cov(erage)?\s*:\s*excuse\s* [\"\'].*[\"\']\s*")
 )
 
 
@@ -16,7 +16,7 @@ class DocStringCoverageVisitor(NodeVisitor):
     def __init__(self, filename):
         self.filename = filename
         with open(filename, 'rb') as file:
-            self.line_tokens = list(tokenize.tokenize(file.readline))
+            self.tokens = list(tokenize.tokenize(file.readline))
         self.symbol_count = 0
         self.tree = []
 
@@ -51,23 +51,43 @@ class DocStringCoverageVisitor(NodeVisitor):
     def _has_doc_or_excuse(self, node):
         return self._has_docstring(node=node) or self._has_excuse(node=node)
 
+    @staticmethod
+    def _is_excuse_token(token):
+        return (
+                token.type == tokenize.COMMENT
+                and any(regex.match(token.string) for regex in ACCEPTED_EXCUSE_PATTERNS)
+        )
+
+    @staticmethod
+    def _is_skip_token(token):
+        return (
+                token.type == tokenize.NL
+                or token.type == tokenize.NEWLINE
+        )
+
     def _has_excuse(self, node):
-        excuse_line = node.lineno - 1
-        if excuse_line < 0:
+        node_start = node.lineno
+        if node_start < 0:
             # The node started on line 0 and has thus no excuse line
             return False
-        assert excuse_line < len(self.line_tokens), \
+        assert node_start < len(self.tokens), \
             f"An unexpected context occurred during parsing of {self.filename} " \
             "It seems not all file lines were tokenized for comment checking."
-        as_token = self.line_tokens[excuse_line]
-        return (
-                as_token.type == tokenize.COMMENT
-                and any(regex.match(as_token.string) for regex in ACCEPTED_EXCUSE_PATTERNS)
-        )
+        token_index = -1
+        for i, t in enumerate(self.tokens):
+            if t.start[0] == node_start:
+                token_index = i - 1
+                break
+
+        while token_index >= 0:
+            as_token = self.tokens[token_index]
+            if self._is_skip_token(as_token):
+                token_index -= 1
+            else:
+                return self._is_excuse_token(as_token)
+        # Reached the top of the file
+        return False
 
     @staticmethod
     def _has_docstring(node):
         return get_docstring(node) is not None and get_docstring(node).strip() != ""
-
-
-
