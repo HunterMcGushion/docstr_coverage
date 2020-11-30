@@ -86,7 +86,7 @@ Note that `docstr-coverage` performs static code analysis to count docstrings.
 Thus, dynamically added documentation (e.g. through class extension) will not be counted by default.
 You can take account of this by adding either `#docstring_coverage:inherited`
 or something like `#docstring_coverage:excused 'My probably bad excuse'` 
-in the line above any class or function definition.
+in the line above any class or function definition (or above annotations, if applicable).
 Such class or function would then be counted as if they had a docstring below them.
 
 ```python

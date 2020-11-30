@@ -9,8 +9,8 @@ class FooBar:
     def __init__(self):
         pass
 
+    # docstring_cov:excuse '..., I really am...'
     @abc.abstractmethod
-    #   docstring_cov:excuse '..., I really am...'
     def function(self):
         pass
 
