@@ -77,8 +77,9 @@ class DocStringCoverageVisitor(NodeVisitor):
             # The node started on line 0 and has thus no excuse line
             return False
         assert node_start < len(self.tokens), \
-            f"An unexpected context occurred during parsing of {self.filename} " \
-            "It seems not all file lines were tokenized for comment checking."
+            "An unexpected context occurred during parsing of {} " \
+            "It seems not all file lines were tokenized for comment checking.".format(self.filename)
+
         token_index = -1
         for i, t in enumerate(self.tokens):
             if t.start[0] == node_start:
