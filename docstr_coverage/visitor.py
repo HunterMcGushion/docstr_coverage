@@ -5,7 +5,7 @@ from ast import NodeVisitor, get_docstring, FunctionDef, ClassDef, Module
 
 ACCEPTED_EXCUSE_PATTERNS = (
     re.compile(r"#\s*docstr(ing)?_cov(erage)?\s*:\s*inherit(ed)?\s*"),
-    re.compile(r"#\s*docstr(ing)?_cov(erage)?\s*:\s*excuse\s* [\"\'].*[\"\']\s*")
+    re.compile(r"#\s*docstr(ing)?_cov(erage)?\s*:\s*excuse(d)?\s* [\"\'].*[\"\']\s*")
 )
 
 

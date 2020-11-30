@@ -80,6 +80,27 @@ docstr-coverage some_project/src
   ```
 - _--badge=\<filepath\>, -b \<filepath\>_ - Generate a docstring coverage percent badge as an SVG saved to a given filepath
 
+
+#### Overriding by comments
+Note that `docstr-coverage` performs static code analysis to count docstrings. 
+Thus, dynamically added documentation (e.g. through class extension) will not be counted by default.
+You can take account of this by adding either `#docstring_coverage:inherited`
+or something like `#docstring_coverage:excused 'My probably bad excuse'` 
+in the line above any class or function definition.
+Such class or function would then be counted as if they had a docstring below them.
+
+```python
+# docstring_cov:excused 'no one is reading this anyways'
+class FooBarChild(FooBar):
+
+    # docstr_cov:inherited
+    def function(self):
+        pass
+```
+
+*Note*: While some variation in these comments is accounted for (e.g. `#docstr_cov:inherit` is valid as well),
+any comment must be either an `inherit` or `excuse`, and for excuse a reason within " " or ' ' must be provided.
+
 #### Package in Your Project
 
 You can also use `docstr-coverage` as a part of your project by importing it thusly:
