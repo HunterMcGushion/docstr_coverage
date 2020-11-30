@@ -5,7 +5,7 @@ from ast import NodeVisitor, get_docstring, FunctionDef, ClassDef, Module
 
 ACCEPTED_EXCUSE_PATTERNS = (
     re.compile(r"#\s*docstr(ing)?_cov(erage)?\s*:\s*inherit(ed)?\s*"),
-    re.compile(r"#\s*docstr(ing)?_cov(erage)?\s*:\s*excuse(d)?\s* [\"\'].*[\"\']\s*")
+    re.compile(r"#\s*docstr(ing)?_cov(erage)?\s*:\s*excuse(d)?\s* [\"\'].*[\"\']\s*"),
 )
 
 
@@ -15,7 +15,7 @@ class DocStringCoverageVisitor(NodeVisitor):
 
     def __init__(self, filename):
         self.filename = filename
-        with open(filename, 'rb') as file:
+        with open(filename, "rb") as file:
             self.tokens = list(tokenize.tokenize(file.readline))
         self.symbol_count = 0
         self.tree = []
@@ -55,19 +55,15 @@ class DocStringCoverageVisitor(NodeVisitor):
     @staticmethod
     def _is_excuse_token(token):
         """Evaluates, for the given tokenizer.token if said token represents a valid excuse comment."""
-        return (
-                token.type == tokenize.COMMENT
-                and any(regex.match(token.string) for regex in ACCEPTED_EXCUSE_PATTERNS)
+        return token.type == tokenize.COMMENT and any(
+            regex.match(token.string) for regex in ACCEPTED_EXCUSE_PATTERNS
         )
 
     @staticmethod
     def _is_skip_token(token):
         """Evaluates, for the given tokenize.token,
         if said token is expected between a node start and an excuse token."""
-        return (
-                token.type == tokenize.NL
-                or token.type == tokenize.NEWLINE
-        )
+        return token.type == tokenize.NL or token.type == tokenize.NEWLINE
 
     def _has_excuse(self, node):
         """Iterates through the tokenize tokens above the passed node to evaluate whether a
@@ -76,9 +72,10 @@ class DocStringCoverageVisitor(NodeVisitor):
         if node_start < 0:
             # The node started on line 0 and has thus no excuse line
             return False
-        assert node_start < len(self.tokens), \
-            "An unexpected context occurred during parsing of {} " \
-            "It seems not all file lines were tokenized for comment checking.".format(self.filename)
+        assert node_start < len(self.tokens), (
+            "An unexpected context occurred during parsing of {} "
+            "It seems not all file lines were tokenized for comment checking."
+        ).format(self.filename)
 
         token_index = -1
         for i, t in enumerate(self.tokens):

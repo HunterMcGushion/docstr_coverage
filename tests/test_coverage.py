@@ -34,9 +34,9 @@ def test_should_report_for_an_empty_file():
     assert total_results == {"missing_count": 0, "needed_count": 0, "coverage": 100}
 
 
-@pytest.mark.parametrize("file_path,needed_count",
-                         [(DOCUMENTED_FILE_PATH, 9),
-                          (FULLY_EXCUSED_FILE_PATH, 8)])
+@pytest.mark.parametrize(
+    "file_path,needed_count", [(DOCUMENTED_FILE_PATH, 9), (FULLY_EXCUSED_FILE_PATH, 8)]
+)
 def test_should_report_full_coverage(file_path, needed_count):
     file_results, total_results = get_docstring_coverage([file_path])
     assert file_results == {
@@ -52,10 +52,16 @@ def test_should_report_full_coverage(file_path, needed_count):
     assert total_results == {"missing_count": 0, "needed_count": needed_count, "coverage": 100.0}
 
 
-@pytest.mark.parametrize("file_path,  missing, module_doc,missing_count, needed_count, coverage",
-                         [(PARTLY_DOCUMENTED_FILE_PATH, ["FooBar.__init__", "foo", "bar"], False, 4, 5, 20.),
-                          (PARTLY_EXCUSED_FILE_PATH, ["FooBar.__init__", "bar"], True, 2, 8, 75.)])
-def test_should_report_partial_coverage(file_path, missing, module_doc, missing_count, needed_count, coverage):
+@pytest.mark.parametrize(
+    "file_path,  missing, module_doc,missing_count, needed_count, coverage",
+    [
+        (PARTLY_DOCUMENTED_FILE_PATH, ["FooBar.__init__", "foo", "bar"], False, 4, 5, 20.0),
+        (PARTLY_EXCUSED_FILE_PATH, ["FooBar.__init__", "bar"], True, 2, 8, 75.0),
+    ],
+)
+def test_should_report_partial_coverage(
+    file_path, missing, module_doc, missing_count, needed_count, coverage
+):
     file_results, total_results = get_docstring_coverage([file_path])
     assert file_results == {
         file_path: {
@@ -67,7 +73,11 @@ def test_should_report_partial_coverage(file_path, missing, module_doc, missing_
             "empty": False,
         }
     }
-    assert total_results == {"missing_count": missing_count, "needed_count": needed_count, "coverage": coverage}
+    assert total_results == {
+        "missing_count": missing_count,
+        "needed_count": needed_count,
+        "coverage": coverage,
+    }
 
 
 def test_should_report_for_multiple_files():
@@ -126,15 +136,15 @@ def test_should_report_when_no_docs_in_a_file():
     ["expected"],
     [
         (
-                [
-                    '\nFile: "tests/sample_files/subdir_a/empty_file.py"',
-                    " - File is empty",
-                    " Needed: 0; Found: 0; Missing: 0; Coverage: 0.0%",
-                    "\n",
-                    "Overall statistics (1 files are empty):",
-                    "Needed: 0  -  Found: 0  -  Missing: 0",
-                    "Total coverage: 100.0%  -  Grade: " + GRADES[0][0],
-                ],
+            [
+                '\nFile: "tests/sample_files/subdir_a/empty_file.py"',
+                " - File is empty",
+                " Needed: 0; Found: 0; Missing: 0; Coverage: 0.0%",
+                "\n",
+                "Overall statistics (1 files are empty):",
+                "Needed: 0  -  Found: 0  -  Missing: 0",
+                "Total coverage: 100.0%  -  Grade: " + GRADES[0][0],
+            ],
         )
     ],
 )
@@ -149,65 +159,65 @@ def test_logging_empty_file(caplog, expected):
     ["expected", "verbose", "ignore_names"],
     [
         (
-                [
-                    '\nFile: "tests/sample_files/subdir_a/partly_documented_file.py"',
-                    " - No module docstring",
-                    " - No docstring for `foo`",
-                    " - No docstring for `bar`",
-                    " Needed: 4; Found: 1; Missing: 3; Coverage: 25.0%",
-                    "\n",
-                    "Overall statistics:",
-                    "Needed: 4  -  Found: 1  -  Missing: 3",
-                    "Total coverage: 25.0%  -  Grade: " + GRADES[6][0],
-                ],
-                3,
-                ([".*", "__.+__"],),
+            [
+                '\nFile: "tests/sample_files/subdir_a/partly_documented_file.py"',
+                " - No module docstring",
+                " - No docstring for `foo`",
+                " - No docstring for `bar`",
+                " Needed: 4; Found: 1; Missing: 3; Coverage: 25.0%",
+                "\n",
+                "Overall statistics:",
+                "Needed: 4  -  Found: 1  -  Missing: 3",
+                "Total coverage: 25.0%  -  Grade: " + GRADES[6][0],
+            ],
+            3,
+            ([".*", "__.+__"],),
         ),
         (
-                [
-                    '\nFile: "tests/sample_files/subdir_a/partly_documented_file.py"',
-                    " - No module docstring",
-                    " - No docstring for `FooBar.__init__`",
-                    " - No docstring for `foo`",
-                    " - No docstring for `bar`",
-                    " Needed: 5; Found: 1; Missing: 4; Coverage: 20.0%",
-                    "\n",
-                    "Overall statistics:",
-                    "Needed: 5  -  Found: 1  -  Missing: 4",
-                    "Total coverage: 20.0%  -  Grade: " + GRADES[7][0],
-                ],
-                3,
-                (),
+            [
+                '\nFile: "tests/sample_files/subdir_a/partly_documented_file.py"',
+                " - No module docstring",
+                " - No docstring for `FooBar.__init__`",
+                " - No docstring for `foo`",
+                " - No docstring for `bar`",
+                " Needed: 5; Found: 1; Missing: 4; Coverage: 20.0%",
+                "\n",
+                "Overall statistics:",
+                "Needed: 5  -  Found: 1  -  Missing: 4",
+                "Total coverage: 20.0%  -  Grade: " + GRADES[7][0],
+            ],
+            3,
+            (),
         ),
         (
-                [
-                    '\nFile: "tests/sample_files/subdir_a/partly_documented_file.py"',
-                    " Needed: 5; Found: 1; Missing: 4; Coverage: 20.0%",
-                    "\n",
-                    "Overall statistics:",
-                    "Needed: 5  -  Found: 1  -  Missing: 4",
-                    "Total coverage: 20.0%  -  Grade: " + GRADES[7][0],
-                ],
-                2,
-                (),
+            [
+                '\nFile: "tests/sample_files/subdir_a/partly_documented_file.py"',
+                " Needed: 5; Found: 1; Missing: 4; Coverage: 20.0%",
+                "\n",
+                "Overall statistics:",
+                "Needed: 5  -  Found: 1  -  Missing: 4",
+                "Total coverage: 20.0%  -  Grade: " + GRADES[7][0],
+            ],
+            2,
+            (),
         ),
         (
-                [
-                    "Overall statistics:",
-                    "Needed: 5  -  Found: 1  -  Missing: 4",
-                    "Total coverage: 20.0%  -  Grade: " + GRADES[7][0],
-                ],
-                1,
-                (),
+            [
+                "Overall statistics:",
+                "Needed: 5  -  Found: 1  -  Missing: 4",
+                "Total coverage: 20.0%  -  Grade: " + GRADES[7][0],
+            ],
+            1,
+            (),
         ),
         (
-                [
-                    "Overall statistics:",
-                    "Needed: 2  -  Found: 1  -  Missing: 1",
-                    "Total coverage: 50.0%  -  Grade: " + GRADES[5][0],
-                ],
-                1,
-                ([".*", ".*"],),
+            [
+                "Overall statistics:",
+                "Needed: 2  -  Found: 1  -  Missing: 1",
+                "Total coverage: 50.0%  -  Grade: " + GRADES[5][0],
+            ],
+            1,
+            ([".*", ".*"],),
         ),
     ],
 )

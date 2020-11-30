@@ -5,7 +5,6 @@ import abc
 
 # docstring_cov:excuse 'no one is reading this anyways'
 class FooBar:
-
     def __init__(self):
         pass
 
