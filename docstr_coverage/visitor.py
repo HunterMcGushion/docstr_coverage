@@ -49,12 +49,14 @@ class DocStringCoverageVisitor(NodeVisitor):
         self.tree.pop()
 
     def _has_doc_or_excuse(self, node):
-        """Evaluates if the passed not has a corresponding docstring or if there is an excuse comment."""
+        """Evaluates if the passed not has a corresponding docstring
+        or if there is an excuse comment."""
         return self._has_docstring(node=node) or self._has_excuse(node=node)
 
     @staticmethod
     def _is_excuse_token(token):
-        """Evaluates, for the given tokenizer.token if said token represents a valid excuse comment."""
+        """Evaluates, for the given tokenizer.token
+        if said token represents a valid excuse comment."""
         return token.type == tokenize.COMMENT and any(
             regex.match(token.string) for regex in ACCEPTED_EXCUSE_PATTERNS
         )

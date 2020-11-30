@@ -1,4 +1,5 @@
-""" Ignoring module docstrings is not yet supported. However, belows classes and functions docs are."""
+""" Ignoring module docstrings is not yet supported.
+However, belows classes and functions docs are."""
 
 import abc
 
