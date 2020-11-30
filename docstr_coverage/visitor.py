@@ -65,7 +65,12 @@ class DocStringCoverageVisitor(NodeVisitor):
     def _is_skip_token(token):
         """Evaluates, for the given tokenize.token,
         if said token is expected between a node start and an excuse token."""
-        return token.type == tokenize.NL or token.type == tokenize.NEWLINE
+        return (
+            token.type == tokenize.NL
+            or token.type == tokenize.NEWLINE
+            or (token.type == tokenize.NAME and token.string == "class")
+            or token.line.strip().startswith("@")
+        )
 
     def _has_excuse(self, node):
         """Iterates through the tokenize tokens above the passed node to evaluate whether a
