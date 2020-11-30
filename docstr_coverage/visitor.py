@@ -96,5 +96,5 @@ class DocStringCoverageVisitor(NodeVisitor):
 
     @staticmethod
     def _has_docstring(node):
-        """Uses ast to check if the passed not contains a non-empty docstring"""
+        """Uses ast to check if the passed not contains a non-empty docstring."""
         return get_docstring(node) is not None and get_docstring(node).strip() != ""

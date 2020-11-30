@@ -14,6 +14,7 @@ EXCUSED_SAMPLES_DIRECTORY = os.path.join("tests", "excused_samples")
 EMPTY_FILE_PATH = os.path.join(SAMPLES_DIRECTORY, "empty_file.py")
 DOCUMENTED_FILE_PATH = os.path.join(SAMPLES_DIRECTORY, "documented_file.py")
 FULLY_EXCUSED_FILE_PATH = os.path.join(EXCUSED_SAMPLES_DIRECTORY, "fully_excused.py")
+PARTLY_EXCUSED_FILE_PATH = os.path.join(EXCUSED_SAMPLES_DIRECTORY, "partially_excused.py")
 PARTLY_DOCUMENTED_FILE_PATH = os.path.join(SAMPLES_DIRECTORY, "partly_documented_file.py")
 SOME_CODE_NO_DOCS_FILE_PATH = os.path.join(SAMPLES_DIRECTORY, "some_code_no_docs.py")
 
@@ -54,19 +55,22 @@ def test_should_report_full_coverage(file_path, needed_count):
     assert total_results == {"missing_count": 0, "needed_count": needed_count, "coverage": 100.0}
 
 
-def test_should_report_partial_coverage():
-    file_results, total_results = get_docstring_coverage([PARTLY_DOCUMENTED_FILE_PATH])
+@pytest.mark.parametrize("file_path,  missing, module_doc,missing_count, needed_count, coverage",
+                         [(PARTLY_DOCUMENTED_FILE_PATH, ["FooBar.__init__", "foo", "bar"], False, 4, 5, 20.),
+                          (PARTLY_EXCUSED_FILE_PATH, ["FooBar.__init__", "bar"], True, 2, 8, 75.)])
+def test_should_report_partial_coverage(file_path, missing, module_doc, missing_count, needed_count, coverage):
+    file_results, total_results = get_docstring_coverage([file_path])
     assert file_results == {
-        PARTLY_DOCUMENTED_FILE_PATH: {
-            "missing": ["FooBar.__init__", "foo", "bar"],
-            "module_doc": False,
-            "missing_count": 4,
-            "needed_count": 5,
-            "coverage": 20.0,
+        file_path: {
+            "missing": missing,
+            "module_doc": module_doc,
+            "missing_count": missing_count,
+            "needed_count": needed_count,
+            "coverage": coverage,
             "empty": False,
         }
     }
-    assert total_results == {"missing_count": 4, "needed_count": 5, "coverage": 20.0}
+    assert total_results == {"missing_count": missing_count, "needed_count": needed_count, "coverage": coverage}
 
 
 def test_should_report_for_multiple_files():
