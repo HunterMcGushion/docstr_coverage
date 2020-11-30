@@ -252,7 +252,7 @@ def get_docstring_coverage(
         with open(filename, "r", encoding="utf-8") as f:
             source_tree = f.read()
 
-        doc_visitor = DocStringCoverageVisitor()
+        doc_visitor = DocStringCoverageVisitor(filename=filename)
         doc_visitor.visit(parse(source_tree))
         _tree = doc_visitor.tree[0]
         # pp(_tree)
