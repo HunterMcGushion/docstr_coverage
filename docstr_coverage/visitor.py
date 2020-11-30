@@ -49,10 +49,12 @@ class DocStringCoverageVisitor(NodeVisitor):
         self.tree.pop()
 
     def _has_doc_or_excuse(self, node):
+        """Evaluates if the passed not has a corresponding docstring or if there is an excuse comment."""
         return self._has_docstring(node=node) or self._has_excuse(node=node)
 
     @staticmethod
     def _is_excuse_token(token):
+        """Evaluates, for the given tokenizer.token if said token represents a valid excuse comment."""
         return (
                 token.type == tokenize.COMMENT
                 and any(regex.match(token.string) for regex in ACCEPTED_EXCUSE_PATTERNS)
@@ -60,12 +62,16 @@ class DocStringCoverageVisitor(NodeVisitor):
 
     @staticmethod
     def _is_skip_token(token):
+        """Evaluates, for the given tokenize.token,
+        if said token is expected between a node start and an excuse token."""
         return (
                 token.type == tokenize.NL
                 or token.type == tokenize.NEWLINE
         )
 
     def _has_excuse(self, node):
+        """Iterates through the tokenize tokens above the passed node to evaluate whether a
+        doc-missing excuse has been placed (right) above this nodes begin."""
         node_start = node.lineno
         if node_start < 0:
             # The node started on line 0 and has thus no excuse line
@@ -90,4 +96,5 @@ class DocStringCoverageVisitor(NodeVisitor):
 
     @staticmethod
     def _has_docstring(node):
+        """Uses ast to check if the passed not contains a non-empty docstring"""
         return get_docstring(node) is not None and get_docstring(node).strip() != ""
