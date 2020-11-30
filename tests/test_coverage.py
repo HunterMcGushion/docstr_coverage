@@ -6,9 +6,6 @@ import pytest
 from docstr_coverage import get_docstring_coverage
 from docstr_coverage.coverage import GRADES
 
-# TODO revert
-os.chdir("..")
-
 SAMPLES_DIRECTORY = os.path.join("tests", "sample_files", "subdir_a")
 EXCUSED_SAMPLES_DIRECTORY = os.path.join("tests", "excused_samples")
 EMPTY_FILE_PATH = os.path.join(SAMPLES_DIRECTORY, "empty_file.py")
