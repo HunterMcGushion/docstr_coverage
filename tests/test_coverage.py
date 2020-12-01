@@ -7,13 +7,14 @@ from docstr_coverage import get_docstring_coverage
 from docstr_coverage.coverage import GRADES
 
 SAMPLES_DIRECTORY = os.path.join("tests", "sample_files", "subdir_a")
-EXCUSED_SAMPLES_DIRECTORY = os.path.join("tests", "excused_samples")
 EMPTY_FILE_PATH = os.path.join(SAMPLES_DIRECTORY, "empty_file.py")
 DOCUMENTED_FILE_PATH = os.path.join(SAMPLES_DIRECTORY, "documented_file.py")
-FULLY_EXCUSED_FILE_PATH = os.path.join(EXCUSED_SAMPLES_DIRECTORY, "fully_excused.py")
-PARTLY_EXCUSED_FILE_PATH = os.path.join(EXCUSED_SAMPLES_DIRECTORY, "partially_excused.py")
 PARTLY_DOCUMENTED_FILE_PATH = os.path.join(SAMPLES_DIRECTORY, "partly_documented_file.py")
 SOME_CODE_NO_DOCS_FILE_PATH = os.path.join(SAMPLES_DIRECTORY, "some_code_no_docs.py")
+
+EXCUSED_SAMPLES_DIRECTORY = os.path.join("tests", "excused_samples")
+FULLY_EXCUSED_FILE_PATH = os.path.join(EXCUSED_SAMPLES_DIRECTORY, "fully_excused.py")
+PARTLY_EXCUSED_FILE_PATH = os.path.join(EXCUSED_SAMPLES_DIRECTORY, "partially_excused.py")
 
 SAMPLES_C_DIRECTORY = os.path.join("tests", "extra_samples")
 PRIVATE_NO_DOCS_PATH = os.path.join(SAMPLES_C_DIRECTORY, "private_undocumented.py")
