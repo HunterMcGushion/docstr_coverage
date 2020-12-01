@@ -35,7 +35,7 @@ def test_should_report_for_an_empty_file():
 
 
 @pytest.mark.parametrize(
-    "file_path,needed_count", [(DOCUMENTED_FILE_PATH, 9), (FULLY_EXCUSED_FILE_PATH, 8)]
+    ["file_path", "needed_count"], [(DOCUMENTED_FILE_PATH, 9), (FULLY_EXCUSED_FILE_PATH, 8)]
 )
 def test_should_report_full_coverage(file_path, needed_count):
     file_results, total_results = get_docstring_coverage([file_path])
