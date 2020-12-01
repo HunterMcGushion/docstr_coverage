@@ -80,8 +80,7 @@ docstr-coverage some_project/src
   ```
 - _--badge=\<filepath\>, -b \<filepath\>_ - Generate a docstring coverage percent badge as an SVG saved to a given filepath
 
-
-#### Overriding by comments
+#### Overriding by Comments
 Note that `docstr-coverage` performs static code analysis to count docstrings. 
 Thus, dynamically added documentation (e.g. through class extension) will not be counted by default.
 You can take account of this by adding either `#docstring_coverage:inherited`
