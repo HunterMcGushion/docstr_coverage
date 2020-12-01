@@ -53,7 +53,7 @@ def test_should_report_full_coverage(file_path, needed_count):
 
 
 @pytest.mark.parametrize(
-    "file_path,  missing, module_doc,missing_count, needed_count, coverage",
+    ["file_path", "missing", "module_doc", "missing_count", "needed_count", "coverage"],
     [
         (PARTLY_DOCUMENTED_FILE_PATH, ["FooBar.__init__", "foo", "bar"], False, 4, 5, 20.0),
         (PARTLY_EXCUSED_FILE_PATH, ["FooBar.__init__", "bar"], True, 2, 8, 75.0),
