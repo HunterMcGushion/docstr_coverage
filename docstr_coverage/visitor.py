@@ -55,7 +55,7 @@ class DocStringCoverageVisitor(NodeVisitor):
 
     @staticmethod
     def _is_excuse_token(token):
-        """Evaluates, for the given tokenizer.token
+        """Evaluates, for the given tokenize.token
         if said token represents a valid excuse comment"""
         return token.type == tokenize.COMMENT and any(
             regex.match(token.string) for regex in ACCEPTED_EXCUSE_PATTERNS
@@ -84,12 +84,17 @@ class DocStringCoverageVisitor(NodeVisitor):
             "It seems not all file lines were tokenized for comment checking."
         ).format(self.filename)
 
+        # Find the index of first token which starts at the same line as the node
         token_index = -1
         for i, t in enumerate(self.tokens):
             if t.start[0] == node_start:
                 token_index = i - 1
                 break
 
+        # Iterate downwards on token index
+        #   (i.e., skip tokens which we expect to see between excuse and node start)
+        #   until we either found a en excuse
+        #   or some token which shows that there was no excuse present.
         while token_index >= 0:
             as_token = self.tokens[token_index]
             if self._is_skip_token(as_token):
@@ -101,5 +106,5 @@ class DocStringCoverageVisitor(NodeVisitor):
 
     @staticmethod
     def _has_docstring(node):
-        """Uses ast to check if the passed not contains a non-empty docstring"""
+        """Uses ast to check if the passed node contains a non-empty docstring"""
         return get_docstring(node) is not None and get_docstring(node).strip() != ""
