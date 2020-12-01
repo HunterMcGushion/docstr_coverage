@@ -81,24 +81,25 @@ docstr-coverage some_project/src
 - _--badge=\<filepath\>, -b \<filepath\>_ - Generate a docstring coverage percent badge as an SVG saved to a given filepath
 
 #### Overriding by Comments
-Note that `docstr-coverage` performs static code analysis to count docstrings. 
-Thus, dynamically added documentation (e.g. through class extension) will not be counted by default.
-You can take account of this by adding either `#docstring_coverage:inherited`
-or something like `#docstring_coverage:excused 'My probably bad excuse'` 
-in the line above any class or function definition (or above annotations, if applicable).
-Such class or function would then be counted as if they had a docstring below them.
+Note that `docstr-coverage` can not parse 
+dynamically added documentation (e.g. through class extension).
+Thus, some of your code which deliberately has no docstring might be counted as uncovered.
+
+You can override this by adding either ```#docstr_coverage:inherited``` 
+(intended for use if a docstring is provided in the corresponding superclass method)
+or a generic excuse with a reason, like ```#docstr_coverage:excused `My probably bad excuse` ```.
+These have to be stated right above any class or function definition 
+(or above the functions annotations, if applicable).
+Such class or function would then be counted as if they had a docstring.
 
 ```python
-# docstring_cov:excused 'no one is reading this anyways'
+# docstr-coverage:excused `no one is reading this anyways`
 class FooBarChild(FooBar):
 
-    # docstr_cov:inherited
+    # docstr-coverage:inherited
     def function(self):
         pass
 ```
-
-*Note*: While some variation in these comments is accounted for (e.g. `#docstr_cov:inherit` is valid as well),
-any comment must be either an `inherit` or `excuse`, and for excuse a reason within " " or ' ' must be provided.
 
 #### Package in Your Project
 
