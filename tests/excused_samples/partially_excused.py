@@ -1,5 +1,4 @@
-""" Ignoring module docstrings is not yet supported.
-However, belows classes and functions docs are."""
+"""This is a module docstring"""
 
 import abc
 
