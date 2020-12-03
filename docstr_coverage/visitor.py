@@ -75,9 +75,6 @@ class DocStringCoverageVisitor(NodeVisitor):
         """Iterates through the tokenize tokens above the passed node to evaluate whether a
         doc-missing excuse has been placed (right) above this nodes begin"""
         node_start = node.lineno
-        if node_start < 0:
-            # The node started on line 0 and has thus no excuse line
-            return False
         assert node_start < len(self.tokens), (
             "An unexpected context occurred during parsing of {} "
             "It seems not all file lines were tokenized for comment checking."
