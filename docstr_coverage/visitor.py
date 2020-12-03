@@ -49,7 +49,7 @@ class DocStringCoverageVisitor(NodeVisitor):
         self.tree.pop()
 
     def _has_doc_or_excuse(self, node):
-        """Evaluates if the passed not has a corresponding docstring
+        """Evaluates if the passed node has a corresponding docstring
         or if there is an excuse comment"""
         return self._has_docstring(node=node) or self._has_excuse(node=node)
 
