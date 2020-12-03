@@ -92,7 +92,7 @@ class DocStringCoverageVisitor(NodeVisitor):
 
         # Iterate downwards on token index
         #   (i.e., skip tokens which we expect to see between excuse and node start)
-        #   until we either found a en excuse
+        #   until we find either an excuse
         #   or some token which shows that there was no excuse present.
         while token_index >= 0:
             as_token = self.tokens[token_index]
