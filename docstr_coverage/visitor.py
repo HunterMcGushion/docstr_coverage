@@ -55,8 +55,7 @@ class DocStringCoverageVisitor(NodeVisitor):
 
     @staticmethod
     def _is_excuse_token(token):
-        """Evaluates, for the given tokenize.token
-        if said token represents a valid excuse comment"""
+        """Evaluates whether the given `tokenize.token` represents a valid excuse comment"""
         return token.type == tokenize.COMMENT and any(
             regex.match(token.string) for regex in ACCEPTED_EXCUSE_PATTERNS
         )
