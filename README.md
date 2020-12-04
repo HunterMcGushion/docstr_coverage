@@ -81,6 +81,9 @@ docstr-coverage some_project/src
   detect_.* get_val.*
   ```
 - _--badge=\<filepath\>, -b \<filepath\>_ - Generate a docstring coverage percent badge as an SVG saved to a given filepath
+  - Include the badge in a repo's README using 
+  ```[![docstr_coverage](<filepath/of/your/saved/badge.svg>)](https://github.com/HunterMcGushion/docstr_coverage)```,
+  where `<filepath/of/your/saved/badge.svg>` is the path provided to the `--badge` option
 - _--followlinks, -l_ - Follow symlinks
 - _--percentage-only, -p_ - Output only the overall coverage percentage as a float, silencing all other logging
 - _--help, -h_ - Display CLI options
