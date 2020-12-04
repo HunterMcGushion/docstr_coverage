@@ -56,17 +56,19 @@ docstr-coverage some_project/src
 
 #### Options
 
-- _--skipmagic, -m_ - Ignore all magic methods (like `__init__`, and `__str__`)
+- _--skipmagic, -m_ - Ignore all magic methods (except `__init__`)
+- _--skipinit, -i_ - Ignore all `__init__` methods
 - _--skipfiledoc, -f_ - Ignore module docstrings (at the top of files)
 - _--skip-private, -P_ - Ignore private functions (starting with a single underscore)
+- _--skipclassdef, -c_ - Ignore docstrings of class definitions
 - _--exclude=\<regex\>, -e \<regex\>_ - Filepath pattern to exclude from analysis
-  _ To exclude the contents of a virtual environment `env` and your `tests` directory, run:
-  <br>```\$ docstr-coverage some_project/ -e "env/_|tests/\*"```
+  - To exclude the contents of a virtual environment `env` and your `tests` directory, run:
+  ```docstr-coverage some_project/ -e ".*/(env|tests)"```
 - _--verbose=\<level\>, -v \<level\>_ - Set verbosity level (0-3)
-  _ 0 - Silence
-  _ 1 - Print overall statistics
-  _ 2 - Also print individual statistics for each file
-  _ 3 - Also print missing docstrings (function names, class names, etc.)
+  - 0 - Silence
+  - 1 - Print overall statistics
+  - 2 - Also print individual statistics for each file
+  - 3 - Also print missing docstrings (function names, class names, etc.)
 - _--failunder=<int|float>, -F <int|float>_ - Fail if under a certain percentage of coverage (default: 100.0)
 - _--docstr-ignore-file=\<filepath\>, -d \<filepath\>_ - Filepath containing list of patterns to ignore. Patterns are (file-pattern, name-pattern) pairs
   - File content example:
@@ -79,6 +81,9 @@ docstr-coverage some_project/src
   detect_.* get_val.*
   ```
 - _--badge=\<filepath\>, -b \<filepath\>_ - Generate a docstring coverage percent badge as an SVG saved to a given filepath
+- _--followlinks, -l_ - Follow symlinks
+- _--percentage-only, -p_ - Output only the overall coverage percentage as a float, silencing all other logging
+- _--help, -h_ - Display CLI options
 
 #### Overriding by Comments
 Note that `docstr-coverage` can not parse 
