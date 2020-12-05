@@ -1,10 +1,11 @@
 """This module is the CLI entry point for `docstr_coverage` in which CLI arguments are defined and
 passed on to other modules"""
-import click
 import os
 import re
 import sys
 from typing import List, Optional
+
+import click
 
 from docstr_coverage.badge import Badge
 from docstr_coverage.coverage import get_docstring_coverage

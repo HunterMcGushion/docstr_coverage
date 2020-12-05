@@ -27,7 +27,7 @@ setup(
     packages=["docstr_coverage"],
     install_requires=["click"],
     extras_require={
-        "lint": ["flake8==3.8.2", "black==19.10b0"],
+        "lint": ["flake8==3.8.2", "black==19.10b0", "isort==5.6.4"],
         "test": ["pytest==5.4.2", "pytest-mock"],
     },
     include_package_data=True,

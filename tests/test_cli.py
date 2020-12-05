@@ -1,9 +1,10 @@
 """Tests for :mod:`docstr_coverage.cli`"""
-from click.testing import CliRunner
 import os
-import pytest
 import re
 from typing import List, Optional
+
+import pytest
+from click.testing import CliRunner
 
 from docstr_coverage.cli import (
     collect_filepaths,
