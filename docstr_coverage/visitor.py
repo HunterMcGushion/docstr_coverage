@@ -1,7 +1,7 @@
 """This module handles traversing abstract syntax trees to check for docstrings"""
 import re
 import tokenize
-from ast import NodeVisitor, get_docstring, FunctionDef, ClassDef, Module
+from ast import ClassDef, FunctionDef, Module, NodeVisitor, get_docstring
 
 ACCEPTED_EXCUSE_PATTERNS = (
     re.compile(r"#\s*docstr-coverage\s*:\s*inherit(ed)?\s*"),
