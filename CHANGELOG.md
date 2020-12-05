@@ -1,6 +1,18 @@
 <a name="Unreleased"></a>
 ## [Unreleased]
 
+...
+
+
+<a name="1.4.0"></a>
+## [1.4.0] (2020-12-05)
+
+### Features
+* Excuse missing docstrings by marking classes/functions with special comments. [#34] by [MiWeiss].
+    * `# docstr_coverage: inherited` to mark subclass methods as being documented by their parent
+    * ```# docstr_coverage: excused `My bad excuse` ``` to arbitrarily excuse missing docstrings
+    * Find examples and more information [here](https://github.com/HunterMcGushion/docstr_coverage#overriding-by-comments)
+
 
 <a name="1.3.0"></a>
 ## [1.3.0] (2020-11-17)
@@ -64,7 +76,8 @@
 * Initial release
 
 
-[Unreleased]: https://github.com/HunterMcGushion/docstr_coverage/compare/v1.3.0...HEAD
+[Unreleased]: https://github.com/HunterMcGushion/docstr_coverage/compare/v1.4.0...HEAD
+[1.4.0]: https://github.com/HunterMcGushion/docstr_coverage/compare/v1.3.0...v1.4.0
 [1.3.0]: https://github.com/HunterMcGushion/docstr_coverage/compare/v1.2.0...v1.3.0
 [1.2.0]: https://github.com/HunterMcGushion/docstr_coverage/compare/v1.1.0...v1.2.0
 [1.1.0]: https://github.com/HunterMcGushion/docstr_coverage/compare/v1.0.5...v1.1.0
@@ -78,6 +91,7 @@
 [econchick]: https://github.com/econchick
 [HunterMcGushion]: https://github.com/HunterMcGushion
 [killthekitten]: https://github.com/killthekitten
+[MiWeiss]: https://github.com/MiWeiss
 [Redysz]: https://github.com/Redysz
 [sim0nx]: https://github.com/sim0nx
 
@@ -92,3 +106,4 @@
 [#22]: https://github.com/HunterMcGushion/docstr_coverage/pull/22
 [#24]: https://github.com/HunterMcGushion/docstr_coverage/pull/24
 [#32]: https://github.com/HunterMcGushion/docstr_coverage/pull/32
+[#34]: https://github.com/HunterMcGushion/docstr_coverage/pull/34
