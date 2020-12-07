@@ -223,28 +223,30 @@ def parse_ignore_names_file(ignore_names_file: str) -> tuple:
 def execute(paths, **kwargs):
     """Measure docstring coverage for `PATHS`"""
     for deprecated_name, name in [
-        ('skipmagic', 'skip_magic'),
-        ('skipfiledoc', 'skip_file_doc'),
-        ('skipinit', 'skip_init'),
-        ('skipclassdef', 'skip_class_def'),
-        ('followlinks', 'follow_links'),
+        ("skipmagic", "skip_magic"),
+        ("skipfiledoc", "skip_file_doc"),
+        ("skipinit", "skip_init"),
+        ("skipclassdef", "skip_class_def"),
+        ("followlinks", "follow_links"),
     ]:
         if kwargs.get(deprecated_name):
-            new_flag = name.replace('_', '-')
+            new_flag = name.replace("_", "-")
             if kwargs.get(name):
-                raise ValueError('Should not set deprecated --{} and new --{}'.format(deprecated_name, new_flag))
+                raise ValueError(
+                    "Should not set deprecated --{} and new --{}".format(deprecated_name, new_flag)
+                )
             click.secho(
-                'Using deprecated --{}, should use --{}'.format(deprecated_name, new_flag),
-                fg='red',
+                "Using deprecated --{}, should use --{}".format(deprecated_name, new_flag),
+                fg="red",
             )
             kwargs[name] = kwargs.pop(deprecated_name)
 
     # handle fail under
-    if kwargs.get('failunder') is not None:
-        if kwargs.get('fail_under') is not None:
-            raise ValueError('Should not set deprecated --failunder and --fail-under')
-        click.secho('Using deprecated --failunder, should use --fail-under', fg='red')
-        kwargs['fail_under'] = kwargs.pop('failunder')
+    if kwargs.get("failunder") is not None:
+        if kwargs.get("fail_under") is not None:
+            raise ValueError("Should not set deprecated --failunder and --fail-under")
+        click.secho("Using deprecated --failunder, should use --fail-under", fg="red")
+        kwargs["fail_under"] = kwargs.pop("failunder")
 
     # TODO: Add option to generate pretty coverage reports - Like Python's test `coverage`
     # TODO: Add option to sort reports by filename, coverage score... (ascending/descending)
