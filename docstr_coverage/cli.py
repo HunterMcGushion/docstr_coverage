@@ -195,7 +195,7 @@ def parse_ignore_names_file(ignore_names_file: str) -> tuple:
 @click.option(
     "--failunder",
     type=float,
-    help="Use --fail-under",
+    help="Deprecated. Use --fail-under",
 )
 @click.option(
     "-b",
@@ -222,16 +222,22 @@ def parse_ignore_names_file(ignore_names_file: str) -> tuple:
 )
 def execute(paths, **kwargs):
     """Measure docstring coverage for `PATHS`"""
-    for new_name, deprecated_name in [
-        ('skip_magic', 'skip_magic_old'),
-        # TODO add rest
+    for name in [
+        'skip_magic',
+        'skip_file_doc',
+        'skip_init',
+        'skip_class_def',
+        'follow_links',
+        'fail_under',
     ]:
+        deprecated_name = '{}_old'.format(name)
         if kwargs.get(deprecated_name) is not None:
-            if kwargs.get(new_name) is not None:
-                raise ValueError('Should not set deprecated {} and new'.format(deprecated_name, new_name)
+            if kwargs.get(name) is not None:
+                raise ValueError('Should not set deprecated {} and new'.format(deprecated_name, name))
             else:
-               kwargs[new_name] = kwargs.pop(old_name)
-    
+                click.secho('Using deprecated: {}'.format(deprecated_name), fg='red')
+                kwargs[name] = kwargs.pop(deprecated_name)
+
     # TODO: Add option to generate pretty coverage reports - Like Python's test `coverage`
     # TODO: Add option to sort reports by filename, coverage score... (ascending/descending)
     if kwargs["percentage_only"] is True:
