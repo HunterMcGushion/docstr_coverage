@@ -222,21 +222,29 @@ def parse_ignore_names_file(ignore_names_file: str) -> tuple:
 )
 def execute(paths, **kwargs):
     """Measure docstring coverage for `PATHS`"""
-    for name in [
-        'skip_magic',
-        'skip_file_doc',
-        'skip_init',
-        'skip_class_def',
-        'follow_links',
-        'fail_under',
+    for deprecated_name, name in [
+        ('skipmagic', 'skip_magic'),
+        ('skipfiledoc', 'skip_file_doc'),
+        ('skipinit', 'skip_init'),
+        ('skipclassdef', 'skip_class_def'),
+        ('followlinks', 'follow_links'),
     ]:
-        deprecated_name = '{}_old'.format(name)
-        if kwargs.get(deprecated_name) is not None:
-            if kwargs.get(name) is not None:
-                raise ValueError('Should not set deprecated {} and new'.format(deprecated_name, name))
-            else:
-                click.secho('Using deprecated: {}'.format(deprecated_name), fg='red')
-                kwargs[name] = kwargs.pop(deprecated_name)
+        if kwargs.get(deprecated_name):
+            new_flag = name.replace('_', '-')
+            if kwargs.get(name):
+                raise ValueError('Should not set deprecated --{} and new --{}'.format(deprecated_name, new_flag))
+            click.secho(
+                'Using deprecated --{}, should use --{}'.format(deprecated_name, new_flag),
+                fg='red',
+            )
+            kwargs[name] = kwargs.pop(deprecated_name)
+
+    # handle fail under
+    if kwargs.get('failunder') is not None:
+        if kwargs.get('fail_under') is not None:
+            raise ValueError('Should not set deprecated --failunder and --fail-under')
+        click.secho('Using deprecated --failunder, should use --fail-under', fg='red')
+        kwargs['fail_under'] = kwargs.pop('failunder')
 
     # TODO: Add option to generate pretty coverage reports - Like Python's test `coverage`
     # TODO: Add option to sort reports by filename, coverage score... (ascending/descending)
@@ -258,7 +266,7 @@ def execute(paths, **kwargs):
     file_results, total_results = get_docstring_coverage(
         all_paths,
         skip_magic=kwargs["skip_magic"],
-        skip_file_docstring=kwargs["skip_file_docstring"],
+        skip_file_docstring=kwargs["skip_file_doc"],
         skip_init=kwargs["skip_init"],
         skip_class_def=kwargs["skip_class_def"],
         skip_private=kwargs["skip_private"],
