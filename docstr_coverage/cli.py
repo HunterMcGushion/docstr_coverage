@@ -117,7 +117,9 @@ def parse_ignore_names_file(ignore_names_file: str) -> tuple:
 )
 @click.option("--skipmagic", "skip_magic_old", is_flag=True, help="Deprecated. Use --skip-magic")
 @click.option("-f", "--skip-file-doc", is_flag=True, help="Ignore module docstrings")
-@click.option("--skipfiledoc", "skip_file_doc_old", is_flag=True, help="Deprecated. Use --skip-file-doc")
+@click.option(
+    "--skipfiledoc", "skip_file_doc_old", is_flag=True, help="Deprecated. Use --skip-file-doc"
+)
 @click.option("-i", "--skip-init", is_flag=True, help="Ignore docstrings of `__init__` methods")
 @click.option("--skipinit", is_flag=True, help="Deprecated. Use --skip-init")
 @click.option("-c", "--skip-class-def", is_flag=True, help="Ignore docstrings of class definitions")
