@@ -56,11 +56,11 @@ docstr-coverage some_project/src
 
 #### Options
 
-- _--skipmagic, -m_ - Ignore all magic methods (except `__init__`)
-- _--skipinit, -i_ - Ignore all `__init__` methods
-- _--skipfiledoc, -f_ - Ignore module docstrings (at the top of files)
+- _--skip-magic, -m_ - Ignore all magic methods (except `__init__`)
+- _--skip-init, -i_ - Ignore all `__init__` methods
+- _--skip-file-doc, -f_ - Ignore module docstrings (at the top of files)
 - _--skip-private, -P_ - Ignore private functions (starting with a single underscore)
-- _--skipclassdef, -c_ - Ignore docstrings of class definitions
+- _--skip-class-def, -c_ - Ignore docstrings of class definitions
 - _--exclude=\<regex\>, -e \<regex\>_ - Filepath pattern to exclude from analysis
   - To exclude the contents of a virtual environment `env` and your `tests` directory, run:
   ```docstr-coverage some_project/ -e ".*/(env|tests)"```
@@ -69,7 +69,7 @@ docstr-coverage some_project/src
   - 1 - Print overall statistics
   - 2 - Also print individual statistics for each file
   - 3 - Also print missing docstrings (function names, class names, etc.)
-- _--failunder=<int|float>, -F <int|float>_ - Fail if under a certain percentage of coverage (default: 100.0)
+- _--fail-under=<int|float>, -F <int|float>_ - Fail if under a certain percentage of coverage (default: 100.0)
 - _--docstr-ignore-file=\<filepath\>, -d \<filepath\>_ - Filepath containing list of patterns to ignore. Patterns are (file-pattern, name-pattern) pairs
   - File content example:
 
@@ -84,7 +84,7 @@ docstr-coverage some_project/src
   - Include the badge in a repo's README using 
   ```[![docstr_coverage](<filepath/of/your/saved/badge.svg>)](https://github.com/HunterMcGushion/docstr_coverage)```,
   where `<filepath/of/your/saved/badge.svg>` is the path provided to the `--badge` option
-- _--followlinks, -l_ - Follow symlinks
+- _--follow-links, -l_ - Follow symlinks
 - _--percentage-only, -p_ - Output only the overall coverage percentage as a float, silencing all other logging
 - _--help, -h_ - Display CLI options
 
