@@ -115,65 +115,21 @@ def parse_ignore_names_file(ignore_names_file: str) -> tuple:
     is_flag=True,
     help="Ignore docstrings of magic methods (except `__init__`)",
 )
-@click.option(
-    "--skipmagic",
-    "skip_magic_old",
-    is_flag=True,
-    help="Deprecated. Use --skip-magic",
-)
-@click.option(
-    "-f",
-    "--skip-file-doc",
-    is_flag=True,
-    help="Ignore module docstrings",
-)
-@click.option(
-    "--skipfiledoc",
-    "skip_file_doc_old",
-    is_flag=True,
-    help="Deprecated. Use --skip-file-doc",
-)
-@click.option(
-    "-i",
-    "--skip-init",
-    is_flag=True,
-    help="Ignore docstrings of `__init__` methods",
-)
-@click.option(
-    "--skipinit",
-    is_flag=True,
-    help="Deprecated. Use --skip-init",
-)
-@click.option(
-    "-c",
-    "--skip-class-def",
-    is_flag=True,
-    help="Ignore docstrings of class definitions",
-)
-@click.option(
-    "--skipclassdef",
-    is_flag=True,
-    help="Deprecated. Use --skip-class-def",
-)
+@click.option("--skipmagic", "skip_magic_old", is_flag=True, help="Deprecated. Use --skip-magic")
+@click.option("-f", "--skip-file-doc", is_flag=True, help="Ignore module docstrings")
+@click.option("--skipfiledoc", "skip_file_doc_old", is_flag=True, help="Deprecated. Use --skip-file-doc")
+@click.option("-i", "--skip-init", is_flag=True, help="Ignore docstrings of `__init__` methods")
+@click.option("--skipinit", is_flag=True, help="Deprecated. Use --skip-init")
+@click.option("-c", "--skip-class-def", is_flag=True, help="Ignore docstrings of class definitions")
+@click.option("--skipclassdef", is_flag=True, help="Deprecated. Use --skip-class-def")
 @click.option(
     "-P",
     "--skip-private",
     is_flag=True,
     help="Ignore docstrings of functions starting with a single underscore",
 )
-@click.option(
-    "-l",
-    "--follow-links",
-    type=bool,
-    is_flag=True,
-    help="Follow symlinks",
-)
-@click.option(
-    "--followlinks",
-    type=bool,
-    is_flag=True,
-    help="Deprecated. Use --follow-links",
-)
+@click.option("-l", "--follow-links", is_flag=True, help="Follow symlinks")
+@click.option("--followlinks", is_flag=True, help="Deprecated. Use --follow-links")
 @click.option(
     "-d",
     "--docstr-ignore-file",
@@ -192,11 +148,7 @@ def parse_ignore_names_file(ignore_names_file: str) -> tuple:
     show_default=True,
     metavar="NUMBER",
 )
-@click.option(
-    "--failunder",
-    type=float,
-    help="Deprecated. Use --fail-under",
-)
+@click.option("--failunder", type=float, help="Deprecated. Use --fail-under")
 @click.option(
     "-b",
     "--badge",
@@ -208,11 +160,8 @@ def parse_ignore_names_file(ignore_names_file: str) -> tuple:
 @click.option(
     "-p",
     "--percentage-only",
-    type=bool,
     is_flag=True,
-    default=False,
     help="Output only the overall coverage percentage as a float, silencing all other logging",
-    show_default=True,
 )
 @click.help_option("-h", "--help")
 @click.argument(
