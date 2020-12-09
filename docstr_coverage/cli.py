@@ -111,63 +111,20 @@ def parse_ignore_names_file(ignore_names_file: str) -> tuple:
 )
 @click.option(
     "-m",
-    "--skipmagic",
-    "skip_magic",  # TODO: Remove after deprecating/renaming to "--skip-magic"
-    type=bool,
+    "--skip-magic",
     is_flag=True,
-    default=False,
     help="Ignore docstrings of magic methods (except `__init__`)",
-    show_default=True,
 )
-@click.option(
-    "-f",
-    "--skipfiledoc",
-    "skip_file_docstring",  # TODO: Remove after deprecating/renaming to "--skip-file-doc"
-    type=bool,
-    is_flag=True,
-    default=False,
-    help="Ignore module docstrings",
-    show_default=True,
-)
-@click.option(
-    "-i",
-    "--skipinit",
-    "skip_init",  # TODO: Remove after deprecating/renaming to "--skip-init"
-    type=bool,
-    is_flag=True,
-    default=False,
-    help="Ignore docstrings of `__init__` methods",
-    show_default=True,
-)
-@click.option(
-    "-c",
-    "--skipclassdef",
-    "skip_class_def",  # TODO: Remove after deprecating/renaming to "--skip-class-def"
-    type=bool,
-    is_flag=True,
-    default=False,
-    help="Ignore docstrings of class definitions",
-    show_default=True,
-)
+@click.option("-f", "--skip-file-doc", is_flag=True, help="Ignore module docstrings")
+@click.option("-i", "--skip-init", is_flag=True, help="Ignore docstrings of `__init__` methods")
+@click.option("-c", "--skip-class-def", is_flag=True, help="Ignore docstrings of class definitions")
 @click.option(
     "-P",
     "--skip-private",
-    type=bool,
     is_flag=True,
-    default=False,
     help="Ignore docstrings of functions starting with a single underscore",
-    show_default=True,
 )
-@click.option(
-    "-l",
-    "--followlinks",
-    "follow_links",  # TODO: Remove after deprecating/renaming to "--follow-links"
-    type=bool,
-    is_flag=True,
-    default=False,
-    help="Follow symlinks",
-    show_default=True,
-)
+@click.option("-l", "--follow-links", is_flag=True, help="Follow symlinks")
 @click.option(
     "-d",
     "--docstr-ignore-file",
@@ -179,8 +136,7 @@ def parse_ignore_names_file(ignore_names_file: str) -> tuple:
 )
 @click.option(
     "-F",
-    "--failunder",
-    "fail_under",  # TODO: Remove after deprecating/renaming to "--fail-under"
+    "--fail-under",
     type=float,
     default=100.0,
     help="Fail when coverage % is less than a given amount",
@@ -198,11 +154,8 @@ def parse_ignore_names_file(ignore_names_file: str) -> tuple:
 @click.option(
     "-p",
     "--percentage-only",
-    type=bool,
     is_flag=True,
-    default=False,
     help="Output only the overall coverage percentage as a float, silencing all other logging",
-    show_default=True,
 )
 @click.help_option("-h", "--help")
 @click.argument(
@@ -210,8 +163,42 @@ def parse_ignore_names_file(ignore_names_file: str) -> tuple:
     type=click.Path(exists=True, file_okay=True, dir_okay=True, readable=True, resolve_path=True),
     nargs=-1,
 )
+@click.option("--skipmagic", "skip_magic_old", is_flag=True, help="Deprecated. Use --skip-magic")
+@click.option(
+    "--skipfiledoc", "skip_file_doc_old", is_flag=True, help="Deprecated. Use --skip-file-doc"
+)
+@click.option("--skipinit", is_flag=True, help="Deprecated. Use --skip-init")
+@click.option("--skipclassdef", is_flag=True, help="Deprecated. Use --skip-class-def")
+@click.option("--followlinks", is_flag=True, help="Deprecated. Use --follow-links")
+@click.option("--failunder", type=float, help="Deprecated. Use --fail-under")
 def execute(paths, **kwargs):
     """Measure docstring coverage for `PATHS`"""
+    for deprecated_name, name in [
+        ("skipmagic", "skip_magic"),
+        ("skipfiledoc", "skip_file_doc"),
+        ("skipinit", "skip_init"),
+        ("skipclassdef", "skip_class_def"),
+        ("followlinks", "follow_links"),
+    ]:
+        if kwargs.get(deprecated_name):
+            new_flag = name.replace("_", "-")
+            if kwargs.get(name):
+                raise ValueError(
+                    "Should not set deprecated --{} and new --{}".format(deprecated_name, new_flag)
+                )
+            click.secho(
+                "Using deprecated --{}, should use --{}".format(deprecated_name, new_flag),
+                fg="red",
+            )
+            kwargs[name] = kwargs.pop(deprecated_name)
+
+    # handle fail under
+    if kwargs.get("failunder") is not None:
+        if kwargs.get("fail_under") is not None:
+            raise ValueError("Should not set deprecated --failunder and --fail-under")
+        click.secho("Using deprecated --failunder, should use --fail-under", fg="red")
+        kwargs["fail_under"] = kwargs.pop("failunder")
+
     # TODO: Add option to generate pretty coverage reports - Like Python's test `coverage`
     # TODO: Add option to sort reports by filename, coverage score... (ascending/descending)
     if kwargs["percentage_only"] is True:
@@ -232,7 +219,7 @@ def execute(paths, **kwargs):
     file_results, total_results = get_docstring_coverage(
         all_paths,
         skip_magic=kwargs["skip_magic"],
-        skip_file_docstring=kwargs["skip_file_docstring"],
+        skip_file_docstring=kwargs["skip_file_doc"],
         skip_init=kwargs["skip_init"],
         skip_class_def=kwargs["skip_class_def"],
         skip_private=kwargs["skip_private"],
