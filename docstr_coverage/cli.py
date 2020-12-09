@@ -8,6 +8,7 @@ from typing import List, Optional
 import click
 
 from docstr_coverage.badge import Badge
+from docstr_coverage.configFile import readConfigFile
 from docstr_coverage.coverage import get_docstring_coverage
 
 
@@ -173,6 +174,8 @@ def parse_ignore_names_file(ignore_names_file: str) -> tuple:
 @click.option("--failunder", type=float, help="Deprecated. Use --fail-under")
 def execute(paths, **kwargs):
     """Measure docstring coverage for `PATHS`"""
+    if os.path.exists(".docstr.yaml"):
+        paths, kwargs = readConfigFile(paths, **kwargs)
     for deprecated_name, name in [
         ("skipmagic", "skip_magic"),
         ("skipfiledoc", "skip_file_doc"),

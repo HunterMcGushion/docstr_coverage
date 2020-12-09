@@ -88,6 +88,31 @@ docstr-coverage some_project/src
 - _--percentage-only, -p_ - Output only the overall coverage percentage as a float, silencing all other logging
 - _--help, -h_ - Display CLI options
 
+#### Config File
+All options can be saved in a config file named .docstr.yaml
+example:
+```yaml
+paths: # list or string
+  - docstr_coverage
+  - test
+badge: docs # Path
+exclude: .*/test # regex
+verbose: 1 # int (0-3)
+skip_magic: True # Boolean
+skip_file_doc: True # Boolean
+skip_init: True # Boolean
+skip_class_def: True # Boolean
+skip_private: True # Boolean
+follow_links: True # Boolean
+ignore_names_file: .*/test # regex
+fail_under: 90 # int 
+percentage_only: True # Boolean
+
+```
+equivalent to
+```
+docstr-coverage docstr_coverage -e ".*/(env|tests)" --skip-magic --skip-init --badge="docs" --skip-class-def etc...
+```
 #### Overriding by Comments
 Note that `docstr-coverage` can not parse 
 dynamically added documentation (e.g. through class extension).
