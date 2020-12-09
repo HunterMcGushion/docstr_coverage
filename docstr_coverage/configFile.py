@@ -8,7 +8,7 @@ def readConfigFile(paths, **kwargs):
     """
     Read config file and assign all variable to paths, kwargs.
     """
-    with open(".docstr.yaml", 'r') as stream:
+    with open(".docstr.yaml", "r") as stream:
         try:
             config = yaml.safe_load(stream)
             for item in config.keys():
