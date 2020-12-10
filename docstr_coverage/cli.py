@@ -175,7 +175,7 @@ def parse_ignore_names_file(ignore_names_file: str) -> tuple:
 def execute(paths, **kwargs):
     """Measure docstring coverage for `PATHS`"""
     if os.path.exists(".docstr.yaml"):
-        paths, kwargs = readConfigFile(paths, **kwargs)
+        paths, kwargs = readConfigFile(paths, kwargs)
     for deprecated_name, name in [
         ("skipmagic", "skip_magic"),
         ("skipfiledoc", "skip_file_doc"),
