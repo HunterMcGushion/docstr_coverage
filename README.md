@@ -64,7 +64,7 @@ docstr-coverage some_project/src
 - _--exclude=\<regex\>, -e \<regex\>_ - Filepath pattern to exclude from analysis
   - To exclude the contents of a virtual environment `env` and your `tests` directory, run:
   ```docstr-coverage some_project/ -e ".*/(env|tests)"```
-- _--verbose=\<level\>, -v \<level\>_ - Set verbosity level (0-3)
+- _--verbose=\<level\>, -v \<level\>_ - Set verbosity level (0-3, default: 3)
   - 0 - Silence
   - 1 - Print overall statistics
   - 2 - Also print individual statistics for each file
