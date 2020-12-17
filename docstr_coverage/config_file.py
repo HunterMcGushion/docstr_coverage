@@ -1,6 +1,4 @@
-"""
-This module is for conf file .docstr.yaml
-"""
+"""This module is for conf file .docstr.yaml"""
 import os
 
 import yaml
@@ -12,16 +10,16 @@ def set_config_defaults(ctx, param, value):
     Parameters
     ----------
     ctx: click.Context
-     Click Context object
+        Click Context object
     param: click.Parameter
-     Click Parameter object (assumed to be `config`)
+        Click Parameter object (assumed to be `config`)
     value: String
-     Path to the configuration file
+        Path to the configuration file
 
     Returns
     -------
     String
-     Path to the configuration file"""
+        Path to the configuration file"""
     if (value is not None) and os.path.exists(value):
         with open(value) as f:
             config_data = yaml.safe_load(f) or {}

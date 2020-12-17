@@ -164,7 +164,6 @@ def parse_ignore_names_file(ignore_names_file: str) -> tuple:
     "paths",
     type=click.Path(exists=True, file_okay=True, dir_okay=True, readable=True, resolve_path=True),
     nargs=-1,
-    # TODO: NEW CODE BELOW !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     is_eager=True,  # Eagerly execute before `config` so `set_config_defaults` has `paths`
 )
 @click.option(
