@@ -95,10 +95,11 @@ def parse_ignore_names_file(ignore_names_file: str) -> tuple:
     # TODO: Use counting instead: https://click.palletsprojects.com/en/7.x/options/#counting
     "-v",
     "--verbose",
-    type=click.Choice(["0", "1", "2", "3"]),
+    type=click.Choice([0, 1, 2, 3, "0", "1", "2", "3"]),
     default="3",
     help="Verbosity level",
     show_default=True,
+    callback=lambda _ctx, _param, value: int(value),
 )
 @click.option(
     "-e",
@@ -187,8 +188,7 @@ def execute(paths, **kwargs):
                     "Should not set deprecated --{} and new --{}".format(deprecated_name, new_flag)
                 )
             click.secho(
-                "Using deprecated --{}, should use --{}".format(deprecated_name, new_flag),
-                fg="red",
+                "Using deprecated --{}, should use --{}".format(deprecated_name, new_flag), fg="red"
             )
             kwargs[name] = kwargs.pop(deprecated_name)
 
