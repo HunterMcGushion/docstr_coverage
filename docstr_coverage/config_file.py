@@ -4,7 +4,6 @@ This module is for conf file .docstr.yaml
 import os
 
 import yaml
-from yaml import YAMLError
 
 
 def set_config_defaults(ctx, param, value):

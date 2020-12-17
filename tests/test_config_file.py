@@ -1,6 +1,4 @@
 import os
-from unittest import TestCase
-
 import click
 import yaml
 
