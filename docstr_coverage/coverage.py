@@ -147,9 +147,6 @@ def get_docstring_coverage(
         ...     'needed_count': '<total_needed_docstrings_count int>',
         ...     'coverage': '<total_percent_of_coverage float>'
         ... }"""
-
-    verbose = int(verbose)
-
     # TODO: Switch to Python's `logging` module, and remove
     #       below nested `log` function definition
     def log(text, level=1):
