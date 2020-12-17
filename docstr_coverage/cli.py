@@ -8,7 +8,7 @@ from typing import List, Optional
 import click
 
 from docstr_coverage.badge import Badge
-from docstr_coverage.configFile import readConfigFile
+from docstr_coverage.config_file import set_config_defaults
 from docstr_coverage.coverage import get_docstring_coverage
 
 
@@ -96,10 +96,11 @@ def parse_ignore_names_file(ignore_names_file: str) -> tuple:
     # TODO: Use counting instead: https://click.palletsprojects.com/en/7.x/options/#counting
     "-v",
     "--verbose",
-    type=click.Choice(["0", "1", "2", "3"]),
+    type=click.Choice([0, 1, 2, 3, "0", "1", "2", "3"]),
     default="3",
     help="Verbosity level",
     show_default=True,
+    callback=lambda _ctx, _param, value: int(value),
 )
 @click.option(
     "-e",
@@ -163,6 +164,17 @@ def parse_ignore_names_file(ignore_names_file: str) -> tuple:
     "paths",
     type=click.Path(exists=True, file_okay=True, dir_okay=True, readable=True, resolve_path=True),
     nargs=-1,
+    # TODO: NEW CODE BELOW !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    is_eager=True,  # Eagerly execute before `config` so `set_config_defaults` has `paths`
+)
+@click.option(
+    "-C",
+    "--config",
+    type=click.Path(exists=False, resolve_path=True),
+    default=".docstr.yaml",
+    help="Configuration file containing option defaults",
+    is_eager=True,
+    callback=set_config_defaults,
 )
 @click.option("--skipmagic", "skip_magic_old", is_flag=True, help="Deprecated. Use --skip-magic")
 @click.option(
@@ -174,8 +186,6 @@ def parse_ignore_names_file(ignore_names_file: str) -> tuple:
 @click.option("--failunder", type=float, help="Deprecated. Use --fail-under")
 def execute(paths, **kwargs):
     """Measure docstring coverage for `PATHS`"""
-    if os.path.exists(".docstr.yaml"):
-        paths, kwargs = readConfigFile(paths, kwargs)
     for deprecated_name, name in [
         ("skipmagic", "skip_magic"),
         ("skipfiledoc", "skip_file_doc"),
@@ -190,8 +200,7 @@ def execute(paths, **kwargs):
                     "Should not set deprecated --{} and new --{}".format(deprecated_name, new_flag)
                 )
             click.secho(
-                "Using deprecated --{}, should use --{}".format(deprecated_name, new_flag),
-                fg="red",
+                "Using deprecated --{}, should use --{}".format(deprecated_name, new_flag), fg="red"
             )
             kwargs[name] = kwargs.pop(deprecated_name)
 

@@ -89,12 +89,11 @@ docstr-coverage some_project/src
 - _--help, -h_ - Display CLI options
 
 #### Config File
-All options can be saved in a config file named .docstr.yaml
+All options can be saved in a config file named `.docstr.yaml`
 example:
 ```yaml
 paths: # list or string
   - docstr_coverage
-  - test
 badge: docs # Path
 exclude: .*/test # regex
 verbose: 1 # int (0-3)
@@ -111,7 +110,7 @@ percentage_only: True # Boolean
 ```
 equivalent to
 ```
-docstr-coverage docstr_coverage -e ".*/(env|tests)" --skip-magic --skip-init --badge="docs" --skip-class-def etc...
+docstr-coverage docstr_coverage -e ".*/test" --skip-magic --skip-init --badge="docs" --skip-class-def etc...
 ```
 #### Overriding by Comments
 Note that `docstr-coverage` can not parse 
