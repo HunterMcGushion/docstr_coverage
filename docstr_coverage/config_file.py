@@ -31,7 +31,7 @@ def set_config_defaults(ctx, param, value):
             pass
         else:
             # Use config default if `paths` was not provided as CLI argument
-            if (not ctx.params.get("paths")) and config_paths:
+            if not ctx.params.get("paths") and config_paths:
                 if isinstance(config_paths, str):
                     config_paths = [config_paths]
 
