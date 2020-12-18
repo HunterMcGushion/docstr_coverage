@@ -8,6 +8,7 @@ from typing import List, Optional
 import click
 
 from docstr_coverage.badge import Badge
+from docstr_coverage.config_file import set_config_defaults
 from docstr_coverage.coverage import get_docstring_coverage
 
 
@@ -163,6 +164,16 @@ def parse_ignore_names_file(ignore_names_file: str) -> tuple:
     "paths",
     type=click.Path(exists=True, file_okay=True, dir_okay=True, readable=True, resolve_path=True),
     nargs=-1,
+    is_eager=True,  # Eagerly execute before `config` so `set_config_defaults` has `paths`
+)
+@click.option(
+    "-C",
+    "--config",
+    type=click.Path(exists=False, resolve_path=True),
+    default=".docstr.yaml",
+    help="Configuration file containing option defaults",
+    is_eager=True,
+    callback=set_config_defaults,
 )
 @click.option("--skipmagic", "skip_magic_old", is_flag=True, help="Deprecated. Use --skip-magic")
 @click.option(
