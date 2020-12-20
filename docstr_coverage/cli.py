@@ -34,7 +34,7 @@ def do_include_filepath(filepath: str, exclude_re: Optional["re.Pattern"]) -> bo
 
 
 def collect_filepaths(
-    *paths: str, follow_links: bool = False, exclude: Optional[str] = None
+        *paths: str, follow_links: bool = False, exclude: Optional[str] = None
 ) -> List[str]:
     """Collect filepaths under given `paths` that are not `exclude`-d
 
@@ -89,6 +89,51 @@ def parse_ignore_names_file(ignore_names_file: str) -> tuple:
         ignore_names = tuple([line.split() for line in f.readlines() if " " in line])
 
     return ignore_names
+
+
+def parse_ignore_patterns_from_dict(ignore_patterns_dict) -> tuple:
+    """
+    Parse dictionary containing (file_name_pattern, exclude_patterns) key value pairs
+    to return an output consistent with ignore patterns parsed by `parse_ignore_names_file`.
+
+    Note: To align the workflow with `parse_ignore_names_file`,
+    we check that the passed values have indeed type string,
+    but we do not yet check if they are valid regular expressions.
+
+    Parameters
+    ----------
+    ignore_patterns_dict: Dict
+        A dict where each key is a string and each value is a string or a nonempty list of strings.
+
+    Returns
+    -------
+    Tuple
+        Tuple of iterables of string, with equal meaning as the output from `parse_ignore_names_file` """
+
+    def _assert_valid_key_value(key, value):
+        if not isinstance(key, str):
+            raise TypeError("ignore patters in config contained non-string key {}".format(key))
+        if len(key.strip()) == 0:
+            raise ValueError("ignore pattern in contained empty file name regex")
+        if not all(isinstance(v, str) for v in value) and len(value) > 0:
+            raise TypeError("ignore patters for key {} contained non-string values or was empty.".format(key))
+        if not all(len(v.strip()) > 0 for v in value):
+            raise ValueError("ignore pattern for key {} contained empty regex".format(key))
+
+    if not isinstance(ignore_patterns_dict, dict):
+        raise TypeError("ignore patters in config must have type Dict[str, Union[str, List[str]]],"
+                        "but was {}".format(type(ignore_patterns_dict)))
+
+    result_list = []
+    for key, value in ignore_patterns_dict.items():
+        res = [key]
+        if not isinstance(value, list):
+            value = [value]
+        _assert_valid_key_value(key, value)
+        res += value
+        result_list.append(res)
+
+    return tuple(result_list)
 
 
 @click.command()
@@ -224,7 +269,17 @@ def execute(paths, **kwargs):
         sys.exit("No Python files found")
 
     # Parse ignore names file
-    ignore_names = parse_ignore_names_file(kwargs["ignore_names_file"])
+    if os.path.isfile(kwargs["ignore_names_file"]) and kwargs['ignore_patterns']:
+        raise ValueError(("The docstr-coverage configuration file {} contains ignore_patterns,"
+                          "and at the same time a (deprecated) ignore file {} where found."
+                          "At most one way to specify ignore patterns must be used at a time."
+                          ).format(kwargs["config_file"], kwargs["ignore_names_file"]))
+    elif os.path.isfile(kwargs["ignore_names_file"]):
+        ignore_names = parse_ignore_names_file(kwargs["ignore_names_file"])
+    elif kwargs['ignore_patterns']:
+        ignore_names = parse_ignore_patterns_from_dict(kwargs['ignore_patterns'])
+    else:
+        ignore_names = []
 
     # Calculate docstring coverage
     file_results, total_results = get_docstring_coverage(
