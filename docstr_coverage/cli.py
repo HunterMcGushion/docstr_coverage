@@ -34,7 +34,7 @@ def do_include_filepath(filepath: str, exclude_re: Optional["re.Pattern"]) -> bo
 
 
 def collect_filepaths(
-        *paths: str, follow_links: bool = False, exclude: Optional[str] = None
+    *paths: str, follow_links: bool = False, exclude: Optional[str] = None
 ) -> List[str]:
     """Collect filepaths under given `paths` that are not `exclude`-d
 
@@ -116,13 +116,17 @@ def parse_ignore_patterns_from_dict(ignore_patterns_dict) -> tuple:
         if len(key.strip()) == 0:
             raise ValueError("ignore pattern in contained empty file name regex")
         if not all(isinstance(v, str) for v in value) and len(value) > 0:
-            raise TypeError("ignore patters for key {} contained non-string values or was empty.".format(key))
+            raise TypeError(
+                "ignore patters for key {} contained non-string values or was empty.".format(key)
+            )
         if not all(len(v.strip()) > 0 for v in value):
             raise ValueError("ignore pattern for key {} contained empty regex".format(key))
 
     if not isinstance(ignore_patterns_dict, dict):
-        raise TypeError("ignore patters in config must have type Dict[str, Union[str, List[str]]],"
-                        "but was {}".format(type(ignore_patterns_dict)))
+        raise TypeError(
+            "ignore patters in config must have type Dict[str, Union[str, List[str]]],"
+            "but was {}".format(type(ignore_patterns_dict))
+        )
 
     result_list = []
     for key, value in ignore_patterns_dict.items():
@@ -269,16 +273,19 @@ def execute(paths, **kwargs):
         sys.exit("No Python files found")
 
     # Parse ignore names file
-    has_ignore_patterns_in_config = 'ignore_patterns' in kwargs
+    has_ignore_patterns_in_config = "ignore_patterns" in kwargs
     if os.path.isfile(kwargs["ignore_names_file"]) and has_ignore_patterns_in_config:
-        raise ValueError(("The docstr-coverage configuration file {} contains ignore_patterns,"
-                          "and at the same time a (deprecated) ignore file {} where found."
-                          "At most one way to specify ignore patterns must be used at a time."
-                          ).format(kwargs["config_file"], kwargs["ignore_names_file"]))
+        raise ValueError(
+            (
+                "The docstr-coverage configuration file {} contains ignore_patterns,"
+                "and at the same time a (deprecated) ignore file {} where found."
+                "At most one way to specify ignore patterns must be used at a time."
+            ).format(kwargs["config_file"], kwargs["ignore_names_file"])
+        )
     elif os.path.isfile(kwargs["ignore_names_file"]):
         ignore_names = parse_ignore_names_file(kwargs["ignore_names_file"])
     elif has_ignore_patterns_in_config:
-        ignore_names = parse_ignore_patterns_from_dict(kwargs['ignore_patterns'])
+        ignore_names = parse_ignore_patterns_from_dict(kwargs["ignore_patterns"])
     else:
         ignore_names = []
 

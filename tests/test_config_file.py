@@ -135,4 +135,4 @@ def test_set_config_defaults_with_ignore_patterns():
     assert "docstr_coverage" in ctx.params["paths"][0]
     assert ctx.default_map.keys() == fake_config_file_ignore_patterns.keys()
     assert ctx.default_map["verbose"] == fake_config_file_ignore_patterns["verbose"]
-    assert ctx.params['ignore_patterns'] == test_ignore_patterns
+    assert ctx.params["ignore_patterns"] == test_ignore_patterns

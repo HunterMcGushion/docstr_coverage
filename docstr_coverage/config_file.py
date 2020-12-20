@@ -1,6 +1,6 @@
 """This module is for conf file .docstr.yaml"""
 import os
-from typing import Callable, List, Any, Dict
+from typing import Any, Callable, Dict, List
 
 import click
 import yaml
@@ -27,16 +27,21 @@ def set_config_defaults(ctx, param, value):
             config_data = yaml.safe_load(f) or {}
             ctx.params["config_file"] = value
         # Resolve paths like Click would have with the `click.Path.resolve_path` kwarg
-        _extract_non_default_list(config_data, ctx, "paths",
-                                  lambda config_paths: tuple([os.path.realpath(path) for path in config_paths]))
+        _extract_non_default_list(
+            config_data,
+            ctx,
+            "paths",
+            lambda config_paths: tuple([os.path.realpath(path) for path in config_paths]),
+        )
         _extract_non_default_list(config_data, ctx, "ignore_patterns", lambda x: x)
         ctx.default_map = config_data
 
     return value
 
 
-def _extract_non_default_list(config_data: Dict, ctx: click.Context, field: str,
-                              process: Callable[[List], Any]) -> None:
+def _extract_non_default_list(
+    config_data: Dict, ctx: click.Context, field: str, process: Callable[[List], Any]
+) -> None:
     """Processes a field of the config file which should not be read as a default value,
     but instead by directly stored on the ctx.params.
 
