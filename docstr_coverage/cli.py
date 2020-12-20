@@ -269,14 +269,15 @@ def execute(paths, **kwargs):
         sys.exit("No Python files found")
 
     # Parse ignore names file
-    if os.path.isfile(kwargs["ignore_names_file"]) and kwargs['ignore_patterns']:
+    has_ignore_patterns_in_config = 'ignore_patterns' in kwargs
+    if os.path.isfile(kwargs["ignore_names_file"]) and has_ignore_patterns_in_config:
         raise ValueError(("The docstr-coverage configuration file {} contains ignore_patterns,"
                           "and at the same time a (deprecated) ignore file {} where found."
                           "At most one way to specify ignore patterns must be used at a time."
                           ).format(kwargs["config_file"], kwargs["ignore_names_file"]))
     elif os.path.isfile(kwargs["ignore_names_file"]):
         ignore_names = parse_ignore_names_file(kwargs["ignore_names_file"])
-    elif kwargs['ignore_patterns']:
+    elif has_ignore_patterns_in_config:
         ignore_names = parse_ignore_patterns_from_dict(kwargs['ignore_patterns'])
     else:
         ignore_names = []
