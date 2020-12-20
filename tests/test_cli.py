@@ -141,6 +141,54 @@ def test_collect_filepaths(paths: List[str], exclude: str, expected: List[str]):
     assert actual == expected
 
 
+def test_ignore_patterns():
+    """Test that parsing an ignore_pattern_dict (typically coming from yaml) leads
+    to the expected list-of-string tuples"""
+    dict_patterns = {
+        "SomeFile": ["method_to_ignore1", "method_to_ignore2", "method_to_ignore3"],
+        "FileWhereWeWantToIgnoreAllSpecialMethods": "__.+__",
+        ".*": "method_to_ignore_in_all_files",
+        "a_very_important_view_file": ["^get$", "^set$", "^post$"],
+        "detect_.*": ["get_val.*"],
+    }
+    expected = (
+        ["SomeFile", "method_to_ignore1", "method_to_ignore2", "method_to_ignore3"],
+        ["FileWhereWeWantToIgnoreAllSpecialMethods", "__.+__"],
+        [".*", "method_to_ignore_in_all_files"],
+        ["a_very_important_view_file", "^get$", "^set$", "^post$"],
+        ["detect_.*", "get_val.*"],
+    )
+    actual = parse_ignore_patterns_from_dict(dict_patterns)
+    assert actual == expected
+
+
+@pytest.mark.parametrize(
+    ["input_dict", "error"],
+    [
+        ("not_a_dict", TypeError),  # Wrong type: not a dict
+        ({0: ["get_val.*"]}, TypeError),  # Wrong type: non-string key
+        ({'SomeFile': 0}, TypeError),  # Wrong type: non string non List[str]
+        ({'SomeFile': [0]}, TypeError),  # Wrong type: non string non List[str]
+        ({'SomeFile': {"asd", "adw"}}, TypeError),  # Wrong type: non string non List[str]
+        ({" ": ["get_val.*"]}, ValueError),  # Empty string not permitted
+        ({'SomeFile': ""}, ValueError),  # Empty string not permitted
+        ({'SomeFile': " "}, ValueError),  # Empty string not permitted
+    ],
+)
+def test_ignore_patterns_from_dict_errors(input_dict, error):
+    """
+    Test that invalid yaml ignore_pattern dicts raises an error.
+
+    Parameters
+    ----------
+    input_dict:
+        The faulty input.
+    error: Union[TypeError, ValueError]
+        The expected error """
+    with pytest.raises(error):
+        parse_ignore_patterns_from_dict(input_dict)
+
+
 @pytest.mark.parametrize(
     ["path", "expected"],
     [
@@ -271,39 +319,3 @@ def test_cli_collect_filepaths(
     mock_collect_filepaths.assert_called_once_with(
         *[os.path.abspath(_) for _ in paths], follow_links=follow_links_value, exclude=exclude_value
     )
-
-
-def test_ignore_patterns():
-    dict_patterns = {
-        "SomeFile": ["method_to_ignore1", "method_to_ignore2", "method_to_ignore3"],
-        "FileWhereWeWantToIgnoreAllSpecialMethods": "__.+__",
-        ".*": "method_to_ignore_in_all_files",
-        "a_very_important_view_file": ["^get$", "^set$", "^post$"],
-        "detect_.*": ["get_val.*"],
-    }
-    expected = (
-        ["SomeFile", "method_to_ignore1", "method_to_ignore2", "method_to_ignore3"],
-        ["FileWhereWeWantToIgnoreAllSpecialMethods", "__.+__"],
-        [".*", "method_to_ignore_in_all_files"],
-        ["a_very_important_view_file", "^get$", "^set$", "^post$"],
-        ["detect_.*", "get_val.*"],
-    )
-    actual = parse_ignore_patterns_from_dict(dict_patterns)
-    assert actual == expected
-
-
-@pytest.mark.parametrize(
-    ["input_dict", "error"],
-    [
-        ({0: ["get_val.*"]}, TypeError),  # Wrong type: non-string key
-        ({'SomeFile': 0}, TypeError),  # Wrong type: non string non List[str]
-        ({'SomeFile': [0]}, TypeError),  # Wrong type: non string non List[str]
-        ({'SomeFile': {"asd", "adw"}}, TypeError),  # Wrong type: non string non List[str]
-        ({" ": ["get_val.*"]}, ValueError),  # Empty string not permitted
-        ({'SomeFile': ""}, ValueError),  # Empty string not permitted
-        ({'SomeFile': " "}, ValueError),  # Empty string not permitted
-    ],
-)
-def test_ignore_patterns_from_dict_errors(input_dict, error):
-    with pytest.raises(error):
-        parse_ignore_patterns_from_dict(input_dict)
