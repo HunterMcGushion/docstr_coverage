@@ -6,7 +6,7 @@ def readme():
         return f.read()
 
 
-MAJOR, MINOR, MICRO = 1, 3, 0
+MAJOR, MINOR, MICRO = 1, 4, 0
 __VERSION__ = "{}.{}.{}".format(MAJOR, MINOR, MICRO)
 
 setup(
@@ -25,9 +25,9 @@ setup(
     author_email="hunter@mcgushion.com",
     license="MIT",
     packages=["docstr_coverage"],
-    install_requires=["click"],
+    install_requires=["click", "PyYAML"],
     extras_require={
-        "lint": ["flake8==3.8.2", "black==19.10b0"],
+        "lint": ["flake8==3.8.2", "black==19.10b0", "isort==5.6.4"],
         "test": ["pytest==5.4.2", "pytest-mock"],
     },
     include_package_data=True,

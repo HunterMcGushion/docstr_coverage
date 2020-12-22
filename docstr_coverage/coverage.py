@@ -1,11 +1,12 @@
 """This repository is based on the work of Alexey "DataGreed" Strelkov,
 and James Harlow (see "THANKS.txt" for details)"""
 
-# TODO: If Python 2, ```from __future__ import print_function```
-from ast import parse
 import logging
 import os
 import re
+
+# TODO: If Python 2, ```from __future__ import print_function```
+from ast import parse
 from typing import List, Tuple
 
 from docstr_coverage.visitor import DocStringCoverageVisitor
@@ -146,9 +147,6 @@ def get_docstring_coverage(
         ...     'needed_count': '<total_needed_docstrings_count int>',
         ...     'coverage': '<total_percent_of_coverage float>'
         ... }"""
-
-    verbose = int(verbose)
-
     # TODO: Switch to Python's `logging` module, and remove
     #       below nested `log` function definition
     def log(text, level=1):

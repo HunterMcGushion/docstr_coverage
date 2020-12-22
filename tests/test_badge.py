@@ -1,9 +1,9 @@
 """Tests for :mod:`docstr_coverage.badge`"""
 import os
+
 import pytest
 
 from docstr_coverage.badge import Badge
-
 
 CWD = os.path.abspath(os.path.dirname(__file__))
 SAMPLE_BADGE_DIR = os.path.join(CWD, "sample_files", "badges")

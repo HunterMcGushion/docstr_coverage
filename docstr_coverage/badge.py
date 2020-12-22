@@ -7,8 +7,8 @@ repository. Thank you to the authors for their fantastic work! Go give
 [coverage-badge](https://github.com/dbrgn/coverage-badge) a star!"""
 
 import os
-import pkg_resources
 
+import pkg_resources
 
 COLORS = {
     "brightgreen": "#4c1",
