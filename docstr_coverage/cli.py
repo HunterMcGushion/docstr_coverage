@@ -1,5 +1,7 @@
 """This module is the CLI entry point for `docstr_coverage` in which CLI arguments are defined and
 passed on to other modules"""
+import platform
+
 import click
 import os
 import re
@@ -11,7 +13,12 @@ from docstr_coverage.coverage import get_docstring_coverage
 
 
 def do_include_filepath(filepath: str, exclude_re: Optional["re.Pattern"]) -> bool:
-    """Determine whether `filepath` should be included in docstring search
+    """Determine whether `filepath` should be included in docstring search.
+    Note on regex matching:
+    On windows we check against unix and windows regex matches (if one of the two matches)
+    Hence we have a one-way compatibility (regex for unix paths work in win as well).
+    Two way compatibility (matching win-path regexes on linux) is not possible as a single backslash
+    is a valid character in a unix path.
 
     Parameters
     ----------
@@ -27,7 +34,10 @@ def do_include_filepath(filepath: str, exclude_re: Optional["re.Pattern"]) -> bo
     if not filepath.endswith(".py"):
         return False
     if exclude_re is not None:
-        return not exclude_re.match(filepath)
+        if exclude_re.match(filepath):
+            return False
+        if platform.system() == 'Windows':
+            return not exclude_re.match(filepath.replace("\\", "/"))
     return True
 
 
