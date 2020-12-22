@@ -43,7 +43,7 @@ def do_include_filepath(filepath: str, exclude_re: Optional["re.Pattern"]) -> bo
 
 
 def collect_filepaths(
-        *paths: str, follow_links: bool = False, exclude: Optional[str] = None
+    *paths: str, follow_links: bool = False, exclude: Optional[str] = None
 ) -> List[str]:
     """Collect filepaths under given `paths` that are not `exclude`-d
 
