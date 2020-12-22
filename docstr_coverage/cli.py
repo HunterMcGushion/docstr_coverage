@@ -1,12 +1,12 @@
 """This module is the CLI entry point for `docstr_coverage` in which CLI arguments are defined and
 passed on to other modules"""
-import platform
-
-import click
 import os
+import platform
 import re
 import sys
 from typing import List, Optional
+
+import click
 
 from docstr_coverage.badge import Badge
 from docstr_coverage.config_file import set_config_defaults
@@ -43,7 +43,7 @@ def do_include_filepath(filepath: str, exclude_re: Optional["re.Pattern"]) -> bo
 
 
 def collect_filepaths(
-    *paths: str, follow_links: bool = False, exclude: Optional[str] = None
+        *paths: str, follow_links: bool = False, exclude: Optional[str] = None
 ) -> List[str]:
     """Collect filepaths under given `paths` that are not `exclude`-d
 
