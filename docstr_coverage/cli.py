@@ -39,7 +39,7 @@ def do_include_filepath(filepath: str, exclude_re: Optional["re.Pattern"]) -> bo
     if exclude_re is not None:
         if exclude_re.match(filepath):
             return False
-        if platform.system() == 'Windows':
+        if platform.system() == "Windows":
             return not exclude_re.match(filepath.replace("\\", "/"))
     return True
 

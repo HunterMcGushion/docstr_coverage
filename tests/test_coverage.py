@@ -154,7 +154,7 @@ def test_logging_empty_file(caplog, expected):
     with caplog.at_level(logging.DEBUG):
         _file_results, _total_results = get_docstring_coverage([EMPTY_FILE_PATH], verbose=3)
 
-    if platform.system() == 'Windows':
+    if platform.system() == "Windows":
         assert [m.replace("\\", "/") for m in caplog.messages] == expected
     else:
         assert caplog.messages == expected
@@ -232,11 +232,10 @@ def test_logging_partially_documented_file(caplog, expected, verbose, ignore_nam
             [PARTLY_DOCUMENTED_FILE_PATH], verbose=verbose, ignore_names=ignore_names
         )
 
-    if platform.system() == 'Windows':
+    if platform.system() == "Windows":
         assert [m.replace("\\", "/") for m in caplog.messages] == expected
     else:
         assert caplog.messages == expected
-
 
 
 def test_skip_private():
