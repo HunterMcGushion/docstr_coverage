@@ -8,8 +8,6 @@ import re
 import sys
 from typing import List, Optional
 
-import click
-
 from docstr_coverage.badge import Badge
 from docstr_coverage.config_file import set_config_defaults
 from docstr_coverage.coverage import get_docstring_coverage
