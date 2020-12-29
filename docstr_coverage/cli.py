@@ -123,7 +123,7 @@ def parse_ignore_patterns_from_dict(ignore_patterns_dict) -> tuple:
         if not isinstance(key, str):
             raise TypeError("ignore patters in config contained non-string key {}".format(key))
         if len(key.strip()) == 0:
-            raise ValueError("ignore pattern in contained empty file name regex")
+            raise ValueError("ignore pattern in contained empty (file name) regex")
         if not all(isinstance(v, str) for v in value) and len(value) > 0:
             raise TypeError(
                 "ignore patters for key {} contained non-string values or was empty.".format(key)
