@@ -143,6 +143,9 @@ def test_collect_filepaths(paths: List[str], exclude: str, expected: List[str]):
     assert actual == expected
 
 
+# we could manually implement order-ignoring ==,
+#   but I do not think its worth it, since py 3.6+ supports
+#   it and thus runs the test
 @pytest.mark.skipif(
     sys.version_info < (3, 6),
     reason="order-ignoring dict == comparison requires python3.6 or later ",
