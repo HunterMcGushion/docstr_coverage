@@ -1,6 +1,7 @@
 """Tests for :mod:`docstr_coverage.cli`"""
 import os
 import re
+import sys
 from typing import List, Optional
 
 import pytest
@@ -364,7 +365,7 @@ def test_cli_collect_filepaths(
 @pytest.mark.parametrize(
     ["ignore_file_flag", "use_ignore_file"],
     [
-        pytest.param([], False, id="no_config_specified"),
+        pytest.param([], False, id="no_ignore_file"),
         pytest.param(
             ["-d", os.path.join("config_files", "docstr_ignore.txt")], True, id="short_ignore_file"
         ),
@@ -376,6 +377,9 @@ def test_cli_collect_filepaths(
     ],
 )
 @pytest.mark.usefixtures("cd_tests_dir_fixture")
+@pytest.mark.skipif(
+    sys.version_info < (3, 6), reason="assert_called_once requires python3.6 or later "
+)
 def test_ignore_patterns_files(
     paths: List[str],
     config_flag: List[str],
