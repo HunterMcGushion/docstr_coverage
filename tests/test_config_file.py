@@ -47,7 +47,7 @@ fake_config_file_ignore_patterns["ignore_patterns"] = test_ignore_patterns
 def run_before_and_after_tests(tmpdir):
     """
     Delete the fake config file before and after every test
-    to make sure the tests do influence each other.
+    to make sure the tests do *NOT* influence each other.
     """
     if os.path.isfile(TEST_CONFIG_FILE):
         os.remove(TEST_CONFIG_FILE)
