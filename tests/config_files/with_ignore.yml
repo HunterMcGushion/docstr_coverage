@@ -14,7 +14,7 @@ ignore_patterns:
   detect_.*:
     - get_val.*
   custom_only_in_yml_specified_filename:
-    -
+    - method*
 paths:
   - tests
   - docstr_coverage
