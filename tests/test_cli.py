@@ -406,7 +406,8 @@ def test_ignore_patterns_files(
     mocker: pytest_mock.MockFixture
         Mock to check arguments passed to :func:`docstr_coverage.cli.collect_filepaths`"""
 
-    # Check that there is no `.docstr_coverage` file added to the test folder, which may be used as default
+    # Check that there is no `.docstr_coverage` file added to the test folder,
+    #   which may be used as default
     assert not os.path.isfile(
         ".docstr_coverage"
     ), "This test must run in a folder without a `.docstr_coverage` file"

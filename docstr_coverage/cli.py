@@ -117,7 +117,8 @@ def parse_ignore_patterns_from_dict(ignore_patterns_dict) -> tuple:
     Returns
     -------
     Tuple
-        Tuple of iterables of string, with equal meaning as the output from `parse_ignore_names_file` """
+        Tuple of iterables of string,
+        with equal meaning as the output from `parse_ignore_names_file` """
 
     def _assert_valid_key_value(key, value):
         if not isinstance(key, str):
