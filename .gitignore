@@ -6,6 +6,8 @@
 env/
 env.bak/
 venv/
+venv*/
+
 
 # Documentation
 docs/_build/

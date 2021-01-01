@@ -143,6 +143,10 @@ def test_collect_filepaths(paths: List[str], exclude: str, expected: List[str]):
     assert actual == expected
 
 
+@pytest.mark.skipif(
+    sys.version_info < (3, 6),
+    reason="order-ignoring dict == comparison requires python3.6 or later ",
+)
 def test_ignore_patterns():
     """Test that parsing an ignore_pattern_dict (typically coming from yaml) leads
     to the expected list-of-string tuples"""
