@@ -254,9 +254,6 @@ def test_percentage_only(
 ##################################################
 # Click Tests
 ##################################################
-def YML_CONFIG_PATH():
-    return os.path.join("config_files", "with_ignore.yml")
-
 
 @pytest.mark.parametrize(
     "paths",
@@ -287,14 +284,6 @@ def YML_CONFIG_PATH():
         # TODO: Add cases with multiple short and long patterns, and combinations of short/long
     ],
 )
-@pytest.mark.parametrize(
-    ["config_flag", "config_value"],
-    [
-        pytest.param([], None, id="no_config_specified"),
-        pytest.param(["-C", YML_CONFIG_PATH()], YML_CONFIG_PATH(), id="short_config_specifier"),
-        pytest.param(["--config", YML_CONFIG_PATH()], YML_CONFIG_PATH(), id="long_config_specifier"),
-    ],
-)
 @pytest.mark.usefixtures("cd_tests_dir_fixture")
 def test_cli_collect_filepaths(
         paths: List[str],
@@ -302,8 +291,6 @@ def test_cli_collect_filepaths(
         follow_links_value: bool,
         exclude_flag: List[str],
         exclude_value: Optional[str],
-        config_flag: List[str],
-        config_value: Optional[str],
         runner: CliRunner,
         mocker,
 ):
@@ -329,11 +316,103 @@ def test_cli_collect_filepaths(
         Mock to check arguments passed to :func:`docstr_coverage.cli.collect_filepaths`"""
     mock_collect_filepaths = mocker.patch("docstr_coverage.cli.collect_filepaths")
 
-    invoke_result = runner.invoke(execute, follow_links_flag + exclude_flag + paths + config_flag)
-
-    assert invoke_result.exit_code == 0, \
-        "docstr-coverage invocation failed with exception: {}".format(str(invoke_result.exception))
+    runner.invoke(execute, follow_links_flag + exclude_flag + paths)
 
     mock_collect_filepaths.assert_called_once_with(
         *[os.path.abspath(_) for _ in paths], follow_links=follow_links_value, exclude=exclude_value
     )
+
+
+@pytest.mark.parametrize(
+    "paths",
+    [
+        pytest.param([SAMPLES_DIR], id="samples_dir_x1"),
+        pytest.param([SAMPLES_A.documented], id="files_x1"),
+        pytest.param([SAMPLES_A.empty, SAMPLES_A.partial], id="files_x2"),
+        pytest.param([SAMPLES_A.dirpath, SAMPLES_B.dirpath], id="dirs_x2"),
+        pytest.param([SAMPLES_A.empty, SAMPLES_A.partial, SAMPLES_B.dirpath], id="files_x2+dir_x1"),
+        pytest.param([os.path.join("sample_files", "subdir_a")], id="rel_dir_x1"),
+    ],
+)
+@pytest.mark.parametrize(
+    ["config_flag", "use_yml_ignore"],
+    [
+        pytest.param([],
+                     False, id="no_config_specified"),
+        pytest.param(["-C", os.path.join("config_files", "with_ignore.yml")],
+                     True, id="short_config_specifier_w_ignore"),
+        pytest.param(["--config", os.path.join("config_files", "with_ignore.yml")],
+                     True, id="long_config_specifier_w_ignore"),
+        pytest.param(["-C", os.path.join("config_files", "without_ignore.yml")],
+                     False, id="short_config_specifier_wo_ignore"),
+        pytest.param(["--config", os.path.join("config_files", "without_ignore.yml")],
+                     False, id="long_config_specifier_wo_ignore"),
+    ],
+)
+@pytest.mark.parametrize(
+    ["ignore_file_flag", "use_ignore_file"],
+    [
+        pytest.param([],
+                     False, id="no_config_specified"),
+        pytest.param(["-d", os.path.join("config_files", "docstr_ignore.txt")],
+                     True, id="short_ignore_file"),
+        pytest.param(["--docstr-ignore-file", os.path.join("config_files", "docstr_ignore.txt")],
+                     True, id="long_ignore_file"),
+    ],
+)
+@pytest.mark.usefixtures("cd_tests_dir_fixture")
+def test_ignore_patterns_files(
+        paths: List[str],
+        config_flag: List[str],
+        use_yml_ignore: Optional[str],
+        ignore_file_flag: List[str],
+        use_ignore_file: Optional[str],
+        runner: CliRunner,
+        mocker,
+):
+    """Test that CLI inputs are correctly interpreted and passed along to
+    :func:`docstr_coverage.cli.collect_filepaths`
+
+    Parameters
+    ----------
+    paths: List[str]
+        Path arguments provided to CLI. These should be made absolute before they are passed to
+        :func:`docstr_coverage.cli.collect_filepaths`
+    config_flag: List[str]
+        CLI option to specify path of yml config file
+    use_yml_ignore: Boolean
+        True iff `config_flag` points to a file with custom ignore patterns
+    ignore_file_flag: List[str]
+        CLI option to specify path of a plain ignore patterns file
+    use_ignore_file: Boolean
+        True iff `ignore_file_flag` points to a file with custom ignore patterns
+    runner: CliRunner
+        Click utility to invoke command line scripts
+    mocker: pytest_mock.MockFixture
+        Mock to check arguments passed to :func:`docstr_coverage.cli.collect_filepaths`"""
+
+    # Check that there is no `.docstr_coverage` file added to the test folder, which may be used as default
+    assert not os.path.isfile(".docstr_coverage"), \
+        "This test must run in a folder without a `.docstr_coverage` file"
+
+    mock_parse_ig_f = mocker.patch("docstr_coverage.cli.parse_ignore_names_file")
+    parse_ig_from_dict = mocker.patch("docstr_coverage.cli.parse_ignore_patterns_from_dict")
+
+    run_result = runner.invoke(execute, paths + config_flag + ignore_file_flag)
+
+    if use_yml_ignore and use_ignore_file:
+        assert run_result.exception, \
+            "No exception was raised even though yml and txt custom ignore patterns were passed"
+        assert isinstance(run_result.exception, ValueError)
+        assert "At most one way to specify ignore patterns must be used" in run_result.exception.args[0]
+
+    elif use_yml_ignore:
+        mock_parse_ig_f.assert_not_called()
+        parse_ig_from_dict.assert_called_once()
+    elif use_ignore_file:
+        parse_ig_from_dict.assert_not_called()
+        mock_parse_ig_f.assert_called_once()
+    else:
+        parse_ig_from_dict.assert_not_called()
+        mock_parse_ig_f.assert_not_called()
+

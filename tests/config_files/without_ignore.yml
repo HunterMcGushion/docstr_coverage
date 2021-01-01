@@ -1,0 +1,9 @@
+fail_under: 90
+follow_links: true
+percentage_only: true
+skip_class_def: true
+skip_file_doc: true
+skip_init: true
+skip_magic: true
+skip_private: true
+verbose: '2'
