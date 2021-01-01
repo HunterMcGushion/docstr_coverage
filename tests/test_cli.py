@@ -116,14 +116,14 @@ def test_do_include_filepath(filepath: str, exclude_re: Optional[str], expected:
         ([SAMPLES_A.dirpath, SAMPLES_B.dirpath], "", SAMPLES_A.all + SAMPLES_B.all),
         ([SAMPLES_A.dirpath, SAMPLES_B.dirpath], ".*subdir_a.*", SAMPLES_B.all),
         (
-                [SAMPLES_A.dirpath, SAMPLES_B.documented, SAMPLES_B.empty],
-                ".*subdir_a.*",
-                [SAMPLES_B.documented, SAMPLES_B.empty],
+            [SAMPLES_A.dirpath, SAMPLES_B.documented, SAMPLES_B.empty],
+            ".*subdir_a.*",
+            [SAMPLES_B.documented, SAMPLES_B.empty],
         ),
         (
-                [SAMPLES_A.dirpath, SAMPLES_B.dirpath],
-                ".*_file\\.py",
-                [SAMPLES_A.undocumented, SAMPLES_B.undocumented],
+            [SAMPLES_A.dirpath, SAMPLES_B.dirpath],
+            ".*_file\\.py",
+            [SAMPLES_A.undocumented, SAMPLES_B.undocumented],
         ),
     ],
 )
@@ -196,14 +196,14 @@ def test_ignore_patterns_from_dict_errors(input_dict, error):
         ("", ()),
         ("this_file_does_not_exist.txt", ()),
         (
-                os.path.join(SAMPLES_A.dirpath, "docstr_ignore.txt"),
-                (
-                        ["SomeFile", "method_to_ignore1", "method_to_ignore2", "method_to_ignore3"],
-                        ["FileWhereWeWantToIgnoreAllSpecialMethods", "__.+__"],
-                        [".*", "method_to_ignore_in_all_files"],
-                        ["a_very_important_view_file", "^get$", "^set$", "^post$"],
-                        ["detect_.*", "get_val.*"],
-                ),
+            os.path.join(SAMPLES_A.dirpath, "docstr_ignore.txt"),
+            (
+                ["SomeFile", "method_to_ignore1", "method_to_ignore2", "method_to_ignore3"],
+                ["FileWhereWeWantToIgnoreAllSpecialMethods", "__.+__"],
+                [".*", "method_to_ignore_in_all_files"],
+                ["a_very_important_view_file", "^get$", "^set$", "^post$"],
+                ["detect_.*", "get_val.*"],
+            ),
         ),
     ],
 )
@@ -232,7 +232,7 @@ def test_parse_ignore_names_file(path: str, expected: tuple):
 )
 @pytest.mark.parametrize("verbose_flag", [["-v", "0"], ["-v", "1"], ["-v", "2"], ["-v", "3"]])
 def test_percentage_only(
-        paths: List[str], expected_output: str, verbose_flag: List[str], runner: CliRunner
+    paths: List[str], expected_output: str, verbose_flag: List[str], runner: CliRunner
 ):
     """Test that using the `--percentage-only` CLI option works correctly
 
@@ -254,6 +254,7 @@ def test_percentage_only(
 ##################################################
 # Click Tests
 ##################################################
+
 
 @pytest.mark.parametrize(
     "paths",
@@ -286,13 +287,13 @@ def test_percentage_only(
 )
 @pytest.mark.usefixtures("cd_tests_dir_fixture")
 def test_cli_collect_filepaths(
-        paths: List[str],
-        follow_links_flag: List[str],
-        follow_links_value: bool,
-        exclude_flag: List[str],
-        exclude_value: Optional[str],
-        runner: CliRunner,
-        mocker,
+    paths: List[str],
+    follow_links_flag: List[str],
+    follow_links_value: bool,
+    exclude_flag: List[str],
+    exclude_value: Optional[str],
+    runner: CliRunner,
+    mocker,
 ):
     """Test that CLI inputs are correctly interpreted and passed along to
     :func:`docstr_coverage.cli.collect_filepaths`
@@ -337,38 +338,52 @@ def test_cli_collect_filepaths(
 @pytest.mark.parametrize(
     ["config_flag", "use_yml_ignore"],
     [
-        pytest.param([],
-                     False, id="no_config_specified"),
-        pytest.param(["-C", os.path.join("config_files", "with_ignore.yml")],
-                     True, id="short_config_specifier_w_ignore"),
-        pytest.param(["--config", os.path.join("config_files", "with_ignore.yml")],
-                     True, id="long_config_specifier_w_ignore"),
-        pytest.param(["-C", os.path.join("config_files", "without_ignore.yml")],
-                     False, id="short_config_specifier_wo_ignore"),
-        pytest.param(["--config", os.path.join("config_files", "without_ignore.yml")],
-                     False, id="long_config_specifier_wo_ignore"),
+        pytest.param([], False, id="no_config_specified"),
+        pytest.param(
+            ["-C", os.path.join("config_files", "with_ignore.yml")],
+            True,
+            id="short_config_specifier_w_ignore",
+        ),
+        pytest.param(
+            ["--config", os.path.join("config_files", "with_ignore.yml")],
+            True,
+            id="long_config_specifier_w_ignore",
+        ),
+        pytest.param(
+            ["-C", os.path.join("config_files", "without_ignore.yml")],
+            False,
+            id="short_config_specifier_wo_ignore",
+        ),
+        pytest.param(
+            ["--config", os.path.join("config_files", "without_ignore.yml")],
+            False,
+            id="long_config_specifier_wo_ignore",
+        ),
     ],
 )
 @pytest.mark.parametrize(
     ["ignore_file_flag", "use_ignore_file"],
     [
-        pytest.param([],
-                     False, id="no_config_specified"),
-        pytest.param(["-d", os.path.join("config_files", "docstr_ignore.txt")],
-                     True, id="short_ignore_file"),
-        pytest.param(["--docstr-ignore-file", os.path.join("config_files", "docstr_ignore.txt")],
-                     True, id="long_ignore_file"),
+        pytest.param([], False, id="no_config_specified"),
+        pytest.param(
+            ["-d", os.path.join("config_files", "docstr_ignore.txt")], True, id="short_ignore_file"
+        ),
+        pytest.param(
+            ["--docstr-ignore-file", os.path.join("config_files", "docstr_ignore.txt")],
+            True,
+            id="long_ignore_file",
+        ),
     ],
 )
 @pytest.mark.usefixtures("cd_tests_dir_fixture")
 def test_ignore_patterns_files(
-        paths: List[str],
-        config_flag: List[str],
-        use_yml_ignore: Optional[str],
-        ignore_file_flag: List[str],
-        use_ignore_file: Optional[str],
-        runner: CliRunner,
-        mocker,
+    paths: List[str],
+    config_flag: List[str],
+    use_yml_ignore: Optional[str],
+    ignore_file_flag: List[str],
+    use_ignore_file: Optional[str],
+    runner: CliRunner,
+    mocker,
 ):
     """Test that CLI inputs are correctly interpreted and passed along to
     :func:`docstr_coverage.cli.collect_filepaths`
@@ -392,8 +407,9 @@ def test_ignore_patterns_files(
         Mock to check arguments passed to :func:`docstr_coverage.cli.collect_filepaths`"""
 
     # Check that there is no `.docstr_coverage` file added to the test folder, which may be used as default
-    assert not os.path.isfile(".docstr_coverage"), \
-        "This test must run in a folder without a `.docstr_coverage` file"
+    assert not os.path.isfile(
+        ".docstr_coverage"
+    ), "This test must run in a folder without a `.docstr_coverage` file"
 
     mock_parse_ig_f = mocker.patch("docstr_coverage.cli.parse_ignore_names_file")
     parse_ig_from_dict = mocker.patch("docstr_coverage.cli.parse_ignore_patterns_from_dict")
@@ -401,10 +417,14 @@ def test_ignore_patterns_files(
     run_result = runner.invoke(execute, paths + config_flag + ignore_file_flag)
 
     if use_yml_ignore and use_ignore_file:
-        assert run_result.exception, \
-            "No exception was raised even though yml and txt custom ignore patterns were passed"
+        assert (
+            run_result.exception
+        ), "No exception was raised even though yml and txt custom ignore patterns were passed"
         assert isinstance(run_result.exception, ValueError)
-        assert "At most one way to specify ignore patterns must be used" in run_result.exception.args[0]
+        assert (
+            "At most one way to specify ignore patterns must be used"
+            in run_result.exception.args[0]
+        )
 
     elif use_yml_ignore:
         mock_parse_ig_f.assert_not_called()
@@ -415,4 +435,3 @@ def test_ignore_patterns_files(
     else:
         parse_ig_from_dict.assert_not_called()
         mock_parse_ig_f.assert_not_called()
-
