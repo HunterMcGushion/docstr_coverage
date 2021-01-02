@@ -119,8 +119,6 @@ ignore_patterns:
     - "^post$"
   detect_.*:
     - "get_val.*"
-  custom_only_in_yml_specified_filename:
-    - "method*"
 ```
 equivalent to
 ```
