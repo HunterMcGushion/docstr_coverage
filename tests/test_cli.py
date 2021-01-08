@@ -431,7 +431,7 @@ def test_ignore_patterns_files(
         ), "No exception was raised even though yml and txt custom ignore patterns were passed"
         assert isinstance(run_result.exception, ValueError)
         assert (
-            "At most one way to specify ignore patterns must be used"
+            "Ignore patterns must be specified in only one location at a time."
             in run_result.exception.args[0]
         )
 
