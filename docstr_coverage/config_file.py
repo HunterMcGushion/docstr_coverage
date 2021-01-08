@@ -60,9 +60,7 @@ def _extract_non_default_list(
         Name of the field for which the value has to be extracted
     process: Callable
         A mapping function, allowing to modify or replace transfer the values
-        present in the config file before storing them in ctx.params
-
-    """
+        present in the config file before storing them in ctx.params"""
     try:
         # Check if `field` was given in config file
         config_paths = config_data.pop(field)

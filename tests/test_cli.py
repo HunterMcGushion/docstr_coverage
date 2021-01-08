@@ -185,15 +185,14 @@ def test_ignore_patterns():
     ],
 )
 def test_ignore_patterns_from_dict_errors(input_dict, error):
-    """
-    Test that invalid yaml ignore_pattern dicts raises an error.
+    """Test that invalid yaml ignore_pattern dicts raises an error
 
     Parameters
     ----------
-    input_dict:
-        The faulty input.
+    input_dict
+        The faulty input
     error: Union[TypeError, ValueError]
-        The expected error """
+        The expected error"""
     with pytest.raises(error):
         parse_ignore_patterns_from_dict(input_dict)
 
@@ -262,8 +261,6 @@ def test_percentage_only(
 ##################################################
 # Click Tests
 ##################################################
-
-
 @pytest.mark.parametrize(
     "paths",
     [
@@ -390,9 +387,9 @@ def test_cli_collect_filepaths(
 def test_ignore_patterns_files(
     paths: List[str],
     config_flag: List[str],
-    use_yml_ignore: Optional[str],
+    use_yml_ignore: bool,
     ignore_file_flag: List[str],
-    use_ignore_file: Optional[str],
+    use_ignore_file: bool,
     runner: CliRunner,
     mocker,
 ):

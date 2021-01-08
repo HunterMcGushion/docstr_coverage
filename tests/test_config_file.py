@@ -45,10 +45,8 @@ fake_config_file_ignore_patterns["ignore_patterns"] = test_ignore_patterns
 
 @pytest.fixture(autouse=True)
 def run_before_and_after_tests(tmpdir):
-    """
-    Delete the fake config file before and after every test
-    to make sure the tests do *NOT* influence each other.
-    """
+    """Delete the fake config file before and after every test
+    to make sure the tests do *NOT* influence each other"""
     if os.path.isfile(TEST_CONFIG_FILE):
         os.remove(TEST_CONFIG_FILE)
     yield  # this is where the testing happens
@@ -57,9 +55,7 @@ def run_before_and_after_tests(tmpdir):
 
 
 def test_set_config_defaults_no_conf_file():
-    """
-    Test set_config_defaults when .docstr.yaml is missing
-    """
+    """Test set_config_defaults when .docstr.yaml is missing"""
     ctx = click.Context(click.Command("paths"))
     ctx.params = {"paths": ()}
     value = set_config_defaults(ctx, click.Option("-C", "--config"), None)
@@ -68,9 +64,7 @@ def test_set_config_defaults_no_conf_file():
 
 
 def test_set_config_defaults():
-    """
-    Test ReadConfigFile with fake .docstr.yaml with multiple paths
-    """
+    """Test ReadConfigFile with fake .docstr.yaml with multiple paths"""
     # fake .docstr.yaml
     with open(TEST_CONFIG_FILE, "w") as outfile:
         yaml.dump(fake_config_file, outfile, default_flow_style=False)
@@ -91,9 +85,7 @@ def test_set_config_defaults():
 
 
 def test_set_config_defaults_with_string_paths():
-    """
-    Test ReadConfigFile with fake .docstr.yaml with only one path
-    """
+    """Test ReadConfigFile with fake .docstr.yaml with only one path"""
     # fake .docstr.yaml
     with open(TEST_CONFIG_FILE, "w") as outfile:
         yaml.dump(fake_config_file_string_paths, outfile, default_flow_style=False)
@@ -114,9 +106,8 @@ def test_set_config_defaults_with_string_paths():
 
 
 def test_set_config_defaults_with_ignore_patterns():
-    """
-    Test ReadConfigFile with fake .docstr.yaml w.r.t. the parsing of custom ignore patterns
-    """
+    """Test ReadConfigFile with fake .docstr.yaml w.r.t. the parsing of custom ignore
+    patterns"""
     # fake .docstr.yaml
     with open(TEST_CONFIG_FILE, "w") as outfile:
         yaml.dump(fake_config_file_ignore_patterns, outfile, default_flow_style=False)

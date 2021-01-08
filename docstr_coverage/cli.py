@@ -101,13 +101,8 @@ def parse_ignore_names_file(ignore_names_file: str) -> tuple:
 
 
 def parse_ignore_patterns_from_dict(ignore_patterns_dict) -> tuple:
-    """
-    Parse dictionary containing (file_name_pattern, exclude_patterns) key value pairs
-    to return an output consistent with ignore patterns parsed by `parse_ignore_names_file`.
-
-    Note: To align the workflow with `parse_ignore_names_file`,
-    we check that the passed values have indeed type string,
-    but we do not yet check if they are valid regular expressions.
+    """Parse dictionary containing (file_name_pattern, exclude_patterns) key value pairs
+    to return an output consistent with ignore patterns parsed by `parse_ignore_names_file`
 
     Parameters
     ----------
@@ -117,8 +112,12 @@ def parse_ignore_patterns_from_dict(ignore_patterns_dict) -> tuple:
     Returns
     -------
     Tuple
-        Tuple of iterables of string,
-        with equal meaning as the output from `parse_ignore_names_file` """
+        Tuple of iterables of string with the same form as the output of `parse_ignore_names_file`
+
+    Notes
+    -----
+    To align the workflow with `parse_ignore_names_file`, we check that the passed values
+    are of type string, but we do not yet check if they are valid regular expressions"""
 
     def _assert_valid_key_value(key, value):
         if not isinstance(key, str):
