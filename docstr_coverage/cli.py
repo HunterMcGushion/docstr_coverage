@@ -122,19 +122,19 @@ def parse_ignore_patterns_from_dict(ignore_patterns_dict) -> tuple:
 
     def _assert_valid_key_value(key, value):
         if not isinstance(key, str):
-            raise TypeError("ignore patters in config contained non-string key {}".format(key))
+            raise TypeError("ignore patterns in config contained non-string key {}".format(key))
         if len(key.strip()) == 0:
-            raise ValueError("ignore pattern in contained empty (file name) regex")
+            raise ValueError("ignore pattern in config contained empty (file name) regex")
         if not all(isinstance(v, str) for v in value) and len(value) > 0:
             raise TypeError(
-                "ignore patters for key {} contained non-string values or was empty.".format(key)
+                "ignore patterns for key {} contained non-string values or was empty.".format(key)
             )
         if not all(len(v.strip()) > 0 for v in value):
             raise ValueError("ignore pattern for key {} contained empty regex".format(key))
 
     if not isinstance(ignore_patterns_dict, dict):
         raise TypeError(
-            "ignore patters in config must have type Dict[str, Union[str, List[str]]],"
+            "ignore patterns in config must have type Dict[str, Union[str, List[str]]],"
             "but was {}".format(type(ignore_patterns_dict))
         )
 

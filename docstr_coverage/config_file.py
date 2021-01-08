@@ -64,13 +64,13 @@ def _extract_non_default_list(
 
     """
     try:
-        # Check if `paths` were given in config file
+        # Check if `field` was given in config file
         config_paths = config_data.pop(field)
     except KeyError:
         # No value for field was provided
         pass
     else:
-        # Use config default if `paths` was not provided as CLI argument
+        # Use config default if `field` was not provided as CLI argument
         if not ctx.params.get(field) and config_paths:
             if isinstance(config_paths, str):
                 config_paths = [config_paths]

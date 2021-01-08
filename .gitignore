@@ -49,5 +49,5 @@ coverage.xml
 .DS_Store
 .vscode
 
-# Temporary test artefacts
+# Temporary test artifacts
 /tests/.docstr.yaml
