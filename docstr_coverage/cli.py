@@ -100,6 +100,55 @@ def parse_ignore_names_file(ignore_names_file: str) -> tuple:
     return ignore_names
 
 
+def parse_ignore_patterns_from_dict(ignore_patterns_dict) -> tuple:
+    """Parse dictionary containing (file_name_pattern, exclude_patterns) key value pairs
+    to return an output consistent with ignore patterns parsed by `parse_ignore_names_file`
+
+    Parameters
+    ----------
+    ignore_patterns_dict: Dict
+        A dict where each key is a string and each value is a string or a nonempty list of strings.
+
+    Returns
+    -------
+    Tuple
+        Tuple of iterables of string with the same form as the output of `parse_ignore_names_file`
+
+    Notes
+    -----
+    To align the workflow with `parse_ignore_names_file`, we check that the passed values
+    are of type string, but we do not yet check if they are valid regular expressions"""
+
+    def _assert_valid_key_value(k, v):
+        if not isinstance(k, str):
+            raise TypeError("ignore patterns in config contained non-string key {}".format(k))
+        if len(k.strip()) == 0:
+            raise ValueError("ignore pattern in config contained empty (file name) regex")
+        if not all(isinstance(v, str) for v in v) and len(v) > 0:
+            raise TypeError(
+                "ignore patterns for key {} contained non-string values or was empty.".format(k)
+            )
+        if not all(len(v.strip()) > 0 for v in v):
+            raise ValueError("ignore pattern for key {} contained empty regex".format(k))
+
+    if not isinstance(ignore_patterns_dict, dict):
+        raise TypeError(
+            "ignore patterns in config must have type Dict[str, Union[str, List[str]]],"
+            "but was {}".format(type(ignore_patterns_dict))
+        )
+
+    result_list = []
+    for key, value in ignore_patterns_dict.items():
+        res = [key]
+        if not isinstance(value, list):
+            value = [value]
+        _assert_valid_key_value(key, value)
+        res += value
+        result_list.append(res)
+
+    return tuple(result_list)
+
+
 @click.command()
 @click.option(
     # TODO: Use counting instead: https://click.palletsprojects.com/en/7.x/options/#counting
@@ -233,7 +282,21 @@ def execute(paths, **kwargs):
         sys.exit("No Python files found")
 
     # Parse ignore names file
-    ignore_names = parse_ignore_names_file(kwargs["ignore_names_file"])
+    has_ignore_patterns_in_config = "ignore_patterns" in kwargs
+    if os.path.isfile(kwargs["ignore_names_file"]) and has_ignore_patterns_in_config:
+        raise ValueError(
+            (
+                "The docstr-coverage configuration file {} contains ignore_patterns,"
+                " and at the same time an ignore file {} was found."
+                " Ignore patterns must be specified in only one location at a time."
+            ).format(kwargs["config_file"], kwargs["ignore_names_file"])
+        )
+    elif os.path.isfile(kwargs["ignore_names_file"]):
+        ignore_names = parse_ignore_names_file(kwargs["ignore_names_file"])
+    elif has_ignore_patterns_in_config:
+        ignore_names = parse_ignore_patterns_from_dict(kwargs["ignore_patterns"])
+    else:
+        ignore_names = []
 
     # Calculate docstring coverage
     file_results, total_results = get_docstring_coverage(

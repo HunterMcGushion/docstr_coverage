@@ -1,0 +1,27 @@
+fail_under: 90
+follow_links: true
+ignore_patterns:
+  .*: method_to_ignore_in_all_files
+  FileWhereWeWantToIgnoreAllSpecialMethods: "__.+__"
+  SomeFile:
+    - method_to_ignore1
+    - method_to_ignore2
+    - method_to_ignore3
+  a_very_important_view_file:
+    - "^get$"
+    - "^set$"
+    - "^post$"
+  detect_.*:
+    - "get_val.*"
+  custom_only_in_yml_specified_filename:
+    - "method*"
+paths:
+  - tests
+  - docstr_coverage
+percentage_only: true
+skip_class_def: true
+skip_file_doc: true
+skip_init: true
+skip_magic: true
+skip_private: true
+verbose: '2'

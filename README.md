@@ -106,12 +106,30 @@ follow_links: True # Boolean
 ignore_names_file: .*/test # regex
 fail_under: 90 # int 
 percentage_only: True # Boolean
-
+ignore_patterns: # Dict with key/value pairs of file-pattern/node-pattern
+  .*: method_to_ignore_in_all_files
+  FileWhereWeWantToIgnoreAllSpecialMethods: "__.+__"
+  SomeFile:
+    - method_to_ignore1
+    - method_to_ignore2
+    - method_to_ignore3
+  a_very_important_view_file:
+    - "^get$"
+    - "^set$"
+    - "^post$"
+  detect_.*:
+    - "get_val.*"
 ```
 equivalent to
 ```
 docstr-coverage docstr_coverage -e ".*/test" --skip-magic --skip-init --badge="docs" --skip-class-def etc...
 ```
+
+Note that options passed as command line arguments have precedence over options 
+configured in a config file.
+Exception: If a `--docstr-ignore-file` is present and the yml config contains `ignore_patterns`,
+a `ValueError` is raised.
+
 #### Overriding by Comments
 Note that `docstr-coverage` can not parse 
 dynamically added documentation (e.g. through class extension).
