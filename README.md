@@ -106,7 +106,7 @@ follow_links: True # Boolean
 ignore_names_file: .*/test # regex
 fail_under: 90 # int 
 percentage_only: True # Boolean
-ignore_patterns:
+ignore_patterns: # Dict with key/value pairs of file-pattern/node-pattern
   .*: method_to_ignore_in_all_files
   FileWhereWeWantToIgnoreAllSpecialMethods: "__.+__"
   SomeFile:
