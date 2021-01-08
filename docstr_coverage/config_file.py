@@ -42,8 +42,8 @@ def set_config_defaults(ctx, param, value):
 def _extract_non_default_list(
     config_data: Dict, ctx: click.Context, field: str, process: Callable[[List], Any]
 ) -> None:
-    """Processes a field of the config file which should not be read as a default value,
-    but instead by directly stored on the ctx.params.
+    """Processes a field of the config file which should be used as the default value 
+    if not provided as a CLI argument
 
     The field is considered an optional list: If not present in the config data,
     calling this method has no effect.
