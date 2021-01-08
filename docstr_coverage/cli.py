@@ -119,17 +119,17 @@ def parse_ignore_patterns_from_dict(ignore_patterns_dict) -> tuple:
     To align the workflow with `parse_ignore_names_file`, we check that the passed values
     are of type string, but we do not yet check if they are valid regular expressions"""
 
-    def _assert_valid_key_value(key, value):
-        if not isinstance(key, str):
-            raise TypeError("ignore patterns in config contained non-string key {}".format(key))
-        if len(key.strip()) == 0:
+    def _assert_valid_key_value(k, v):
+        if not isinstance(k, str):
+            raise TypeError("ignore patterns in config contained non-string key {}".format(k))
+        if len(k.strip()) == 0:
             raise ValueError("ignore pattern in config contained empty (file name) regex")
-        if not all(isinstance(v, str) for v in value) and len(value) > 0:
+        if not all(isinstance(v, str) for v in v) and len(v) > 0:
             raise TypeError(
-                "ignore patterns for key {} contained non-string values or was empty.".format(key)
+                "ignore patterns for key {} contained non-string values or was empty.".format(k)
             )
-        if not all(len(v.strip()) > 0 for v in value):
-            raise ValueError("ignore pattern for key {} contained empty regex".format(key))
+        if not all(len(v.strip()) > 0 for v in v):
+            raise ValueError("ignore pattern for key {} contained empty regex".format(k))
 
     if not isinstance(ignore_patterns_dict, dict):
         raise TypeError(
