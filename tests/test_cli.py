@@ -479,14 +479,15 @@ def test_accept_empty(
     accept_empty_value: bool,
     runner: CliRunner,
 ):
-    """ Test that the flag to accept paths which do not point to any .py file leads to the correct exit codes.
+    """ Test that the flag to accept paths
+     which do not point to any .py file leads to the correct exit codes.
 
     Parameters
     ----------
     paths: List[str]
         Path arguments provided to CLI. These should be made absolute before they are passed to
         :func:`docstr_coverage.cli.collect_filepaths`
-    paths_contains_py: bool
+    path_contains_py: bool
         True iff the passed paths point (directly or indirectly via dir) to at least one .py file
     accept_empty_flag: List[str]
         Flag under test

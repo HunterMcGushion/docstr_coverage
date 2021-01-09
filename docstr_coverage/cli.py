@@ -291,7 +291,8 @@ def execute(paths, **kwargs):
             sys.exit(0)
         else:
             sys.exit(
-                "No Python files found (use `--accept-empty` to exit with code 0 if you expect this case)"
+                "No Python files found "
+                "(use `--accept-empty` to exit with code 0 if you expect this case)"
             )
 
     # Parse ignore names file
