@@ -4,6 +4,7 @@ import os
 import platform
 import re
 import sys
+import warnings
 from typing import List, Optional
 
 import click
@@ -217,6 +218,12 @@ def parse_ignore_patterns_from_dict(ignore_patterns_dict) -> tuple:
     is_flag=True,
     help="Output only the overall coverage percentage as a float, silencing all other logging",
 )
+@click.option(
+    "-a",
+    "--accept-empty",
+    is_flag=True,
+    help="Exit with code 0 if no Python files are found (default: exit code 1)",
+)
 @click.help_option("-h", "--help")
 @click.argument(
     "paths",
@@ -279,7 +286,14 @@ def execute(paths, **kwargs):
     )
 
     if len(all_paths) < 1:
-        sys.exit("No Python files found")
+        if kwargs["accept_empty"] is True:
+            warnings.warn("No Python files found in specified paths. Processing aborted")
+            sys.exit(0)
+        else:
+            sys.exit(
+                "No Python files found "
+                "(use `--accept-empty` to exit with code 0 if you expect this case)"
+            )
 
     # Parse ignore names file
     has_ignore_patterns_in_config = "ignore_patterns" in kwargs

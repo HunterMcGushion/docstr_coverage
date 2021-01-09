@@ -444,3 +444,62 @@ def test_ignore_patterns_files(
     else:
         parse_ig_from_dict.assert_not_called()
         mock_parse_ig_f.assert_not_called()
+
+
+@pytest.mark.parametrize(
+    ["paths", "path_contains_py"],
+    [
+        pytest.param([SAMPLES_DIR], True, id="samples_dir_x1"),
+        pytest.param([SAMPLES_A.documented], True, id="files_x1"),
+        pytest.param([SAMPLES_A.empty, SAMPLES_A.partial], True, id="files_x2"),
+        pytest.param([SAMPLES_A.dirpath, SAMPLES_B.dirpath], True, id="dirs_x2"),
+        pytest.param(
+            [SAMPLES_A.empty, SAMPLES_A.partial, SAMPLES_B.dirpath], True, id="files_x2+dir_x1"
+        ),
+        pytest.param([os.path.join("sample_files", "subdir_a")], True, id="rel_dir_x1"),
+        pytest.param(
+            [os.path.join("config_files", "docstr_ignore.txt")], False, id="file_with_no_python"
+        ),
+        pytest.param([os.path.join(CWD, "config_files")], False, id="folder_with_no_python"),
+    ],
+)
+@pytest.mark.parametrize(
+    ["accept_empty_flag", "accept_empty_value"],
+    [
+        pytest.param([], False, id="no_accept_empty"),
+        pytest.param(["-a"], True, id="short_accept_empty"),
+        pytest.param(["--accept-empty"], True, id="long_accept_empty"),
+    ],
+)
+@pytest.mark.usefixtures("cd_tests_dir_fixture")
+def test_accept_empty(
+    paths: List[str],
+    path_contains_py: bool,
+    accept_empty_flag: List[str],
+    accept_empty_value: bool,
+    runner: CliRunner,
+):
+    """Test that the `--accept-empty`/`-a` flag leads to the correct exit codes
+
+    Parameters
+    ----------
+    paths: List[str]
+        Path arguments provided to CLI. These should be made absolute before they are passed to
+        :func:`docstr_coverage.cli.collect_filepaths`
+    path_contains_py: bool
+        True iff the passed paths point (directly or indirectly via dir) to at least one .py file
+    accept_empty_flag: List[str]
+        Flag under test
+    accept_empty_value: bool
+        True iff the flag under test specifies to return exit code 0 if no .py file was found
+    runner: CliRunner
+        Click utility to invoke command line scripts"""
+
+    dont_fail_due_to_coverage = ["--fail-under=5"]
+
+    run_result = runner.invoke(execute, paths + accept_empty_flag + dont_fail_due_to_coverage)
+
+    if accept_empty_flag or path_contains_py:
+        assert run_result.exit_code == 0
+    else:
+        assert run_result.exit_code == 1
