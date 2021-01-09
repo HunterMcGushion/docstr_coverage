@@ -117,14 +117,14 @@ def test_do_include_filepath(filepath: str, exclude_re: Optional[str], expected:
         ([SAMPLES_A.dirpath, SAMPLES_B.dirpath], "", SAMPLES_A.all + SAMPLES_B.all),
         ([SAMPLES_A.dirpath, SAMPLES_B.dirpath], ".*subdir_a.*", SAMPLES_B.all),
         (
-                [SAMPLES_A.dirpath, SAMPLES_B.documented, SAMPLES_B.empty],
-                ".*subdir_a.*",
-                [SAMPLES_B.documented, SAMPLES_B.empty],
+            [SAMPLES_A.dirpath, SAMPLES_B.documented, SAMPLES_B.empty],
+            ".*subdir_a.*",
+            [SAMPLES_B.documented, SAMPLES_B.empty],
         ),
         (
-                [SAMPLES_A.dirpath, SAMPLES_B.dirpath],
-                ".*_file\\.py",
-                [SAMPLES_A.undocumented, SAMPLES_B.undocumented],
+            [SAMPLES_A.dirpath, SAMPLES_B.dirpath],
+            ".*_file\\.py",
+            [SAMPLES_A.undocumented, SAMPLES_B.undocumented],
         ),
     ],
 )
@@ -203,14 +203,14 @@ def test_ignore_patterns_from_dict_errors(input_dict, error):
         ("", ()),
         ("this_file_does_not_exist.txt", ()),
         (
-                os.path.join(SAMPLES_A.dirpath, "docstr_ignore.txt"),
-                (
-                        ["SomeFile", "method_to_ignore1", "method_to_ignore2", "method_to_ignore3"],
-                        ["FileWhereWeWantToIgnoreAllSpecialMethods", "__.+__"],
-                        [".*", "method_to_ignore_in_all_files"],
-                        ["a_very_important_view_file", "^get$", "^set$", "^post$"],
-                        ["detect_.*", "get_val.*"],
-                ),
+            os.path.join(SAMPLES_A.dirpath, "docstr_ignore.txt"),
+            (
+                ["SomeFile", "method_to_ignore1", "method_to_ignore2", "method_to_ignore3"],
+                ["FileWhereWeWantToIgnoreAllSpecialMethods", "__.+__"],
+                [".*", "method_to_ignore_in_all_files"],
+                ["a_very_important_view_file", "^get$", "^set$", "^post$"],
+                ["detect_.*", "get_val.*"],
+            ),
         ),
     ],
 )
@@ -239,7 +239,7 @@ def test_parse_ignore_names_file(path: str, expected: tuple):
 )
 @pytest.mark.parametrize("verbose_flag", [["-v", "0"], ["-v", "1"], ["-v", "2"], ["-v", "3"]])
 def test_percentage_only(
-        paths: List[str], expected_output: str, verbose_flag: List[str], runner: CliRunner
+    paths: List[str], expected_output: str, verbose_flag: List[str], runner: CliRunner
 ):
     """Test that using the `--percentage-only` CLI option works correctly
 
@@ -292,13 +292,13 @@ def test_percentage_only(
 )
 @pytest.mark.usefixtures("cd_tests_dir_fixture")
 def test_cli_collect_filepaths(
-        paths: List[str],
-        follow_links_flag: List[str],
-        follow_links_value: bool,
-        exclude_flag: List[str],
-        exclude_value: Optional[str],
-        runner: CliRunner,
-        mocker,
+    paths: List[str],
+    follow_links_flag: List[str],
+    follow_links_value: bool,
+    exclude_flag: List[str],
+    exclude_value: Optional[str],
+    runner: CliRunner,
+    mocker,
 ):
     """Test that CLI inputs are correctly interpreted and passed along to
     :func:`docstr_coverage.cli.collect_filepaths`
@@ -385,13 +385,13 @@ def test_cli_collect_filepaths(
     sys.version_info < (3, 6), reason="assert_called_once requires python3.6 or later "
 )
 def test_ignore_patterns_files(
-        paths: List[str],
-        config_flag: List[str],
-        use_yml_ignore: bool,
-        ignore_file_flag: List[str],
-        use_ignore_file: bool,
-        runner: CliRunner,
-        mocker,
+    paths: List[str],
+    config_flag: List[str],
+    use_yml_ignore: bool,
+    ignore_file_flag: List[str],
+    use_ignore_file: bool,
+    runner: CliRunner,
+    mocker,
 ):
     """Test that CLI inputs are correctly interpreted and passed along to
     :func:`docstr_coverage.cli.collect_filepaths`
@@ -431,8 +431,8 @@ def test_ignore_patterns_files(
         ), "No exception was raised even though yml and txt custom ignore patterns were passed"
         assert isinstance(run_result.exception, ValueError)
         assert (
-                "Ignore patterns must be specified in only one location at a time."
-                in run_result.exception.args[0]
+            "Ignore patterns must be specified in only one location at a time."
+            in run_result.exception.args[0]
         )
 
     elif use_yml_ignore:
@@ -453,11 +453,14 @@ def test_ignore_patterns_files(
         pytest.param([SAMPLES_A.documented], True, id="files_x1"),
         pytest.param([SAMPLES_A.empty, SAMPLES_A.partial], True, id="files_x2"),
         pytest.param([SAMPLES_A.dirpath, SAMPLES_B.dirpath], True, id="dirs_x2"),
-        pytest.param([SAMPLES_A.empty, SAMPLES_A.partial, SAMPLES_B.dirpath], True, id="files_x2+dir_x1"),
+        pytest.param(
+            [SAMPLES_A.empty, SAMPLES_A.partial, SAMPLES_B.dirpath], True, id="files_x2+dir_x1"
+        ),
         pytest.param([os.path.join("sample_files", "subdir_a")], True, id="rel_dir_x1"),
-        pytest.param([os.path.join("config_files", "docstr_ignore.txt")], False, id="file_with_no_python"),
+        pytest.param(
+            [os.path.join("config_files", "docstr_ignore.txt")], False, id="file_with_no_python"
+        ),
         pytest.param([os.path.join(CWD, "config_files")], False, id="folder_with_no_python"),
-
     ],
 )
 @pytest.mark.parametrize(
@@ -470,11 +473,11 @@ def test_ignore_patterns_files(
 )
 @pytest.mark.usefixtures("cd_tests_dir_fixture")
 def test_accept_empty(
-        paths: List[str],
-        path_contains_py: bool,
-        accept_empty_flag: List[str],
-        accept_empty_value: bool,
-        runner: CliRunner,
+    paths: List[str],
+    path_contains_py: bool,
+    accept_empty_flag: List[str],
+    accept_empty_value: bool,
+    runner: CliRunner,
 ):
     """ Test that the flag to accept paths which do not point to any .py file leads to the correct exit codes.
 

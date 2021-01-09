@@ -290,7 +290,9 @@ def execute(paths, **kwargs):
             warnings.warn("No Python files found in specified paths: processing is aborted")
             sys.exit(0)
         else:
-            sys.exit("No Python files found (use `--accept-empty` to exit with code 0 if you expect this case)")
+            sys.exit(
+                "No Python files found (use `--accept-empty` to exit with code 0 if you expect this case)"
+            )
 
     # Parse ignore names file
     has_ignore_patterns_in_config = "ignore_patterns" in kwargs
