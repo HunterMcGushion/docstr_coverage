@@ -479,8 +479,7 @@ def test_accept_empty(
     accept_empty_value: bool,
     runner: CliRunner,
 ):
-    """ Test that the flag to accept paths
-     which do not point to any .py file leads to the correct exit codes.
+    """Test that the `--accept-empty`/`-a` flag leads to the correct exit codes
 
     Parameters
     ----------

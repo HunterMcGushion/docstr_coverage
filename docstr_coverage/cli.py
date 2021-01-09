@@ -222,7 +222,7 @@ def parse_ignore_patterns_from_dict(ignore_patterns_dict) -> tuple:
     "-a",
     "--accept-empty",
     is_flag=True,
-    help="Exit with code 0 if there are no python files to test (default: exit code 1)",
+    help="Exit with code 0 if no Python files are found (default: exit code 1)",
 )
 @click.help_option("-h", "--help")
 @click.argument(
@@ -287,7 +287,7 @@ def execute(paths, **kwargs):
 
     if len(all_paths) < 1:
         if kwargs["accept_empty"] is True:
-            warnings.warn("No Python files found in specified paths: processing is aborted")
+            warnings.warn("No Python files found in specified paths. Processing aborted")
             sys.exit(0)
         else:
             sys.exit(
