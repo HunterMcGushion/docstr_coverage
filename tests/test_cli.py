@@ -522,4 +522,6 @@ def test_accept_empty(
 )
 def test_deprecations(paths, deprecated_option, runner: CliRunner):
     run_result = runner.invoke(execute, deprecated_option + paths)
-    assert run_result.stdout.startswith(f"Using deprecated {deprecated_option[0].split('=')[0]}")
+    assert run_result.stdout.startswith(
+        "Using deprecated {}".format(deprecated_option[0].split("=")[0])
+    )
