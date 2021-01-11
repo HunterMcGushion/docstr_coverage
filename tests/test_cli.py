@@ -503,3 +503,36 @@ def test_accept_empty(
         assert run_result.exit_code == 0
     else:
         assert run_result.exit_code == 1
+
+
+##################################################
+# Deprecation Tests
+##################################################
+@pytest.mark.parametrize(["paths"], [pytest.param([SAMPLES_DIR])])
+@pytest.mark.parametrize(
+    ["deprecated_option"],
+    [
+        pytest.param(["--failunder=60"]),
+        pytest.param(["--followlinks"]),
+        pytest.param(["--skipclassdef"]),
+        pytest.param(["--skipfiledoc"]),
+        pytest.param(["--skipinit"]),
+        pytest.param(["--skipmagic"]),
+    ],
+)
+def test_deprecations(paths, deprecated_option, runner: CliRunner):
+    """Test that using deprecated CLI options logs a warning
+
+    Parameters
+    ----------
+    paths: List[str]
+        Path arguments provided to CLI. These should be made absolute before they are passed to
+        :func:`docstr_coverage.cli.collect_filepaths`
+    deprecated_option: List[str]
+        CLI option that has been deprecated
+    runner: CliRunner
+        Click utility to invoke command line scripts"""
+    run_result = runner.invoke(execute, deprecated_option + paths)
+    assert run_result.stdout.startswith(
+        "Using deprecated {}".format(deprecated_option[0].split("=")[0])
+    )
