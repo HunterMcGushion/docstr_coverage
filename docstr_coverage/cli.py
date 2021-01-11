@@ -240,10 +240,8 @@ def parse_ignore_patterns_from_dict(ignore_patterns_dict) -> tuple:
     is_eager=True,
     callback=set_config_defaults,
 )
-@click.option("--skipmagic", "skip_magic_old", is_flag=True, help="Deprecated. Use --skip-magic")
-@click.option(
-    "--skipfiledoc", "skip_file_doc_old", is_flag=True, help="Deprecated. Use --skip-file-doc"
-)
+@click.option("--skipmagic", is_flag=True, help="Deprecated. Use --skip-magic")
+@click.option("--skipfiledoc", is_flag=True, help="Deprecated. Use --skip-file-doc")
 @click.option("--skipinit", is_flag=True, help="Deprecated. Use --skip-init")
 @click.option("--skipclassdef", is_flag=True, help="Deprecated. Use --skip-class-def")
 @click.option("--followlinks", is_flag=True, help="Deprecated. Use --follow-links")
@@ -270,7 +268,7 @@ def execute(paths, **kwargs):
 
     # handle fail under
     if kwargs.get("failunder") is not None:
-        if kwargs.get("fail_under") is not None:
+        if kwargs.get("fail_under") != 100.0:
             raise ValueError("Should not set deprecated --failunder and --fail-under")
         click.secho("Using deprecated --failunder, should use --fail-under", fg="red")
         kwargs["fail_under"] = kwargs.pop("failunder")

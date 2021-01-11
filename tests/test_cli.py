@@ -503,3 +503,23 @@ def test_accept_empty(
         assert run_result.exit_code == 0
     else:
         assert run_result.exit_code == 1
+
+
+##################################################
+# Deprecation Tests
+##################################################
+@pytest.mark.parametrize(["paths"], [pytest.param([SAMPLES_DIR])])
+@pytest.mark.parametrize(
+    ["deprecated_option"],
+    [
+        pytest.param(["--failunder=60"]),
+        pytest.param(["--followlinks"]),
+        pytest.param(["--skipclassdef"]),
+        pytest.param(["--skipfiledoc"]),
+        pytest.param(["--skipinit"]),
+        pytest.param(["--skipmagic"]),
+    ],
+)
+def test_deprecations(paths, deprecated_option, runner: CliRunner):
+    run_result = runner.invoke(execute, deprecated_option + paths)
+    assert run_result.stdout.startswith(f"Using deprecated {deprecated_option[0].split('=')[0]}")
