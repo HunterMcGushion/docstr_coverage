@@ -4,6 +4,36 @@
 ...
 
 
+<a name="2.0.0"></a>
+## [2.0.0] (2021-01-11)
+
+### Features
+- Add `.docstr.yaml` config file. [#39] by [mBouamama].
+    - Save docstr-coverage CLI options in `.docstr.yaml` to be used as the default configuration
+    - For more details, see the [README's "Config File" section](https://github.com/HunterMcGushion/docstr_coverage#config-file) 
+- Allow `ignore_patterns` to be defined in the `.docstr.yaml` config file. [#46] by [MiWeiss]. 
+    - This is an alternative to the `--docstr-ignore-file` CLI option. Do not use both at the same time
+- Add `--accept-empty`/`-a` flag to exit with code 0 if no `.py` files are found. [#48] by [MiWeiss].
+    - Helpful for using `docstr_coverage` in GitHub Actions as described in [#47] by [epassaro]
+
+### Deprecations
+- Convert all CLI options to kebab-case. [#38] by [cthoyt].
+    
+    | New                | Deprecated       |
+    |--------------------|------------------|
+    | `--fail-under`     | `--failunder`    |
+    | `--follow-links`   | `--followlinks`  |
+    | `--skip-class-def` | `--skipclassdef` |
+    | `--skip-file-doc`  | `--skipfiledoc`  |
+    | `--skip-init`      | `--skipinit`     |
+    | `--skip-magic`     | `--skipmagic`    |
+    
+    - :exclamation: **Deprecated option names will be removed in v3.0.0** :exclamation:
+
+### Bug Fixes
+- Fix Windows compatibility issues and upgrade CI suite. [#45] by [MiWeiss].
+
+
 <a name="1.4.0"></a>
 ## [1.4.0] (2020-12-05)
 
@@ -76,7 +106,8 @@
 * Initial release
 
 
-[Unreleased]: https://github.com/HunterMcGushion/docstr_coverage/compare/v1.4.0...HEAD
+[Unreleased]: https://github.com/HunterMcGushion/docstr_coverage/compare/v2.0.0...HEAD
+[2.0.0]: https://github.com/HunterMcGushion/docstr_coverage/compare/v1.4.0...v2.0.0
 [1.4.0]: https://github.com/HunterMcGushion/docstr_coverage/compare/v1.3.0...v1.4.0
 [1.3.0]: https://github.com/HunterMcGushion/docstr_coverage/compare/v1.2.0...v1.3.0
 [1.2.0]: https://github.com/HunterMcGushion/docstr_coverage/compare/v1.1.0...v1.2.0
@@ -89,8 +120,10 @@
 [asergeant01]: https://github.com/asergeant01
 [cthoyt]: https://github.com/cthoyt
 [econchick]: https://github.com/econchick
+[epassaro]: https://github.com/epassaro
 [HunterMcGushion]: https://github.com/HunterMcGushion
 [killthekitten]: https://github.com/killthekitten
+[mBouamama]: https://github.com/mBouamama
 [MiWeiss]: https://github.com/MiWeiss
 [Redysz]: https://github.com/Redysz
 [sim0nx]: https://github.com/sim0nx
@@ -107,3 +140,9 @@
 [#24]: https://github.com/HunterMcGushion/docstr_coverage/pull/24
 [#32]: https://github.com/HunterMcGushion/docstr_coverage/pull/32
 [#34]: https://github.com/HunterMcGushion/docstr_coverage/pull/34
+[#38]: https://github.com/HunterMcGushion/docstr_coverage/pull/38
+[#39]: https://github.com/HunterMcGushion/docstr_coverage/pull/39
+[#45]: https://github.com/HunterMcGushion/docstr_coverage/pull/45
+[#46]: https://github.com/HunterMcGushion/docstr_coverage/pull/46
+[#47]: https://github.com/HunterMcGushion/docstr_coverage/issues/47
+[#48]: https://github.com/HunterMcGushion/docstr_coverage/pull/48
