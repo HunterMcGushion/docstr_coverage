@@ -56,18 +56,21 @@ docstr-coverage some_project/src
 
 #### Options
 
-- _--skipmagic, -m_ - Ignore all magic methods (like `__init__`, and `__str__`)
-- _--skipfiledoc, -f_ - Ignore module docstrings (at the top of files)
+- _--skip-magic, -m_ - Ignore all magic methods (except `__init__`)
+- _--skip-init, -i_ - Ignore all `__init__` methods
+- _--skip-file-doc, -f_ - Ignore module docstrings (at the top of files)
 - _--skip-private, -P_ - Ignore private functions (starting with a single underscore)
+- _--skip-class-def, -c_ - Ignore docstrings of class definitions
+- _--accept-empty, -a_ - Exit with code 0 if no Python files are found (default: exit code 1)
 - _--exclude=\<regex\>, -e \<regex\>_ - Filepath pattern to exclude from analysis
-  _ To exclude the contents of a virtual environment `env` and your `tests` directory, run:
-  <br>```\$ docstr-coverage some_project/ -e "env/_|tests/\*"```
-- _--verbose=\<level\>, -v \<level\>_ - Set verbosity level (0-3)
-  _ 0 - Silence
-  _ 1 - Print overall statistics
-  _ 2 - Also print individual statistics for each file
-  _ 3 - Also print missing docstrings (function names, class names, etc.)
-- _--failunder=<int|float>, -F <int|float>_ - Fail if under a certain percentage of coverage (default: 100.0)
+  - To exclude the contents of a virtual environment `env` and your `tests` directory, run:
+  ```docstr-coverage some_project/ -e ".*/(env|tests)"```
+- _--verbose=\<level\>, -v \<level\>_ - Set verbosity level (0-3, default: 3)
+  - 0 - Silence
+  - 1 - Print overall statistics
+  - 2 - Also print individual statistics for each file
+  - 3 - Also print missing docstrings (function names, class names, etc.)
+- _--fail-under=<int|float>, -F <int|float>_ - Fail if under a certain percentage of coverage (default: 100.0)
 - _--docstr-ignore-file=\<filepath\>, -d \<filepath\>_ - Filepath containing list of patterns to ignore. Patterns are (file-pattern, name-pattern) pairs
   - File content example:
 
@@ -79,6 +82,76 @@ docstr-coverage some_project/src
   detect_.* get_val.*
   ```
 - _--badge=\<filepath\>, -b \<filepath\>_ - Generate a docstring coverage percent badge as an SVG saved to a given filepath
+  - Include the badge in a repo's README using 
+  ```[![docstr_coverage](<filepath/of/your/saved/badge.svg>)](https://github.com/HunterMcGushion/docstr_coverage)```,
+  where `<filepath/of/your/saved/badge.svg>` is the path provided to the `--badge` option
+- _--follow-links, -l_ - Follow symlinks
+- _--percentage-only, -p_ - Output only the overall coverage percentage as a float, silencing all other logging
+- _--help, -h_ - Display CLI options
+
+#### Config File
+All options can be saved in a config file named `.docstr.yaml`
+example:
+```yaml
+paths: # list or string
+  - docstr_coverage
+badge: docs # Path
+exclude: .*/test # regex
+verbose: 1 # int (0-3)
+skip_magic: True # Boolean
+skip_file_doc: True # Boolean
+skip_init: True # Boolean
+skip_class_def: True # Boolean
+skip_private: True # Boolean
+follow_links: True # Boolean
+accept_empty: True # Boolean
+ignore_names_file: .*/test # regex
+fail_under: 90 # int 
+percentage_only: True # Boolean
+ignore_patterns: # Dict with key/value pairs of file-pattern/node-pattern
+  .*: method_to_ignore_in_all_files
+  FileWhereWeWantToIgnoreAllSpecialMethods: "__.+__"
+  SomeFile:
+    - method_to_ignore1
+    - method_to_ignore2
+    - method_to_ignore3
+  a_very_important_view_file:
+    - "^get$"
+    - "^set$"
+    - "^post$"
+  detect_.*:
+    - "get_val.*"
+```
+equivalent to
+```
+docstr-coverage docstr_coverage -e ".*/test" --skip-magic --skip-init --badge="docs" --skip-class-def etc...
+```
+
+Note that options passed as command line arguments have precedence over options 
+configured in a config file.
+Exception: If a `--docstr-ignore-file` is present and the yml config contains `ignore_patterns`,
+a `ValueError` is raised.
+
+#### Overriding by Comments
+Note that `docstr-coverage` can not parse 
+dynamically added documentation (e.g. through class extension).
+Thus, some of your code which deliberately has no docstring might be counted as uncovered.
+
+You can override this by adding either ```#docstr_coverage:inherited``` 
+(intended for use if a docstring is provided in the corresponding superclass method)
+or a generic excuse with a reason, like ```#docstr_coverage:excused `My probably bad excuse` ```.
+These have to be stated right above any class or function definition 
+(or above the functions annotations, if applicable).
+Such class or function would then be counted as if they had a docstring.
+
+```python
+# docstr-coverage:excused `no one is reading this anyways`
+class FooBarChild(FooBar):
+
+    # docstr-coverage:inherited
+    def function(self):
+        pass
+```
 
 #### Package in Your Project
 

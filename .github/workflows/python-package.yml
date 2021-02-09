@@ -23,11 +23,13 @@ jobs:
           pip install -e .[lint]
       - run: black . --check
       - run: flake8
+      - run: isort docstr_coverage tests --check-only --profile black
 
   test:
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
     strategy:
       matrix:
+        os: [macos-latest, windows-latest, ubuntu-latest]
         python-version: [3.5, 3.6, 3.7, 3.8, 3.9]
 
     steps:

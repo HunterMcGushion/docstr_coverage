@@ -1,17 +1,26 @@
 """This module is the CLI entry point for `docstr_coverage` in which CLI arguments are defined and
 passed on to other modules"""
-import click
 import os
+import platform
 import re
 import sys
+import warnings
 from typing import List, Optional
 
+import click
+
 from docstr_coverage.badge import Badge
+from docstr_coverage.config_file import set_config_defaults
 from docstr_coverage.coverage import get_docstring_coverage
 
 
 def do_include_filepath(filepath: str, exclude_re: Optional["re.Pattern"]) -> bool:
-    """Determine whether `filepath` should be included in docstring search
+    """Determine whether `filepath` should be included in docstring search.
+    Note on regex matching:
+    On windows we check against unix and windows regex matches (if one of the two matches)
+    Hence we have a one-way compatibility (regex for unix paths work in win as well).
+    Two way compatibility (matching win-path regexes on linux) is not possible as a single backslash
+    is a valid character in a unix path.
 
     Parameters
     ----------
@@ -27,7 +36,10 @@ def do_include_filepath(filepath: str, exclude_re: Optional["re.Pattern"]) -> bo
     if not filepath.endswith(".py"):
         return False
     if exclude_re is not None:
-        return not exclude_re.match(filepath)
+        if exclude_re.match(filepath):
+            return False
+        if platform.system() == "Windows":
+            return not exclude_re.match(filepath.replace("\\", "/"))
     return True
 
 
@@ -89,15 +101,65 @@ def parse_ignore_names_file(ignore_names_file: str) -> tuple:
     return ignore_names
 
 
+def parse_ignore_patterns_from_dict(ignore_patterns_dict) -> tuple:
+    """Parse dictionary containing (file_name_pattern, exclude_patterns) key value pairs
+    to return an output consistent with ignore patterns parsed by `parse_ignore_names_file`
+
+    Parameters
+    ----------
+    ignore_patterns_dict: Dict
+        A dict where each key is a string and each value is a string or a nonempty list of strings.
+
+    Returns
+    -------
+    Tuple
+        Tuple of iterables of string with the same form as the output of `parse_ignore_names_file`
+
+    Notes
+    -----
+    To align the workflow with `parse_ignore_names_file`, we check that the passed values
+    are of type string, but we do not yet check if they are valid regular expressions"""
+
+    def _assert_valid_key_value(k, v):
+        if not isinstance(k, str):
+            raise TypeError("ignore patterns in config contained non-string key {}".format(k))
+        if len(k.strip()) == 0:
+            raise ValueError("ignore pattern in config contained empty (file name) regex")
+        if not all(isinstance(v, str) for v in v) and len(v) > 0:
+            raise TypeError(
+                "ignore patterns for key {} contained non-string values or was empty.".format(k)
+            )
+        if not all(len(v.strip()) > 0 for v in v):
+            raise ValueError("ignore pattern for key {} contained empty regex".format(k))
+
+    if not isinstance(ignore_patterns_dict, dict):
+        raise TypeError(
+            "ignore patterns in config must have type Dict[str, Union[str, List[str]]],"
+            "but was {}".format(type(ignore_patterns_dict))
+        )
+
+    result_list = []
+    for key, value in ignore_patterns_dict.items():
+        res = [key]
+        if not isinstance(value, list):
+            value = [value]
+        _assert_valid_key_value(key, value)
+        res += value
+        result_list.append(res)
+
+    return tuple(result_list)
+
+
 @click.command()
 @click.option(
     # TODO: Use counting instead: https://click.palletsprojects.com/en/7.x/options/#counting
     "-v",
     "--verbose",
-    type=click.Choice(["0", "1", "2", "3"]),
+    type=click.Choice([0, 1, 2, 3, "0", "1", "2", "3"]),
     default="3",
     help="Verbosity level",
     show_default=True,
+    callback=lambda _ctx, _param, value: int(value),
 )
 @click.option(
     "-e",
@@ -110,63 +172,20 @@ def parse_ignore_names_file(ignore_names_file: str) -> tuple:
 )
 @click.option(
     "-m",
-    "--skipmagic",
-    "skip_magic",  # TODO: Remove after deprecating/renaming to "--skip-magic"
-    type=bool,
+    "--skip-magic",
     is_flag=True,
-    default=False,
     help="Ignore docstrings of magic methods (except `__init__`)",
-    show_default=True,
 )
-@click.option(
-    "-f",
-    "--skipfiledoc",
-    "skip_file_docstring",  # TODO: Remove after deprecating/renaming to "--skip-file-doc"
-    type=bool,
-    is_flag=True,
-    default=False,
-    help="Ignore module docstrings",
-    show_default=True,
-)
-@click.option(
-    "-i",
-    "--skipinit",
-    "skip_init",  # TODO: Remove after deprecating/renaming to "--skip-init"
-    type=bool,
-    is_flag=True,
-    default=False,
-    help="Ignore docstrings of `__init__` methods",
-    show_default=True,
-)
-@click.option(
-    "-c",
-    "--skipclassdef",
-    "skip_class_def",  # TODO: Remove after deprecating/renaming to "--skip-class-def"
-    type=bool,
-    is_flag=True,
-    default=False,
-    help="Ignore docstrings of class definitions",
-    show_default=True,
-)
+@click.option("-f", "--skip-file-doc", is_flag=True, help="Ignore module docstrings")
+@click.option("-i", "--skip-init", is_flag=True, help="Ignore docstrings of `__init__` methods")
+@click.option("-c", "--skip-class-def", is_flag=True, help="Ignore docstrings of class definitions")
 @click.option(
     "-P",
     "--skip-private",
-    type=bool,
     is_flag=True,
-    default=False,
     help="Ignore docstrings of functions starting with a single underscore",
-    show_default=True,
 )
-@click.option(
-    "-l",
-    "--followlinks",
-    "follow_links",  # TODO: Remove after deprecating/renaming to "--follow-links"
-    type=bool,
-    is_flag=True,
-    default=False,
-    help="Follow symlinks",
-    show_default=True,
-)
+@click.option("-l", "--follow-links", is_flag=True, help="Follow symlinks")
 @click.option(
     "-d",
     "--docstr-ignore-file",
@@ -178,8 +197,7 @@ def parse_ignore_names_file(ignore_names_file: str) -> tuple:
 )
 @click.option(
     "-F",
-    "--failunder",
-    "fail_under",  # TODO: Remove after deprecating/renaming to "--fail-under"
+    "--fail-under",
     type=float,
     default=100.0,
     help="Fail when coverage % is less than a given amount",
@@ -197,20 +215,64 @@ def parse_ignore_names_file(ignore_names_file: str) -> tuple:
 @click.option(
     "-p",
     "--percentage-only",
-    type=bool,
     is_flag=True,
-    default=False,
     help="Output only the overall coverage percentage as a float, silencing all other logging",
-    show_default=True,
+)
+@click.option(
+    "-a",
+    "--accept-empty",
+    is_flag=True,
+    help="Exit with code 0 if no Python files are found (default: exit code 1)",
 )
 @click.help_option("-h", "--help")
 @click.argument(
     "paths",
     type=click.Path(exists=True, file_okay=True, dir_okay=True, readable=True, resolve_path=True),
     nargs=-1,
+    is_eager=True,  # Eagerly execute before `config` so `set_config_defaults` has `paths`
 )
+@click.option(
+    "-C",
+    "--config",
+    type=click.Path(exists=False, resolve_path=True),
+    default=".docstr.yaml",
+    help="Configuration file containing option defaults",
+    is_eager=True,
+    callback=set_config_defaults,
+)
+@click.option("--skipmagic", is_flag=True, help="Deprecated. Use --skip-magic")
+@click.option("--skipfiledoc", is_flag=True, help="Deprecated. Use --skip-file-doc")
+@click.option("--skipinit", is_flag=True, help="Deprecated. Use --skip-init")
+@click.option("--skipclassdef", is_flag=True, help="Deprecated. Use --skip-class-def")
+@click.option("--followlinks", is_flag=True, help="Deprecated. Use --follow-links")
+@click.option("--failunder", type=float, help="Deprecated. Use --fail-under")
 def execute(paths, **kwargs):
     """Measure docstring coverage for `PATHS`"""
+    for deprecated_name, name in [
+        ("skipmagic", "skip_magic"),
+        ("skipfiledoc", "skip_file_doc"),
+        ("skipinit", "skip_init"),
+        ("skipclassdef", "skip_class_def"),
+        ("followlinks", "follow_links"),
+    ]:
+        if kwargs.get(deprecated_name):
+            new_flag = name.replace("_", "-")
+            if kwargs.get(name):
+                raise ValueError(
+                    "Should not set deprecated --{} and new --{}".format(deprecated_name, new_flag)
+                )
+            click.secho(
+                "Using deprecated --{}, should use --{}".format(deprecated_name, new_flag), fg="red"
+            )
+            kwargs[name] = kwargs.pop(deprecated_name)
+
+    # handle fail under
+    if kwargs.get("failunder") is not None:
+        if kwargs.get("fail_under") != 100.0:
+            raise ValueError("Should not set deprecated --failunder and --fail-under")
+        click.secho("Using deprecated --failunder, should use --fail-under", fg="red")
+        kwargs["fail_under"] = kwargs.pop("failunder")
+
     # TODO: Add option to generate pretty coverage reports - Like Python's test `coverage`
     # TODO: Add option to sort reports by filename, coverage score... (ascending/descending)
     if kwargs["percentage_only"] is True:
@@ -222,16 +284,37 @@ def execute(paths, **kwargs):
     )
 
     if len(all_paths) < 1:
-        sys.exit("No Python files found")
+        if kwargs["accept_empty"] is True:
+            warnings.warn("No Python files found in specified paths. Processing aborted")
+            sys.exit(0)
+        else:
+            sys.exit(
+                "No Python files found "
+                "(use `--accept-empty` to exit with code 0 if you expect this case)"
+            )
 
     # Parse ignore names file
-    ignore_names = parse_ignore_names_file(kwargs["ignore_names_file"])
+    has_ignore_patterns_in_config = "ignore_patterns" in kwargs
+    if os.path.isfile(kwargs["ignore_names_file"]) and has_ignore_patterns_in_config:
+        raise ValueError(
+            (
+                "The docstr-coverage configuration file {} contains ignore_patterns,"
+                " and at the same time an ignore file {} was found."
+                " Ignore patterns must be specified in only one location at a time."
+            ).format(kwargs["config_file"], kwargs["ignore_names_file"])
+        )
+    elif os.path.isfile(kwargs["ignore_names_file"]):
+        ignore_names = parse_ignore_names_file(kwargs["ignore_names_file"])
+    elif has_ignore_patterns_in_config:
+        ignore_names = parse_ignore_patterns_from_dict(kwargs["ignore_patterns"])
+    else:
+        ignore_names = []
 
     # Calculate docstring coverage
     file_results, total_results = get_docstring_coverage(
         all_paths,
         skip_magic=kwargs["skip_magic"],
-        skip_file_docstring=kwargs["skip_file_docstring"],
+        skip_file_docstring=kwargs["skip_file_doc"],
         skip_init=kwargs["skip_init"],
         skip_class_def=kwargs["skip_class_def"],
         skip_private=kwargs["skip_private"],

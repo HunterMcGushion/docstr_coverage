@@ -1,12 +1,16 @@
 """Tests for :mod:`docstr_coverage.badge`"""
 import os
+
 import pytest
 
 from docstr_coverage.badge import Badge
 
-
 CWD = os.path.abspath(os.path.dirname(__file__))
 SAMPLE_BADGE_DIR = os.path.join(CWD, "sample_files", "badges")
+
+
+def _clear_whitespace(string):
+    return "".join(string.split())
 
 
 @pytest.mark.parametrize(
@@ -63,7 +67,7 @@ def test_badge_contents(coverage, expected_filename):
     saving SVG file"""
     b = Badge(".", coverage)
     with open(os.path.join(SAMPLE_BADGE_DIR, expected_filename), "r") as f:
-        assert b.badge == f.read()
+        assert _clear_whitespace(b.badge) == _clear_whitespace(f.read())
 
 
 @pytest.mark.parametrize(["given_path", "coverage"], [("foo/bar.svg", 90)])
