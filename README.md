@@ -1,13 +1,35 @@
-# Docstr-Coverage
+![docstr-coverage](https://github.com/MiWeiss/docstr_coverage/raw/readme/docs/logo_wide.png)
+<!---
+TODO After review, replace the line above with this one (will only work after merge)
+![docstr-coverage](https://github.com/HunterMcGushion/docstr_coverage/raw/master/docs/logo_wide.png)
+-->
 
-[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
-If the health of your documentation is in dire straits, `docstr-coverage` will see you now.
+<p align="center">
+    <a href="https://choosealicense.com/licenses/mit/" alt="License: MIT">
+        <img src="https://img.shields.io/badge/license-MIT-green.svg" /></a>
+    <img src="https://github.com/HunterMcGushion/docstr_coverage/workflows/Python%20package/badge.svg" />
+    <a href='https://docstr-coverage.readthedocs.io/en/latest/?badge=latest'>
+        <img src='https://readthedocs.org/projects/docstr-coverage/badge/?version=latest' alt='Documentation Status' />
+    </a>
+    <a href="https://pypi.org/project/docstr-coverage/">
+        <img alt="PyPI" src="https://img.shields.io/pypi/v/docstr-coverage">
+    </a>
+    <a href="https://img.shields.io/pypi/pyversions/docstr-coverage">
+        <img alt="Python Version" src="https://img.shields.io/pypi/pyversions/docstr-coverage">
+    </a>
+    <a href="https://pepy.tech/project/docstr-coverage">
+        <img alt="Download count" src="https://static.pepy.tech/personalized-badge/docstr-coverage?period=total&units=international_system&left_color=gray&right_color=orange&left_text=downloads">
+    </a>
+    <a href="https://black.readthedocs.io/en/stable/" alt="Code Style: Black">
+        <img src="https://img.shields.io/badge/code%20style-black-000000.svg" />
+    </a>
+</p>
 
 `docstr-coverage` is a simple tool that lets you measure your Python source code's
-[docstring](http://www.python.org/dev/peps/pep-0257/#what-is-a-docstring) coverage. It can show you which of your functions,
-classes, methods, and modules don't have docstrings. It also provide statistics about overall docstring coverage for individual
-files, and for your entire project.
+[docstring](http://www.python.org/dev/peps/pep-0257/#what-is-a-docstring) coverage. 
+It shows which of your functions, classes, methods, and modules don't have docstrings. 
+It also provide statistics about overall docstring coverage for individual files, and for your entire project.
 
 - [Source](https://github.com/HunterMcGushion/docstr_coverage)
 - [Documentation](https://docstr-coverage.readthedocs.io/en/latest/api_essentials.html)
