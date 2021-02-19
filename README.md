@@ -1,9 +1,4 @@
-![docstr-coverage](https://github.com/MiWeiss/docstr_coverage/raw/readme/docs/logo_wide.png)
-<!---
-TODO After review, replace the line above with this one (will only work after merge)
 ![docstr-coverage](https://github.com/HunterMcGushion/docstr_coverage/raw/master/docs/logo_wide.png)
--->
-
 
 <p align="center">
     <a href="https://choosealicense.com/licenses/mit/" alt="License: MIT">
