@@ -239,7 +239,7 @@ def test_parse_ignore_names_file(path: str, expected: tuple):
 )
 @pytest.mark.parametrize("verbose_flag", [["-v", "0"], ["-v", "1"], ["-v", "2"], ["-v", "3"]])
 def test_percentage_only(
-        paths: List[str], expected_output: str, verbose_flag: List[str], runner: CliRunner
+    paths: List[str], expected_output: str, verbose_flag: List[str], runner: CliRunner
 ):
     """Test that using the `--percentage-only` CLI option works correctly
 
@@ -292,13 +292,13 @@ def test_percentage_only(
 )
 @pytest.mark.usefixtures("cd_tests_dir_fixture")
 def test_cli_collect_filepaths(
-        paths: List[str],
-        follow_links_flag: List[str],
-        follow_links_value: bool,
-        exclude_flag: List[str],
-        exclude_value: Optional[str],
-        runner: CliRunner,
-        mocker,
+    paths: List[str],
+    follow_links_flag: List[str],
+    follow_links_value: bool,
+    exclude_flag: List[str],
+    exclude_value: Optional[str],
+    runner: CliRunner,
+    mocker,
 ):
     """Test that CLI inputs are correctly interpreted and passed along to
     :func:`docstr_coverage.cli.collect_filepaths`
@@ -540,10 +540,7 @@ def test_deprecations(paths, deprecated_option, runner: CliRunner):
 
 @pytest.mark.parametrize(
     ["help_flag"],
-    [
-        pytest.param(["--help"], id="long: --help"),
-        pytest.param(["-h"], id="short: -h")
-    ],
+    [pytest.param(["--help"], id="long: --help"), pytest.param(["-h"], id="short: -h")],
 )
 def test_help_smoke(help_flag: str, runner: CliRunner):
     """Smoke test which ensures that help is printed with exit code 0
