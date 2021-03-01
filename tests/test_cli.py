@@ -556,4 +556,5 @@ def test_help_smoke(help_flag: str, runner: CliRunner):
         Click utility to invoke command line scripts"""
     run_result = runner.invoke(execute, help_flag)
     assert run_result.exit_code == 0
-    # TODO Assert help string
+    assert isinstance(run_result.stdout, str)
+    assert "Measure docstring coverage for" in run_result.stdout
