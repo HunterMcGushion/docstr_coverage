@@ -35,7 +35,8 @@ def set_config_defaults(ctx, param, value):
         )
         _extract_non_default_list(config_data, ctx, "ignore_patterns", lambda x: x)
         # TODO This can be removed as part PR #52 (verbose counting).
-        #       Until then, this is for backwards compatibility
+        #       Until then, this is for compatibility with docs
+        #       which require verbose in config-file to be an int
         if "verbose" in config_data:
             config_data["verbose"] = str(config_data["verbose"])
         ctx.default_map = config_data
