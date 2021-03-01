@@ -155,7 +155,7 @@ def parse_ignore_patterns_from_dict(ignore_patterns_dict) -> tuple:
     # TODO: Use counting instead: https://click.palletsprojects.com/en/7.x/options/#counting
     "-v",
     "--verbose",
-    type=click.Choice([0, 1, 2, 3, "0", "1", "2", "3"]),
+    type=click.Choice(["0", "1", "2", "3"]),
     default="3",
     help="Verbosity level",
     show_default=True,
