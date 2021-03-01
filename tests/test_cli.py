@@ -536,3 +536,24 @@ def test_deprecations(paths, deprecated_option, runner: CliRunner):
     assert run_result.stdout.startswith(
         "Using deprecated {}".format(deprecated_option[0].split("=")[0])
     )
+
+
+@pytest.mark.parametrize(
+    ["help_flag"],
+    [
+        pytest.param(["--help"]),
+        pytest.param(["--h"])
+    ],
+)
+def test_help_smoke(help_flag: str, runner: CliRunner):
+    """Smoke test which ensures that help is printed with exit code 0
+
+    Parameters
+    ----------
+    help_flag:
+        The (short or long) help path argument
+    runner: CliRunner
+        Click utility to invoke command line scripts"""
+    run_result = runner.invoke(execute, help_flag)
+    assert run_result.exit_code == 0
+    # TODO Assert help string
