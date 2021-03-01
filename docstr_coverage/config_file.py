@@ -34,7 +34,8 @@ def set_config_defaults(ctx, param, value):
             lambda config_paths: tuple([os.path.realpath(path) for path in config_paths]),
         )
         _extract_non_default_list(config_data, ctx, "ignore_patterns", lambda x: x)
-        # TODO This can be removed as part PR #52 (verbose counting). Until then, this is for backwards compatibility
+        # TODO This can be removed as part PR #52 (verbose counting).
+        #       Until then, this is for backwards compatibility
         if "verbose" in config_data:
             config_data["verbose"] = str(config_data["verbose"])
         ctx.default_map = config_data
