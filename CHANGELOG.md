@@ -4,6 +4,13 @@
 ...
 
 
+<a name="2.0.1"></a>
+## [2.0.1] (2021-03-03)
+
+### Bug Fixes
+- Fix `--help`/`-h` flag. [#57] by [MiWeiss].
+
+
 <a name="2.0.0"></a>
 ## [2.0.0] (2021-01-11)
 
@@ -106,7 +113,8 @@
 * Initial release
 
 
-[Unreleased]: https://github.com/HunterMcGushion/docstr_coverage/compare/v2.0.0...HEAD
+[Unreleased]: https://github.com/HunterMcGushion/docstr_coverage/compare/v2.0.1...HEAD
+[2.0.1]: https://github.com/HunterMcGushion/docstr_coverage/compare/v2.0.0...v2.0.1
 [2.0.0]: https://github.com/HunterMcGushion/docstr_coverage/compare/v1.4.0...v2.0.0
 [1.4.0]: https://github.com/HunterMcGushion/docstr_coverage/compare/v1.3.0...v1.4.0
 [1.3.0]: https://github.com/HunterMcGushion/docstr_coverage/compare/v1.2.0...v1.3.0
@@ -146,3 +154,4 @@
 [#46]: https://github.com/HunterMcGushion/docstr_coverage/pull/46
 [#47]: https://github.com/HunterMcGushion/docstr_coverage/issues/47
 [#48]: https://github.com/HunterMcGushion/docstr_coverage/pull/48
+[#57]: https://github.com/HunterMcGushion/docstr_coverage/pull/57
