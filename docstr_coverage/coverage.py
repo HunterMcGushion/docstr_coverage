@@ -10,10 +10,10 @@ from ast import parse
 from typing import List, Tuple
 
 from docstr_coverage.visitor import DocStringCoverageVisitor
+from result_collection import ResultCollection, FileStatus, File
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO, format="%(message)s")
-
 
 GRADES = (
     ("AMAZING! Your docstrings are truly a wonder to behold!", 100),
@@ -147,6 +147,7 @@ def get_docstring_coverage(
         ...     'needed_count': '<total_needed_docstrings_count int>',
         ...     'coverage': '<total_percent_of_coverage float>'
         ... }"""
+
     # TODO: Switch to Python's `logging` module, and remove
     #       below nested `log` function definition
     def log(text, level=1):
@@ -234,10 +235,12 @@ def get_docstring_coverage(
 
         return docs_needed, docs_covered, _missing_list
 
-    total_docs_needed = 0
-    total_docs_covered = 0
-    empty_files = 0
-    file_results = {}
+    total_docs_needed = 0  # TODO Remove
+    total_docs_covered = 0  # TODO Remove
+    empty_files = 0  # TODO Remove
+    file_results = {}  # TODO Remove
+
+    results = ResultCollection()
 
     for filename in filenames:
         log('\nFile: "%s"' % filename, 2)
@@ -245,6 +248,8 @@ def get_docstring_coverage(
         file_docs_needed = 1
         file_docs_covered = 1
         file_missing_list = []
+
+        file_result: File = results.get_module(file_path=filename)
 
         #################### Read and Parse Source ####################
         with open(filename, "r", encoding="utf-8") as f:
@@ -257,14 +262,22 @@ def get_docstring_coverage(
 
         #################### Process Results ####################
         # _tree contains [<module docstring>, <is_empty: bool>, <symbols: classes and funcs>]
-        if (not _tree[0]) and (not _tree[1]) and (not skip_file_docstring):
-            log(" - No module docstring", 3)
-            file_docs_covered -= 1
+        if (not _tree[0]) and (not _tree[1]):
+            if not skip_file_docstring:
+                log(" - No module docstring", 3)
+                file_docs_covered -= 1
+                file_result.report_module(has_docstring=False)
+            else:
+                file_result.report_module(
+                    has_docstring=False, ignore_reason="--skip-file-docstring=True"
+                )
+
         elif _tree[1]:
             log(" - File is empty", 3)
             file_docs_needed = 0
             file_docs_covered = 0
             empty_files += 1
+            file_result.set_file_status(FileStatus.EMPTY)
 
         # Traverse through functions and classes
         for symbol in _tree[-1]:
