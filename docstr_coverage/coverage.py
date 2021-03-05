@@ -7,7 +7,7 @@ import re
 
 # TODO: If Python 2, ```from __future__ import print_function```
 from ast import parse
-from typing import List, Tuple
+from typing import List, Tuple, Optional
 
 from docstr_coverage.visitor import DocStringCoverageVisitor
 from result_collection import ResultCollection, FileStatus, File
@@ -165,7 +165,7 @@ def get_docstring_coverage(
 
     # TODO: Move :func:`print_docstring` to be a normal function
     #       outside of :func:`get_docstring_coverage`
-    def print_docstring(base, node, filename, ignore_names=()):
+    def print_docstring(result_collection: File, base, node, filename, ignore_names=()):
         """Log the existence of a docstring for `node`, and accumulate stats regarding
         expected and encountered docstrings for `node` and its children (if any).
 
@@ -203,31 +203,39 @@ def get_docstring_coverage(
         name, has_doc, child_nodes = node
 
         #################### Check Current Node ####################
-        if not has_doc:
-            # TODO: Add option to skip class definition docstrings
-            #      (though one of class or magic methods should used)
-            if skip_init and name == "__init__":
-                docs_needed -= 1
-            elif (
-                skip_magic and name.startswith("__") and name.endswith("__") and name != "__init__"
-            ):
-                docs_needed -= 1
-            elif skip_class_def and "_" not in name and (name[0] == name[0].upper()):
-                docs_needed -= 1
-            elif skip_private and name.startswith("_") and not name.startswith("__"):
-                docs_needed -= 1
-            elif ignore_names and do_ignore_node(filename, base, name, ignore_names):
-                docs_needed -= 1
-            else:
-                log(" - No docstring for `%s%s`" % (base, name), 3)
-                _missing_list.append(base + name)
+
+        ### Check for ignore status
+        ignore_reason: Optional[str] = None
+        if skip_init and name == "__init__":
+            ignore_reason = "skip-init set to True"
+        elif skip_magic and name.startswith("__") and name.endswith("__") and name != "__init__":
+            ignore_reason = "skip-magic set to True"
+        elif skip_class_def and "_" not in name and (name[0] == name[0].upper()):
+            ignore_reason = "skip-class-def set to True"
+        elif skip_private and name.startswith("_") and not name.startswith("__"):
+            ignore_reason = "skip-private set to True"
+        elif ignore_names and do_ignore_node(filename, base, name, ignore_names):
+            ignore_reason = "matching ignore pattern"
+
+        ### Set Result
+        node_identifier = str(base) + str(name)
+        result_collection.report(
+            identifier=node_identifier, has_docstring=has_doc, ignore_reason=ignore_reason
+        )
+
+        # TODO Delete once old printing is kicked out
+        if not has_doc and ignore_reason:
+            docs_needed -= 1
+        elif not has_doc:
+            log(" - No docstring for `%s%s`" % (base, name), 3)
+            _missing_list.append(base + name)
         else:
             docs_covered += 1
 
         #################### Check Child Nodes ####################
         for _symbol in child_nodes:
             _temp_docs_needed, _temp_docs_covered, temp_missing_list = print_docstring(
-                "%s." % name, _symbol, filename, ignore_names
+                result_collection, "%s." % name, _symbol, filename, ignore_names
             )
             docs_needed += _temp_docs_needed
             docs_covered += _temp_docs_covered
@@ -287,7 +295,7 @@ def get_docstring_coverage(
         # Traverse through functions and classes
         for symbol in _tree[-1]:
             temp_docs_needed, temp_docs_covered, missing_list = print_docstring(
-                "", symbol, filename, ignore_names
+                file_result, "", symbol, filename, ignore_names
             )
             file_docs_needed += temp_docs_needed
             file_docs_covered += temp_docs_covered
