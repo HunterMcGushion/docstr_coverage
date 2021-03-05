@@ -279,6 +279,11 @@ def get_docstring_coverage(
             empty_files += 1
             file_result.set_file_status(FileStatus.EMPTY)
 
+        else:
+            file_result.report_module(bool(_tree[0]))
+
+        # TODO continue here
+        #   (pass file_result obj to print_docstring and add node observations)
         # Traverse through functions and classes
         for symbol in _tree[-1]:
             temp_docs_needed, temp_docs_covered, missing_list = print_docstring(
