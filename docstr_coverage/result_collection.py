@@ -11,7 +11,7 @@ class ResultCollection:
         folder_path, file_name = os.path.split(file_path)
         folder: Folder
         try:
-            return self.folders[folder_path]
+            folder = self.folders[folder_path]
         except KeyError:
             folder = Folder()
             self.folders[folder_path] = folder
