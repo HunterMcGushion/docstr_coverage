@@ -380,4 +380,4 @@ def get_docstring_coverage(
         skip_private=skip_private,
     ).print(results)
 
-    return file_results, total_results
+    return results.to_legacy()

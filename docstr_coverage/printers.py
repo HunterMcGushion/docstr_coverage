@@ -1,5 +1,4 @@
 import logging
-import os
 
 from docstr_coverage.result_collection import ResultCollection
 
@@ -50,36 +49,33 @@ class LegacyPrinter:
             self._print_overall_statistics(results)
 
     def _print_file_statistics(self, results: ResultCollection):
-        for folder_path, folder in results.folders.items():
-            for file_path, file in folder.files.items():
-                # File Header
-                print_line("File: {0}{1}{2}".format(folder_path, os.path.sep, file_path))
+        for file_path, file in results.files():
+            # File Header
+            print_line(file_path)
 
-                # List of missing docstrings
-                if self.verbosity >= 3:
-                    for expected_docstr in file.expected_docstrings:
-                        if not expected_docstr.has_docstring and not expected_docstr.ignore_reason:
-                            if expected_docstr.node_identifier == "module docstring":
-                                print_line(" - No module docstring")
-                            else:
-                                print_line(
-                                    " - No docstring for `{0}`".format(
-                                        expected_docstr.node_identifier
-                                    )
-                                )
+            # List of missing docstrings
+            if self.verbosity >= 3:
+                for expected_docstr in file._expected_docstrings:
+                    if not expected_docstr.has_docstring and not expected_docstr.ignore_reason:
+                        if expected_docstr.node_identifier == "module docstring":
+                            print_line(" - No module docstring")
+                        else:
+                            print_line(
+                                " - No docstring for `{0}`".format(expected_docstr.node_identifier)
+                            )
 
-                # Statistics
-                count = file.count()
-                print_line(
-                    " Needed: %s; Found: %s; Missing: %s; Coverage: %.1f%%"
-                    % (
-                        count.needed,
-                        count.found,
-                        count.missing,
-                        count.coverage(),
-                    ),
-                )
-                print_line()
+            # Statistics
+            count = file.count()
+            print_line(
+                " Needed: %s; Found: %s; Missing: %s; Coverage: %.1f%%"
+                % (
+                    count.needed,
+                    count.found,
+                    count.missing,
+                    count.coverage(),
+                ),
+            )
+            print_line()
         print_line("\n")
 
     def _print_overall_statistics(self, results: ResultCollection):

@@ -3,41 +3,82 @@ import functools
 import operator
 import os
 from dataclasses import dataclass
-from typing import List, Optional, Dict
+from typing import List, Optional, Dict, Generator, Tuple
 
 
 class ResultCollection:
-    folders: Dict[str, "Folder"] = dict()
+    _folders: Dict[str, "Folder"] = dict()
 
     def get_module(self, file_path: str):
         folder_path, file_name = os.path.split(file_path)
         folder: Folder
         try:
-            folder = self.folders[folder_path]
+            folder = self._folders[folder_path]
         except KeyError:
             folder = Folder()
-            self.folders[folder_path] = folder
+            self._folders[folder_path] = folder
         return folder.get_module(file_name=file_name)
 
     def count(self) -> "_AggregatedCount":
-        counts = (folder.count() for folder in self.folders.values())
+        counts = (folder.count() for folder in self._folders.values())
         return functools.reduce(operator.add, counts, _AggregatedCount())
+
+    def files(self) -> Generator[Tuple[str, "File"], None, None]:
+        for folder_path, folder in self._folders.items():
+            for file_name, file in folder.files():
+                yield "{}{}{}".format(folder_path, os.path.sep, file_name), file
+
+    def to_legacy(self) -> Tuple[Dict, Dict]:
+        file_results = dict()
+        for filename, file in self.files():
+            missing_list = [
+                e.node_identifier
+                for e in file.expected_docstrings()
+                if not e.ignore_reason and not e.has_docstring
+            ]
+            has_module_doc = len(
+                [
+                    e
+                    for e in file.expected_docstrings()
+                    if e.node_identifier == "module docstring" and e.has_docstring
+                ]
+            )
+            count = file.count()
+            file_results[filename] = {
+                "missing": missing_list,
+                "module_doc": has_module_doc,
+                "missing_count": count.missing,
+                "needed_count": count.needed,
+                "coverage": count.coverage(),
+                "empty": count.is_empty,
+            }
+        total_count = self.count()
+        total_results = {
+            "missing_count": total_count.missing,
+            "needed_count": total_count.needed,
+            "coverage": total_count.coverage(),
+        }
+        return file_results, total_results
 
 
 class Folder:
-    files: Dict[str, "File"] = dict()
+    _files: Dict[str, "File"] = dict()
 
     def get_module(self, file_name: str):
         try:
-            return self.files[file_name]
+            return self._files[file_name]
         except KeyError:
             file = File()
-            self.files[file_name] = file
+            self._files[file_name] = file
             return file
 
     def count(self) -> "_AggregatedCount":
-        counts = (file.count() for file in self.files.values())
+        counts = (file.count() for file in self._files.values())
         return functools.reduce(operator.add, counts, _AggregatedCount())
+
+    def files(self) -> Generator[Tuple[str, "File"], None, None]:
+        for name, file in self._files.items():
+            yield name, file
 
 
 class FileStatus(enum.Enum):
@@ -47,15 +88,15 @@ class FileStatus(enum.Enum):
 
 
 class File:
-    expected_docstrings: List["_ExpectedDocstring"]
-    status: FileStatus
+    _expected_docstrings: List["_ExpectedDocstring"]
+    _status: FileStatus
 
     def __init__(self) -> None:
         super().__init__()
-        self.expected_docstrings = []
+        self._expected_docstrings = []
 
     def report(self, identifier: str, has_docstring: bool, ignore_reason: Optional[str] = None):
-        self.expected_docstrings.append(
+        self._expected_docstrings.append(
             _ExpectedDocstring(
                 node_identifier=identifier, has_docstring=has_docstring, ignore_reason=ignore_reason
             )
@@ -66,12 +107,16 @@ class File:
             identifier="module docstring", has_docstring=has_docstring, ignore_reason=ignore_reason
         )
 
+    def expected_docstrings(self) -> Generator["_ExpectedDocstring", None, None]:
+        for exds in self._expected_docstrings:
+            yield exds
+
     def set_file_status(self, status: FileStatus):
-        self.status = status
+        self._status = status
 
     def count(self) -> "_FileCount":
         count = _FileCount()
-        for expd in self.expected_docstrings:
+        for expd in self._expected_docstrings:
             if expd.ignore_reason:
                 pass  # Ignores will be counted in a future version
             elif expd.has_docstring:
