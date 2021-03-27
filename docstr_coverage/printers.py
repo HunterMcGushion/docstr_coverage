@@ -1,8 +1,8 @@
 import logging
 
-from docstr_coverage.result_collection import ResultCollection
+from docstr_coverage.result_collection import ResultCollection, FileStatus
 
-GRADES = (
+_GRADES = (
     ("AMAZING! Your docstrings are truly a wonder to behold!", 100),
     ("Excellent", 92),
     ("Great", 85),
@@ -57,10 +57,12 @@ class LegacyPrinter:
     def _print_file_statistics(self, results: ResultCollection):
         for file_path, file in results.files():
             # File Header
-            print_line(file_path)
+            print_line('\nFile: "{}"'.format(file_path))
 
             # List of missing docstrings
             if self.verbosity >= 3:
+                if file.get_status() == FileStatus.EMPTY:
+                    print_line(" - File is empty")
                 for expected_docstr in file._expected_docstrings:
                     if not expected_docstr.has_docstring and not expected_docstr.ignore_reason:
                         if expected_docstr.node_identifier == "module docstring":
@@ -74,15 +76,10 @@ class LegacyPrinter:
             count = file.count()
             print_line(
                 " Needed: %s; Found: %s; Missing: %s; Coverage: %.1f%%"
-                % (
-                    count.needed,
-                    count.found,
-                    count.missing,
-                    count.coverage(),
-                ),
+                % (count.needed, count.found, count.missing, count.coverage(),),
             )
             print_line()
-        print_line("\n")
+        print_line()
 
     def _print_overall_statistics(self, results: ResultCollection):
         if self.verbosity < 1:
@@ -117,7 +114,7 @@ class LegacyPrinter:
 
         #################### Calculate Total Grade ####################
         grade = next(
-            message for message, grade_threshold in GRADES if grade_threshold <= count.coverage()
+            message for message, grade_threshold in _GRADES if grade_threshold <= count.coverage()
         )
 
         print_line("Total coverage: {:.1f}%  -  Grade: {}".format(count.coverage(), grade))
