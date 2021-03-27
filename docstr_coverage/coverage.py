@@ -1,32 +1,14 @@
 """This repository is based on the work of Alexey "DataGreed" Strelkov,
 and James Harlow (see "THANKS.txt" for details)"""
 
-import logging
 import os
 import re
-
 from ast import parse
 from typing import List, Tuple, Optional
 
 from docstr_coverage.printers import LegacyPrinter
 from docstr_coverage.result_collection import ResultCollection, FileStatus, File
 from docstr_coverage.visitor import DocStringCoverageVisitor
-
-logger = logging.getLogger(__name__)
-logging.basicConfig(level=logging.INFO, format="%(message)s")
-
-GRADES = (
-    ("AMAZING! Your docstrings are truly a wonder to behold!", 100),
-    ("Excellent", 92),
-    ("Great", 85),
-    ("Very good", 70),
-    ("Good", 60),
-    ("Not bad", 40),
-    ("Not good", 25),
-    ("Extremely poor", 10),
-    ("Not documented at all", 2),
-    ("Do you even docstring?", 0),
-)
 
 
 def do_ignore_node(filename: str, base_name: str, node_name: str, ignore_names: tuple) -> bool:
@@ -148,27 +130,16 @@ def get_docstring_coverage(
         ...     'coverage': '<total_percent_of_coverage float>'
         ... }"""
 
-    def log(text, level=1):
-        """Prints `text` to log depending on `verbose`
-
-        Parameters
-        ----------
-        text: String
-            The text to print
-        level: Int
-            The verbosity level at which it becomes appropriate to print the content.
-            If `level` > `verbose`, nothing happens. Otherwise, `text` is printed."""
-        if verbose >= level:
-            logger.info(text)
-
-    # TODO: Move :func:`print_docstring` to be a normal function
+    # TODO: Move :func:`analyze_docstrings` to be a normal function
     #       outside of :func:`get_docstring_coverage`
-    def print_docstring(result_collection: File, base, node, filename, ignore_names=()):
-        """Log the existence of a docstring for `node`, and accumulate stats regarding
+    def analyze_docstrings(result_collection: File, base, node, filename, ignore_names=()):
+        """Track the existence of a docstring for `node`, and accumulate stats regarding
         expected and encountered docstrings for `node` and its children (if any).
 
         Parameters
         ----------
+        result_collection: File
+            The result-collection file instance on which the docstring presence is recorded.
         base: String
             The name of this node's parent node
         node: Tuple triple of (String, Boolean, List)
@@ -182,22 +153,8 @@ def get_docstring_coverage(
             element is the regular expression for matching filenames. All remaining
             arguments are regexes for matching names of functions/classes to be
             excluded from checking for documentation. It will be excluded if and
-            only if the first and at least one of the remaining regexes hits a match.
+            only if the first and at least one of the remaining regexes hits a match."""
 
-        Returns
-        -------
-        docs_needed: Int
-            The number of docstrings expected for `node` and its children to achieve
-            full documentation coverage
-        docs_covered: Int
-            The number of docstrings found for `node` and its children
-        _missing_list: List
-            Nodes that were expected to have docstrings but did not.
-            Values are the concatenation of a node's base and its name"""
-
-        _missing_list = []
-        docs_needed = 1
-        docs_covered = 0
         name, has_doc, child_nodes = node
 
         #################### Check Current Node ####################
@@ -221,40 +178,13 @@ def get_docstring_coverage(
             identifier=node_identifier, has_docstring=has_doc, ignore_reason=ignore_reason
         )
 
-        # TODO Delete once old printing is kicked out
-        if not has_doc and ignore_reason:
-            docs_needed -= 1
-        elif not has_doc:
-            log(" - No docstring for `%s%s`" % (base, name), 3)
-            _missing_list.append(base + name)
-        else:
-            docs_covered += 1
-
         #################### Check Child Nodes ####################
         for _symbol in child_nodes:
-            _temp_docs_needed, _temp_docs_covered, temp_missing_list = print_docstring(
-                result_collection, "%s." % name, _symbol, filename, ignore_names
-            )
-            docs_needed += _temp_docs_needed
-            docs_covered += _temp_docs_covered
-            _missing_list += temp_missing_list
-
-        return docs_needed, docs_covered, _missing_list
-
-    total_docs_needed = 0  # TODO Remove
-    total_docs_covered = 0  # TODO Remove
-    empty_files = 0  # TODO Remove
-    file_results = {}  # TODO Remove
+            analyze_docstrings(result_collection, "%s." % name, _symbol, filename, ignore_names)
 
     results = ResultCollection()
 
     for filename in filenames:
-        log('\nFile: "%s"' % filename, 2)
-
-        file_docs_needed = 1
-        file_docs_covered = 1
-        file_missing_list = []
-
         file_result: File = results.get_module(file_path=filename)
 
         #################### Read and Parse Source ####################
@@ -264,115 +194,27 @@ def get_docstring_coverage(
         doc_visitor = DocStringCoverageVisitor(filename=filename)
         doc_visitor.visit(parse(source_tree))
         _tree = doc_visitor.tree[0]
-        # pp(_tree)
 
         #################### Process Results ####################
         # _tree contains [<module docstring>, <is_empty: bool>, <symbols: classes and funcs>]
         if (not _tree[0]) and (not _tree[1]):
             if not skip_file_docstring:
-                log(" - No module docstring", 3)
-                file_docs_covered -= 1
                 file_result.report_module(has_docstring=False)
             else:
                 file_result.report_module(
                     has_docstring=False, ignore_reason="--skip-file-docstring=True"
                 )
-
         elif _tree[1]:
-            log(" - File is empty", 3)
-            file_docs_needed = 0
-            file_docs_covered = 0
-            empty_files += 1
             file_result.set_file_status(FileStatus.EMPTY)
-
         else:
             file_result.report_module(bool(_tree[0]))
 
-        # Traverse through functions and classes
+        # Recursively traverse through functions and classes
         for symbol in _tree[-1]:
-            temp_docs_needed, temp_docs_covered, missing_list = print_docstring(
-                file_result, "", symbol, filename, ignore_names
-            )
-            file_docs_needed += temp_docs_needed
-            file_docs_covered += temp_docs_covered
-            file_missing_list += missing_list
-
-        total_docs_needed += file_docs_needed
-        total_docs_covered += file_docs_covered
-
-        if file_docs_needed:
-            coverage = float(file_docs_covered) * 100 / float(file_docs_needed)
-        else:
-            coverage = 0
-
-        file_results[filename] = {
-            "missing": file_missing_list,
-            "module_doc": bool(_tree[0]),
-            "missing_count": file_docs_needed - file_docs_covered,
-            "needed_count": file_docs_needed,
-            "coverage": coverage,
-            "empty": bool(_tree[1]),
-        }
-
-        log(
-            " Needed: %s; Found: %s; Missing: %s; Coverage: %.1f%%"
-            % (
-                file_docs_needed,
-                file_docs_covered,
-                file_results[filename]["missing_count"],
-                file_results[filename]["coverage"],
-            ),
-            2,
-        )
-
-    total_results = {
-        "missing_count": total_docs_needed - total_docs_covered,
-        "needed_count": total_docs_needed,
-        "coverage": (
-            float(total_docs_covered) * 100 / float(total_docs_needed) if total_docs_needed else 100
-        ),
-    }
-
-    postfix = ""
-    if empty_files:
-        postfix = " (%s files are empty)" % empty_files
-    if skip_magic:
-        postfix += " (skipped all non-init magic methods)"
-    if skip_file_docstring:
-        postfix += " (skipped file-level docstrings)"
-    if skip_init:
-        postfix += " (skipped __init__ methods)"
-    if skip_class_def:
-        postfix += " (skipped class definitions)"
-    if skip_private:
-        postfix += " (skipped private methods)"
-
-    log("\n", 2)
-
-    if len(filenames) > 1:
-        log("Overall statistics for %s files%s:" % (len(filenames), postfix), 1)
-    else:
-        log("Overall statistics%s:" % postfix, 1)
-
-    log(
-        "Needed: {}  -  Found: {}  -  Missing: {}".format(
-            total_docs_needed, total_docs_covered, total_results["missing_count"]
-        ),
-        1,
-    )
-
-    #################### Calculate Total Grade ####################
-    grade = next(
-        message
-        for message, grade_threshold in GRADES
-        if grade_threshold <= total_results["coverage"]
-    )
-
-    log("Total coverage: {:.1f}%  -  Grade: {}".format(total_results["coverage"], grade), 1)
+            analyze_docstrings(file_result, "", symbol, filename, ignore_names)
 
     LegacyPrinter(
         verbosity=verbose,
-        empty_files=empty_files,
         scip_magic=skip_magic,
         skip_file_docstring=skip_file_docstring,
         skip_init=skip_init,
