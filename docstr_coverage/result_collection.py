@@ -7,7 +7,8 @@ from typing import List, Optional, Dict, Generator, Tuple
 
 
 class ResultCollection:
-    _folders: Dict[str, "Folder"] = dict()
+    def __init__(self):
+        self._folders: Dict[str, "Folder"] = dict()
 
     def get_module(self, file_path: str):
         folder_path, file_name = os.path.split(file_path)
@@ -34,14 +35,19 @@ class ResultCollection:
             missing_list = [
                 e.node_identifier
                 for e in file.expected_docstrings()
-                if not e.ignore_reason and not e.has_docstring
+                if not e.ignore_reason
+                and not e.has_docstring
+                and not e.node_identifier == "module docstring"
             ]
-            has_module_doc = len(
-                [
-                    e
-                    for e in file.expected_docstrings()
-                    if e.node_identifier == "module docstring" and e.has_docstring
-                ]
+            has_module_doc = (
+                len(
+                    [
+                        e
+                        for e in file.expected_docstrings()
+                        if e.node_identifier == "module docstring" and e.has_docstring
+                    ]
+                )
+                > 0
             )
             count = file.count()
             file_results[filename] = {
@@ -62,7 +68,8 @@ class ResultCollection:
 
 
 class Folder:
-    _files: Dict[str, "File"] = dict()
+    def __init__(self):
+        self._files: Dict[str, "File"] = dict()
 
     def get_module(self, file_name: str):
         try:
@@ -88,12 +95,10 @@ class FileStatus(enum.Enum):
 
 
 class File:
-    _expected_docstrings: List["_ExpectedDocstring"]
-    _status: FileStatus
-
     def __init__(self) -> None:
         super().__init__()
-        self._expected_docstrings = []
+        self._expected_docstrings: List["_ExpectedDocstring"] = []
+        self._status = FileStatus.ANALYZED
 
     def report(self, identifier: str, has_docstring: bool, ignore_reason: Optional[str] = None):
         self._expected_docstrings.append(
@@ -116,14 +121,20 @@ class File:
 
     def count(self) -> "_FileCount":
         count = _FileCount()
-        for expd in self._expected_docstrings:
-            if expd.ignore_reason:
-                pass  # Ignores will be counted in a future version
-            elif expd.has_docstring:
-                count.found_needed_docstr()
-            else:
-                count.missed_needed_docstring()
+        if self._status == FileStatus.EMPTY:
+            count.found_empty_file()
+        else:
+            for expd in self._expected_docstrings:
+                if expd.ignore_reason:
+                    pass  # Ignores will be counted in a future version
+                elif expd.has_docstring:
+                    count.found_needed_docstr()
+                else:
+                    count.missed_needed_docstring()
         return count
+
+    def get_status(self) -> FileStatus:
+        return self._status
 
 
 @dataclass
