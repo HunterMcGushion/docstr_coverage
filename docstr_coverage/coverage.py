@@ -5,12 +5,12 @@ import logging
 import os
 import re
 
-# TODO: If Python 2, ```from __future__ import print_function```
 from ast import parse
 from typing import List, Tuple, Optional
 
+from docstr_coverage.printers import LegacyPrinter
+from docstr_coverage.result_collection import ResultCollection, FileStatus, File
 from docstr_coverage.visitor import DocStringCoverageVisitor
-from result_collection import ResultCollection, FileStatus, File
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO, format="%(message)s")
@@ -148,8 +148,6 @@ def get_docstring_coverage(
         ...     'coverage': '<total_percent_of_coverage float>'
         ... }"""
 
-    # TODO: Switch to Python's `logging` module, and remove
-    #       below nested `log` function definition
     def log(text, level=1):
         """Prints `text` to log depending on `verbose`
 
@@ -290,8 +288,6 @@ def get_docstring_coverage(
         else:
             file_result.report_module(bool(_tree[0]))
 
-        # TODO continue here
-        #   (pass file_result obj to print_docstring and add node observations)
         # Traverse through functions and classes
         for symbol in _tree[-1]:
             temp_docs_needed, temp_docs_covered, missing_list = print_docstring(
@@ -373,5 +369,15 @@ def get_docstring_coverage(
     )
 
     log("Total coverage: {:.1f}%  -  Grade: {}".format(total_results["coverage"], grade), 1)
+
+    LegacyPrinter(
+        verbosity=verbose,
+        empty_files=empty_files,
+        scip_magic=skip_magic,
+        skip_file_docstring=skip_file_docstring,
+        skip_init=skip_init,
+        skip_class_def=skip_class_def,
+        skip_private=skip_private,
+    ).print(results)
 
     return file_results, total_results
