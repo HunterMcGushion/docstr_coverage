@@ -20,6 +20,14 @@ logging.basicConfig(level=logging.INFO, format="%(message)s")
 
 
 def print_line(line: str = ""):
+    """Prints `line`
+
+    Parameters
+    ----------
+    line: String
+        The text to print
+
+    """
     logger.info(line)
 
 
@@ -27,7 +35,6 @@ class LegacyPrinter:
     def __init__(
         self,
         verbosity: int,
-        empty_files,
         scip_magic,
         skip_file_docstring,
         skip_init,
@@ -35,7 +42,6 @@ class LegacyPrinter:
         skip_private,
     ):
         self.verbosity = verbosity
-        self.empty_files = empty_files
         self.skip_magic = scip_magic
         self.skip_file_docstring = skip_file_docstring
         self.skip_init = skip_init
@@ -85,7 +91,7 @@ class LegacyPrinter:
         count = results.count()
 
         postfix = ""
-        if self.empty_files:
+        if count.num_empty_files > 0:
             postfix = " (%s files are empty)" % count.num_empty_files
         if self.skip_magic:
             postfix += " (skipped all non-init magic methods)"
