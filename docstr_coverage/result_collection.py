@@ -134,7 +134,7 @@ class _AggregatedCount:
         try:
             return self.found * 100 / self.needed
         except ZeroDivisionError:
-            return 0.0
+            return 100.0
 
 
 class _FileCount:
@@ -150,7 +150,7 @@ class _FileCount:
         try:
             return self.found * 100 / self.needed
         except ZeroDivisionError:
-            return 0.0
+            return 100.0
 
     def found_needed_docstr(self):
         self.needed += 1
