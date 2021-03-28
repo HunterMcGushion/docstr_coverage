@@ -185,7 +185,7 @@ def get_docstring_coverage(
     results = ResultCollection()
 
     for filename in filenames:
-        file_result: File = results.get_module(file_path=filename)
+        file_result: File = results.get_file(file_path=filename)
 
         #################### Read and Parse Source ####################
         with open(filename, "r", encoding="utf-8") as f:

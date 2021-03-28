@@ -1,3 +1,5 @@
+"""All logic used to print a recorded ResultCollection to stdout.
+Currently, this module is in BETA and its interface may change in future versions."""
 import logging
 
 from docstr_coverage.result_collection import FileStatus, ResultCollection
@@ -32,6 +34,12 @@ def print_line(line: str = ""):
 
 
 class LegacyPrinter:
+    """ Printing functionality consistent with the original early-versions docstr-coverage outputs.
+
+    In future versions, the interface of this class will be refined
+     and an abstract superclass will be extracted. Thus, coding against
+     the current interface will require refactorings with future versions of docstr-coverage."""
+
     def __init__(
         self,
         verbosity: int,
@@ -49,12 +57,24 @@ class LegacyPrinter:
         self.skip_private = skip_private
 
     def print(self, results: ResultCollection):
+        """ Prints a provided set of results to stdout.
+
+        Parameters
+        ----------
+        results: ResultCollection
+            The information about docstr presence to be printed to stdout."""
         if self.verbosity >= 2:
             self._print_file_statistics(results)
         if self.verbosity >= 1:
             self._print_overall_statistics(results)
 
     def _print_file_statistics(self, results: ResultCollection):
+        """ Prints the file specific information to stdout.
+
+        Parameters
+        ----------
+        results: ResultCollection
+            The information about docstr presence to be printed to stdout."""
         for file_path, file in results.files():
             # File Header
             print_line('\nFile: "{}"'.format(file_path))
@@ -82,6 +102,12 @@ class LegacyPrinter:
         print_line()
 
     def _print_overall_statistics(self, results: ResultCollection):
+        """ Prints overall results (aggregated over all files) to stdout.
+
+        Parameters
+        ----------
+        results: ResultCollection
+            The information about docstr presence to be printed to stdout."""
         if self.verbosity < 1:
             return None
 
