@@ -1,33 +1,30 @@
 import enum
 import functools
 import operator
-import os
 from dataclasses import dataclass
 from typing import Dict, Generator, List, Optional, Tuple
 
 
 class ResultCollection:
     def __init__(self):
-        self._folders: Dict[str, "Folder"] = dict()
+        self._files: Dict[str, "File"] = dict()
 
     def get_module(self, file_path: str):
-        folder_path, file_name = os.path.split(file_path)
-        folder: Folder
+        file: File
         try:
-            folder = self._folders[folder_path]
+            return self._files[file_path]
         except KeyError:
-            folder = Folder()
-            self._folders[folder_path] = folder
-        return folder.get_module(file_name=file_name)
+            file = File()
+            self._files[file_path] = file
+            return file
 
     def count(self) -> "_AggregatedCount":
-        counts = (folder.count() for folder in self._folders.values())
+        counts = (folder.count() for folder in self._files.values())
         return functools.reduce(operator.add, counts, _AggregatedCount())
 
     def files(self) -> Generator[Tuple[str, "File"], None, None]:
-        for folder_path, folder in self._folders.items():
-            for file_name, file in folder.files():
-                yield "{}{}{}".format(folder_path, os.path.sep, file_name), file
+        for file_path, file in self._files.items():
+            yield file_path, file
 
     def to_legacy(self) -> Tuple[Dict, Dict]:
         file_results = dict()
@@ -65,27 +62,6 @@ class ResultCollection:
             "coverage": total_count.coverage(),
         }
         return file_results, total_results
-
-
-class Folder:
-    def __init__(self):
-        self._files: Dict[str, "File"] = dict()
-
-    def get_module(self, file_name: str):
-        try:
-            return self._files[file_name]
-        except KeyError:
-            file = File()
-            self._files[file_name] = file
-            return file
-
-    def count(self) -> "_AggregatedCount":
-        counts = (file.count() for file in self._files.values())
-        return functools.reduce(operator.add, counts, _AggregatedCount())
-
-    def files(self) -> Generator[Tuple[str, "File"], None, None]:
-        for name, file in self._files.items():
-            yield name, file
 
 
 class FileStatus(enum.Enum):
