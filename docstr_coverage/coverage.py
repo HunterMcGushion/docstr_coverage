@@ -4,10 +4,10 @@ and James Harlow (see "THANKS.txt" for details)"""
 import os
 import re
 from ast import parse
-from typing import List, Tuple, Optional
+from typing import List, Optional, Tuple
 
 from docstr_coverage.printers import LegacyPrinter
-from docstr_coverage.result_collection import ResultCollection, FileStatus, File
+from docstr_coverage.result_collection import File, FileStatus, ResultCollection
 from docstr_coverage.visitor import DocStringCoverageVisitor
 
 

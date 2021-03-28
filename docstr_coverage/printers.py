@@ -1,6 +1,6 @@
 import logging
 
-from docstr_coverage.result_collection import ResultCollection, FileStatus
+from docstr_coverage.result_collection import FileStatus, ResultCollection
 
 _GRADES = (
     ("AMAZING! Your docstrings are truly a wonder to behold!", 100),

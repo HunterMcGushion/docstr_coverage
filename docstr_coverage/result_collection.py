@@ -3,7 +3,7 @@ import functools
 import operator
 import os
 from dataclasses import dataclass
-from typing import List, Optional, Dict, Generator, Tuple
+from typing import Dict, Generator, List, Optional, Tuple
 
 
 class ResultCollection:
