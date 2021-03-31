@@ -2,7 +2,7 @@
 Currently, this module is in BETA and its interface may change in future versions."""
 import logging
 
-from docstr_coverage.result_collection import FileStatus, ResultCollection
+from docstr_coverage.result_collection import FileStatus
 
 _GRADES = (
     ("AMAZING! Your docstrings are truly a wonder to behold!", 100),
@@ -21,7 +21,7 @@ logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO, format="%(message)s")
 
 
-def print_line(line: str = ""):
+def print_line(line=""):
     """Prints `line`
 
     Parameters
@@ -41,13 +41,7 @@ class LegacyPrinter:
      the current interface will require refactorings with future versions of docstr-coverage."""
 
     def __init__(
-        self,
-        verbosity: int,
-        scip_magic,
-        skip_file_docstring,
-        skip_init,
-        skip_class_def,
-        skip_private,
+        self, verbosity, scip_magic, skip_file_docstring, skip_init, skip_class_def, skip_private,
     ):
         self.verbosity = verbosity
         self.skip_magic = scip_magic
@@ -56,7 +50,7 @@ class LegacyPrinter:
         self.skip_class_def = skip_class_def
         self.skip_private = skip_private
 
-    def print(self, results: ResultCollection):
+    def print(self, results):
         """ Prints a provided set of results to stdout.
 
         Parameters
@@ -68,7 +62,7 @@ class LegacyPrinter:
         if self.verbosity >= 1:
             self._print_overall_statistics(results)
 
-    def _print_file_statistics(self, results: ResultCollection):
+    def _print_file_statistics(self, results):
         """ Prints the file specific information to stdout.
 
         Parameters
@@ -101,7 +95,7 @@ class LegacyPrinter:
             print_line()
         print_line()
 
-    def _print_overall_statistics(self, results: ResultCollection):
+    def _print_overall_statistics(self, results):
         """ Prints overall results (aggregated over all files) to stdout.
 
         Parameters

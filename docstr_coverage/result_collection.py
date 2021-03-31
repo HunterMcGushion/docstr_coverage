@@ -7,7 +7,7 @@ Currently, this module is in BETA and its interface
 import enum
 import functools
 import operator
-from typing import Dict, Generator, List, Optional, Tuple
+from typing import Optional
 
 
 class ResultCollection:
@@ -18,9 +18,9 @@ class ResultCollection:
     without having to re-walk over the files again."""
 
     def __init__(self):
-        self._files: Dict[str, "File"] = dict()
+        self._files = dict()
 
-    def get_file(self, file_path: str) -> "File":
+    def get_file(self, file_path):
         """
         Provides access to the docstring information for specific files.
         This primarily targets information collection phase
@@ -40,7 +40,6 @@ class ResultCollection:
             The file (information) instance used to track docstring information.
 
         """
-        file: File
         try:
             return self._files[file_path]
         except KeyError:
@@ -48,7 +47,7 @@ class ResultCollection:
             self._files[file_path] = file
             return file
 
-    def count(self) -> "AggregatedCount":
+    def count(self):
         """
         Walks through all the tracked files in this result collection,
         and counts overall statistics, such as #missing docstring.
@@ -61,14 +60,14 @@ class ResultCollection:
         counts = (folder.count() for folder in self._files.values())
         return functools.reduce(operator.add, counts, AggregatedCount())
 
-    def files(self) -> Generator[Tuple[str, "File"], None, None]:
+    def files(self):
         """Generator, allowing to iterate over all
         (file-name, file-info) tuples in this result collection."""
 
         for file_path, file in self._files.items():
             yield file_path, file
 
-    def to_legacy(self) -> Tuple[Dict, Dict]:
+    def to_legacy(self):
         """Converts the information in this ResultsCollection
         into the less expressive dictionary of counts used since
         early versions of docstr-coverage."""
@@ -124,10 +123,10 @@ class File:
 
     def __init__(self) -> None:
         super().__init__()
-        self._expected_docstrings: List["ExpectedDocstring"] = []
+        self._expected_docstrings = []
         self._status = FileStatus.ANALYZED
 
-    def report(self, identifier: str, has_docstring: bool, ignore_reason: Optional[str] = None):
+    def report(self, identifier, has_docstring, ignore_reason=None):
         """Used internally by docstr-coverage to report the status of a
         single, expected docstring.
 
@@ -148,7 +147,7 @@ class File:
             )
         )
 
-    def report_module(self, has_docstring: bool, ignore_reason: Optional[str] = None):
+    def report_module(self, has_docstring, ignore_reason=None):
         """Used internally by docstr-coverage to report the status of a module docstring.
 
         Parameters
@@ -162,13 +161,13 @@ class File:
             identifier="module docstring", has_docstring=has_docstring, ignore_reason=ignore_reason
         )
 
-    def expected_docstrings(self) -> Generator["ExpectedDocstring", None, None]:
+    def expected_docstrings(self):
         """A generator, allowing to iterate over all reported (present or missing)
         docstring presences of this file."""
         for exds in self._expected_docstrings:
             yield exds
 
-    def set_file_status(self, status: FileStatus):
+    def set_file_status(self, status):
         """
         Method used internally by docstr-coverage.
         The default file status is ANALYZED. To change this (e.g. to EMPTY),
@@ -181,7 +180,7 @@ class File:
         """
         self._status = status
 
-    def count(self) -> "FileCount":
+    def count(self):
         """
         Walks through all docstring reports of this file
          and counts them by state (e.g. the #missing).
@@ -220,7 +219,7 @@ class ExpectedDocstring:
         self.ignore_reason = ignore_reason
 
 
-def _calculate_coverage(found: int, needed: int) -> float:
+def _calculate_coverage(found, needed) -> float:
     """
     Calculates the coverage in percent, as the ratio of #found and #needed docstrings.
 
@@ -248,18 +247,18 @@ class AggregatedCount:
 
     def __init__(
         self,
-        num_files: int = 0,
-        num_empty_files: int = 0,
-        needed: int = 0,
-        found: int = 0,
-        missing: int = 0,
+        num_files=0,
+        num_empty_files=0,
+        needed=0,
+        found=0,
+        missing=0,
         # Note: In the future, we'll add `self.ignored` here
     ):
-        self.num_files: int = num_files
-        self.num_empty_files: int = num_empty_files
-        self.needed: int = needed
-        self.found: int = found
-        self.missing: int = missing
+        self.num_files = num_files
+        self.num_empty_files = num_empty_files
+        self.needed = needed
+        self.found = found
+        self.missing = missing
 
     def __add__(self, other):
         if isinstance(other, AggregatedCount):
@@ -288,7 +287,7 @@ class AggregatedCount:
                 " but received {}".format(type(other))
             )
 
-    def coverage(self) -> float:
+    def coverage(self):
         """Calculates the coverage in percent, given the counts recorded in self.
         If no docstrings were needed, the presence is reported as 100%."""
         return _calculate_coverage(found=self.found, needed=self.needed)
@@ -305,7 +304,7 @@ class FileCount:
         self.missing = 0
         # Note: In the future, we'll add `self.ignored` here
 
-    def coverage(self) -> float:
+    def coverage(self):
         """Calculates the coverage in percent, given the counts recorded in self.
         If no docstrings were needed, the presence is reported as 100%."""
         return _calculate_coverage(found=self.found, needed=self.needed)
