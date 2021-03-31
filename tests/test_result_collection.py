@@ -9,8 +9,8 @@ import pytest
 
 from docstr_coverage.result_collection import (
     AggregatedCount,
-    FileCount,
     File,
+    FileCount,
     FileStatus,
     ResultCollection,
 )
