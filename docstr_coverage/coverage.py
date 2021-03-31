@@ -4,7 +4,7 @@ and James Harlow (see "THANKS.txt" for details)"""
 import os
 import re
 from ast import parse
-from typing import List, Optional, Tuple
+from typing import List, Tuple
 
 from docstr_coverage.printers import LegacyPrinter
 from docstr_coverage.result_collection import File, FileStatus, ResultCollection
@@ -160,7 +160,7 @@ def get_docstring_coverage(
         #################### Check Current Node ####################
 
         ### Check for ignore status
-        ignore_reason: Optional[str] = None
+        ignore_reason = None
         if skip_init and name == "__init__":
             ignore_reason = "skip-init set to True"
         elif skip_magic and name.startswith("__") and name.endswith("__") and name != "__init__":
