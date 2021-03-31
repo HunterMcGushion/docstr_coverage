@@ -7,7 +7,6 @@ Currently, this module is in BETA and its interface
 import enum
 import functools
 import operator
-from dataclasses import dataclass
 from typing import Dict, Generator, List, Optional, Tuple
 
 
@@ -209,13 +208,16 @@ class File:
         return self._status
 
 
-@dataclass
 class ExpectedDocstring:
     """A data class containing information about a single docstring and its presence."""
 
-    node_identifier: str
-    has_docstring: bool
-    ignore_reason: Optional[str]
+    def __init__(
+        self, node_identifier: str, has_docstring: bool, ignore_reason: Optional[str]
+    ) -> None:
+        super().__init__()
+        self.node_identifier = node_identifier
+        self.has_docstring = has_docstring
+        self.ignore_reason = ignore_reason
 
 
 def _calculate_coverage(found: int, needed: int) -> float:
