@@ -287,6 +287,17 @@ class AggregatedCount:
                 " but received {}".format(type(other))
             )
 
+    def __eq__(self, other):
+        if isinstance(other, AggregatedCount):
+            return (
+                self.num_files == other.num_files
+                and self.num_empty_files == other.num_empty_files
+                and self.needed == other.needed
+                and self.found == other.found
+                and self.missing == other.missing
+            )
+        return False
+
     def coverage(self):
         """Calculates the coverage in percent, given the counts recorded in self.
         If no docstrings were needed, the presence is reported as 100%."""
