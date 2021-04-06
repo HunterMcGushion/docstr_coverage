@@ -1,8 +1,6 @@
-"""Module containing the classes required to collect
- and aggregate docstring information.
+"""Module containing the classes required to collect and aggregate docstring information.
 
-Currently, this module is in BETA and its interface
- may change in future versions."""
+Currently, this module is in BETA and its interface may change in future versions."""
 
 import enum
 import functools
@@ -11,23 +9,21 @@ from typing import Optional
 
 
 class ResultCollection:
-    """A result collection contains the information about the presence
-    of docstrings collected during the walk through the files.
-    It thus allows to get information about missing docstrings for any
-    inspected file, and to extract summary metrics (e.g. coverage)
-    without having to re-walk over the files again."""
+    """A result collection contains information about the presence of docstrings collected during
+    the walk through the files. From the `ResultCollection`, information about missing docstrings
+    for inspected files can be retrieved, and summary metrics (e.g. coverage) can be extracted
+    without having to walk over the files again."""
 
     def __init__(self):
         self._files = dict()
 
     def get_file(self, file_path):
-        """
-        Provides access to the docstring information for specific files.
+        """Provides access to the docstring information for specific files.
         This primarily targets information collection phase
         (thus the docstr-coverage internal process).
 
-        If no file with the provided name is on record yet,
-         a new empty file information instance is created and returned.
+        If no file with the provided name is on record yet, a new empty `File` information instance
+        is created and returned.
 
         Parameters
         ----------
@@ -37,9 +33,7 @@ class ResultCollection:
         Returns
         -------
         File
-            The file (information) instance used to track docstring information.
-
-        """
+            The file (information) instance used to track docstring information"""
         try:
             return self._files[file_path]
         except KeyError:
@@ -48,30 +42,24 @@ class ResultCollection:
             return file
 
     def count(self):
-        """
-        Walks through all the tracked files in this result collection,
-        and counts overall statistics, such as #missing docstring.
+        """Walks through all the tracked files in this result collection, and counts overall
+        statistics, such as #missing docstring.
 
         Returns
         -------
         AggregatedCount
             A count instance containing a range of docstring counts."""
-
         counts = (folder.count() for folder in self._files.values())
         return functools.reduce(operator.add, counts, AggregatedCount())
 
     def files(self):
-        """Generator, allowing to iterate over all
-        (file-name, file-info) tuples in this result collection."""
-
+        """Generator, iterating over all (file-name, file-info) tuples in this result collection"""
         for file_path, file in self._files.items():
             yield file_path, file
 
     def to_legacy(self):
-        """Converts the information in this ResultsCollection
-        into the less expressive dictionary of counts used since
-        early versions of docstr-coverage."""
-
+        """Converts the information in this `ResultCollection` into the less expressive dictionary
+        of counts used since the early versions of docstr-coverage."""
         file_results = dict()
         for filename, file in self.files():
             missing_list = [
@@ -127,8 +115,7 @@ class File:
         self._status = FileStatus.ANALYZED
 
     def report(self, identifier, has_docstring, ignore_reason=None):
-        """Used internally by docstr-coverage to report the status of a
-        single, expected docstring.
+        """Used internally by docstr-coverage to report the status of a single, expected docstring.
 
         For module docstrings, use `report_module(...)` instead of this method.
 
@@ -140,7 +127,6 @@ class File:
             True if and only if the docstring was present
         ignore_reason: Optional[str]
             Used to indicate that the docstring should be ignored (independent of its presence)"""
-
         self._expected_docstrings.append(
             ExpectedDocstring(
                 node_identifier=identifier, has_docstring=has_docstring, ignore_reason=ignore_reason
@@ -156,40 +142,34 @@ class File:
             True if and only if the docstring was present
         ignore_reason: Optional[str]
             Used to indicate that the docstring should be ignored (independent of its presence)"""
-
         self.report(
             identifier="module docstring", has_docstring=has_docstring, ignore_reason=ignore_reason
         )
 
     def expected_docstrings(self):
-        """A generator, allowing to iterate over all reported (present or missing)
-        docstring presences of this file."""
+        """A generator, iterating over all reported (present or missing) docstrings in this file"""
         for exds in self._expected_docstrings:
             yield exds
 
     def set_file_status(self, status):
-        """
-        Method used internally by docstr-coverage.
+        """Method used internally by docstr-coverage.
         The default file status is ANALYZED. To change this (e.g. to EMPTY),
         this method has to be called.
 
         Parameters
         ----------
         status: FileStatus
-            The status for this file to record
-        """
+            The status for this file to record"""
         self._status = status
 
     def count(self):
-        """
-        Walks through all docstring reports of this file
-         and counts them by state (e.g. the #missing).
+        """Walks through all docstring reports of this file and counts them by state
+        (e.g. the #missing).
 
         Returns
         -------
         FileCount
             A count instance containing a range of docstring counts."""
-
         count = FileCount()
         if self._status == FileStatus.EMPTY:
             count._found_empty_file()
@@ -208,7 +188,7 @@ class File:
 
 
 class ExpectedDocstring:
-    """A data class containing information about a single docstring and its presence."""
+    """A class containing information about a single docstring and its presence"""
 
     def __init__(
         self, node_identifier: str, has_docstring: bool, ignore_reason: Optional[str]
@@ -220,8 +200,7 @@ class ExpectedDocstring:
 
 
 def _calculate_coverage(found, needed) -> float:
-    """
-    Calculates the coverage in percent, as the ratio of #found and #needed docstrings.
+    """Calculates the coverage, in percent, as the ratio of `found` to `needed` docstrings
 
     Parameters
     ----------
@@ -233,9 +212,7 @@ def _calculate_coverage(found, needed) -> float:
     Returns
     -------
     float
-        The coverage as percentage, i.e., in [0;100]
-
-    """
+        The coverage as percentage, i.e., in [0;100]"""
     try:
         return found * 100 / needed
     except ZeroDivisionError:
