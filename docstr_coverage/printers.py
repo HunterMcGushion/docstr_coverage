@@ -27,18 +27,16 @@ def print_line(line=""):
     Parameters
     ----------
     line: String
-        The text to print
-
-    """
+        The text to print"""
     logger.info(line)
 
 
 class LegacyPrinter:
-    """ Printing functionality consistent with the original early-versions docstr-coverage outputs.
+    """Printing functionality consistent with the original early-versions docstr-coverage outputs.
 
-    In future versions, the interface of this class will be refined
-     and an abstract superclass will be extracted. Thus, coding against
-     the current interface will require refactorings with future versions of docstr-coverage."""
+    In future versions, the interface of this class will be refined and an abstract superclass
+    will be extracted. Thus, coding against the current interface will require refactorings with
+    future versions of docstr-coverage."""
 
     def __init__(
         self, verbosity, scip_magic, skip_file_docstring, skip_init, skip_class_def, skip_private,
@@ -51,7 +49,7 @@ class LegacyPrinter:
         self.skip_private = skip_private
 
     def print(self, results):
-        """ Prints a provided set of results to stdout.
+        """Prints a provided set of results to stdout.
 
         Parameters
         ----------
@@ -63,7 +61,7 @@ class LegacyPrinter:
             self._print_overall_statistics(results)
 
     def _print_file_statistics(self, results):
-        """ Prints the file specific information to stdout.
+        """Prints the file specific information to stdout.
 
         Parameters
         ----------
@@ -96,7 +94,7 @@ class LegacyPrinter:
         print_line()
 
     def _print_overall_statistics(self, results):
-        """ Prints overall results (aggregated over all files) to stdout.
+        """Prints overall results (aggregated over all files) to stdout.
 
         Parameters
         ----------
