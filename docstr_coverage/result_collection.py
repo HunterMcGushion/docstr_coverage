@@ -114,7 +114,7 @@ class File:
         self._expected_docstrings = []
         self._status = FileStatus.ANALYZED
 
-    def report(self, identifier, has_docstring, ignore_reason=None):
+    def report(self, identifier: str, has_docstring: bool, ignore_reason: str = None):
         """Used internally by docstr-coverage to report the status of a single, expected docstring.
 
         For module docstrings, use `report_module(...)` instead of this method.
@@ -133,7 +133,7 @@ class File:
             )
         )
 
-    def report_module(self, has_docstring, ignore_reason=None):
+    def report_module(self, has_docstring: bool, ignore_reason: str = None):
         """Used internally by docstr-coverage to report the status of a module docstring.
 
         Parameters
@@ -199,7 +199,7 @@ class ExpectedDocstring:
         self.ignore_reason = ignore_reason
 
 
-def _calculate_coverage(found, needed) -> float:
+def _calculate_coverage(found: int, needed: int) -> float:
     """Calculates the coverage, in percent, as the ratio of `found` to `needed` docstrings
 
     Parameters
@@ -224,11 +224,11 @@ class AggregatedCount:
 
     def __init__(
         self,
-        num_files=0,
-        num_empty_files=0,
-        needed=0,
-        found=0,
-        missing=0,
+        num_files: int = 0,
+        num_empty_files: int = 0,
+        needed: int = 0,
+        found: int = 0,
+        missing: int = 0,
         # Note: In the future, we'll add `self.ignored` here
     ):
         self.num_files = num_files
