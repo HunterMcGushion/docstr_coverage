@@ -1,7 +1,6 @@
-"""The result_collection is a very simple module and
-consists mostly on data-classes with little logic.
-Thus, the tests implemented here are mostly trivial
-and act primarily as smoke- and regression tests."""
+"""The `result_collection` module is very simple and consists mostly of data-classes with
+little logic. Thus, the tests implemented here are mostly trivial and act primarily as
+smoke- and regression tests."""
 import os
 from typing import Dict
 
@@ -18,16 +17,15 @@ from docstr_coverage.result_collection import (
 
 def _path(*argv):
     """Creates test file paths from provided splits (folder and file names) with the
-    current os file path separator."""
+    current `os` file path separator"""
     return os.path.sep.join(argv)
 
 
 class TestResultCollection:
-    """Tests the method in the ResultCollection class"""
+    """Tests the methods in the `ResultCollection` class"""
 
     def test_get_file(self):
-        """Makes sure files are created and stored correctly,
-        and no duplicates are created."""
+        """Makes sure files are created and stored correctly, and no duplicates are created"""
         result_collection = ResultCollection()
         file_1 = result_collection.get_file(_path("some", "path", "file.py"))
         file_2 = result_collection.get_file(_path("some", "path", "file.py"))
@@ -36,7 +34,7 @@ class TestResultCollection:
         assert file_1 != file_3
 
     def test_to_legacy(self):
-        """Some sanity checks on the conversion of ResultCollections to the legacy result format."""
+        """Sanity checks for conversion of `ResultCollection` objects to the legacy result format"""
         result_collection = ResultCollection()
         file_1 = result_collection.get_file(_path("my", "file.py"))
         file_1.report_module(False)
@@ -61,13 +59,11 @@ class TestResultCollection:
 
 
 class TestFile:
-    """Tests the method in the File class"""
+    """Tests the methods in the `File` class"""
 
     def test_count_and_iter(self):
-        """Test that the iterator of expected
-         (i.e., found or missing) docstrings is working,
-         and that the counting works as expected
-         (e.g., that it does not count ignored docstrings)."""
+        """Test that the iterator of expected (i.e., found or missing) docstrings is working, and
+        that the counting works as expected (e.g., that it does not count ignored docstrings)"""
         file = File()
         file.report_module(False)
         file.report("method_one", True, "ignored_nonetheless")
@@ -84,7 +80,7 @@ class TestFile:
         assert count.needed == 3
 
     def test_set_get_status(self):
-        """default settings and getter / setter of status"""
+        """Default settings and getter / setter of status"""
         file = File()
         assert file.get_status() == FileStatus.ANALYZED
         file.set_file_status(FileStatus.EMPTY)
@@ -95,7 +91,7 @@ class TestFile:
         [(True, None), (True, "excuse"), (False, None), (False, "excuse")],
     )
     def test_report_module(self, has_docstr, ignore_reason):
-        """Tests that 'module' docstrings are recoded correctly."""
+        """Tests that 'module' docstrings are recoded correctly"""
         file = File()
         file.report_module(has_docstring=has_docstr, ignore_reason=ignore_reason)
         all_docstrings = [d for d in file.expected_docstrings()]
@@ -114,7 +110,7 @@ class TestFile:
         ],
     )
     def test_report_(self, node_identifier, has_docstr, ignore_reason):
-        """Tests that 'non-module' docstrings are recoded correctly."""
+        """Tests that 'non-module' docstrings are recoded correctly"""
         file = File()
         file.report(
             identifier=node_identifier, has_docstring=has_docstr, ignore_reason=ignore_reason
@@ -127,7 +123,7 @@ class TestFile:
 
 
 class TestAggregateCount:
-    """Test class for the AggregatedCount Utility class"""
+    """Test methods of the `AggregatedCount` utility class"""
 
     @pytest.mark.parametrize(
         ["left", "right", "expected"],
@@ -170,7 +166,7 @@ class TestAggregateCount:
 
 
 class TestFileCount:
-    """Test class for the FileCount Utility class."""
+    """Test methods of the `FileCount` utility class"""
 
     def test_counter_empty(self):
         """Makes sure empty files are correctly tracked"""
@@ -190,7 +186,7 @@ class TestFileCount:
         )
 
     def test_counter_counts(self):
-        """Makes sure the counting of 'found' and 'missing' docstrings works."""
+        """Makes sure the counting of 'found' and 'missing' docstrings works"""
         counter = FileCount()
         assert (
             counter.needed == 0
