@@ -215,7 +215,7 @@ def get_docstring_coverage(
 
     LegacyPrinter(
         verbosity=verbose,
-        scip_magic=skip_magic,
+        skip_magic=skip_magic,
         skip_file_docstring=skip_file_docstring,
         skip_init=skip_init,
         skip_class_def=skip_class_def,

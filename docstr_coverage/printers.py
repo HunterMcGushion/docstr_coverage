@@ -39,10 +39,10 @@ class LegacyPrinter:
     future versions of docstr-coverage."""
 
     def __init__(
-        self, verbosity, scip_magic, skip_file_docstring, skip_init, skip_class_def, skip_private,
+        self, verbosity, skip_magic, skip_file_docstring, skip_init, skip_class_def, skip_private,
     ):
         self.verbosity = verbosity
-        self.skip_magic = scip_magic
+        self.skip_magic = skip_magic
         self.skip_file_docstring = skip_file_docstring
         self.skip_init = skip_init
         self.skip_class_def = skip_class_def
