@@ -244,11 +244,11 @@ class AggregatedCount(_DocstrCount):
                 missing=self.missing + other.missing,
             )
             if isinstance(other, AggregatedCount):
-                aggregated.num_files = (self.num_files + other.num_files,)
+                aggregated.num_files = self.num_files + other.num_files
                 aggregated.num_empty_files = self.num_empty_files + other.num_empty_files
             elif isinstance(other, FileCount):
-                aggregated.num_files = (self.num_files + 1,)
-                aggregated.num_empty_files = (self.num_empty_files + int(other.is_empty),)
+                aggregated.num_files = self.num_files + 1
+                aggregated.num_empty_files = self.num_empty_files + int(other.is_empty)
             else:
                 raise NotImplementedError(
                     "Received unexpected DocstrCount subtype ({}). "
