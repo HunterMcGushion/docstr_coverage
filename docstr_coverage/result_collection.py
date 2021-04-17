@@ -1,7 +1,7 @@
 """Module containing the classes required to collect and aggregate docstring information.
 
 Currently, this module is in BETA and its interface may change in future versions."""
-
+import abc
 import enum
 import functools
 import operator
@@ -49,13 +49,12 @@ class ResultCollection:
         -------
         AggregatedCount
             A count instance containing a range of docstring counts."""
-        counts = (folder.count_aggregate() for folder in self._files.values())
+        counts = (file.count_aggregate() for file in self._files.values())
         return functools.reduce(operator.add, counts, AggregatedCount())
 
     def files(self):
-        """Generator, iterating over all (file-name, file-info) tuples in this result collection"""
-        for file_path, file in self._files.items():
-            yield file_path, file
+        """View of all (file-name, file-info) tuples in this result collection"""
+        return self._files.items()
 
     def to_legacy(self):
         """Converts the information in this `ResultCollection` into the less expressive dictionary
@@ -65,9 +64,9 @@ class ResultCollection:
             missing_list = [
                 e.node_identifier
                 for e in file.expected_docstrings()
-                if not e.ignore_reason
-                and not e.has_docstring
-                and not e.node_identifier == "module docstring"
+                if not (
+                    e.ignore_reason or e.has_docstring or e.node_identifier == "module docstring"
+                )
             ]
             has_module_doc = (
                 len(
@@ -148,10 +147,14 @@ class File:
 
     def expected_docstrings(self):
         """A generator, iterating over all reported (present or missing) docstrings in this file"""
-        for exds in self._expected_docstrings:
-            yield exds
+        return iter(self._expected_docstrings)
 
-    def set_file_status(self, status):
+    @property
+    def status(self) -> FileStatus:
+        return self._status
+
+    @status.setter
+    def status(self, status):
         """Method used internally by docstr-coverage.
         The default file status is ANALYZED. To change this (e.g. to EMPTY),
         this method has to be called.
@@ -172,19 +175,16 @@ class File:
             A count instance containing a range of docstring counts."""
         count = FileCount()
         if self._status == FileStatus.EMPTY:
-            count._found_empty_file()
+            count.found_empty_file()
         else:
             for expd in self._expected_docstrings:
                 if expd.ignore_reason:
                     pass  # Ignores will be counted in a future version
                 elif expd.has_docstring:
-                    count._found_needed_docstr()
+                    count.found_needed_docstr()
                 else:
-                    count._missed_needed_docstring()
+                    count.missed_needed_docstring()
         return count
-
-    def get_status(self) -> FileStatus:
-        return self._status
 
 
 class ExpectedDocstring:
@@ -199,27 +199,23 @@ class ExpectedDocstring:
         self.ignore_reason = ignore_reason
 
 
-def _calculate_coverage(found: int, needed: int) -> float:
-    """Calculates the coverage, in percent, as the ratio of `found` to `needed` docstrings
+class _DocstrCount(abc.ABC):
+    def __init__(self, needed: int, found: int, missing: int):
+        # Note: In the future, we'll add `self.ignored` here
+        self.needed = needed
+        self.found = found
+        self.missing = missing
 
-    Parameters
-    ----------
-    found: int
-        The number of found docstrings
-    needed: int
-        The number of needed (i.e., non-ignored) docstrings
-
-    Returns
-    -------
-    float
-        The coverage as percentage, i.e., in [0;100]"""
-    try:
-        return found * 100 / needed
-    except ZeroDivisionError:
-        return 100.0
+    def coverage(self):
+        """Calculates the coverage in percent, given the counts recorded in self.
+        If no docstrings were needed, the presence is reported as 100%."""
+        try:
+            return self.found * 100 / self.needed
+        except ZeroDivisionError:
+            return 100.0
 
 
-class AggregatedCount:
+class AggregatedCount(_DocstrCount):
     """Counts of docstrings by presence, such as #missing, representing a list of files"""
 
     def __init__(
@@ -229,31 +225,29 @@ class AggregatedCount:
         needed: int = 0,
         found: int = 0,
         missing: int = 0,
-        # Note: In the future, we'll add `self.ignored` here
     ):
+        super().__init__(needed=needed, found=found, missing=missing)
         self.num_files = num_files
         self.num_empty_files = num_empty_files
-        self.needed = needed
-        self.found = found
-        self.missing = missing
 
     def __add__(self, other):
-        if isinstance(other, AggregatedCount):
-            return AggregatedCount(
-                num_files=self.num_files + other.num_files,
-                num_empty_files=self.num_empty_files + other.num_empty_files,
+        if isinstance(other, _DocstrCount):
+            aggregated = AggregatedCount(
                 needed=self.needed + other.needed,
                 found=self.found + other.found,
                 missing=self.missing + other.missing,
             )
-        elif isinstance(other, FileCount):
-            return AggregatedCount(
-                num_files=self.num_files + 1,
-                num_empty_files=self.num_empty_files + int(other.is_empty),
-                needed=self.needed + other.needed,
-                found=self.found + other.found,
-                missing=self.missing + other.missing,
-            )
+            if isinstance(other, AggregatedCount):
+                aggregated.num_files = (self.num_files + other.num_files,)
+                aggregated.num_empty_files = self.num_empty_files + other.num_empty_files
+            elif isinstance(other, FileCount):
+                aggregated.num_files = (self.num_files + 1,)
+                aggregated.num_empty_files = (self.num_empty_files + int(other.is_empty),)
+            else:
+                raise NotImplementedError(
+                    "Received unexpected DocstrCount subtype ({}). "
+                    "Please report to docstr-coverage issue tracker.".format(type(other))
+                )
         else:
             # Chosen NotImplementedError over TypeError as specified in
             #   https://docs.python.org/3/reference/datamodel.html#object.__add__ :
@@ -275,38 +269,24 @@ class AggregatedCount:
             )
         return False
 
-    def coverage(self):
-        """Calculates the coverage in percent, given the counts recorded in self.
-        If no docstrings were needed, the presence is reported as 100%."""
-        return _calculate_coverage(found=self.found, needed=self.needed)
 
-
-class FileCount:
+class FileCount(_DocstrCount):
     """Counts of docstrings by presence, such as #missing, representing a single file"""
 
     def __init__(self) -> None:
-        super().__init__()
+        super().__init__(needed=0, found=0, missing=0)
         self.is_empty = False
-        self.needed = 0
-        self.found = 0
-        self.missing = 0
-        # Note: In the future, we'll add `self.ignored` here
 
-    def coverage(self):
-        """Calculates the coverage in percent, given the counts recorded in self.
-        If no docstrings were needed, the presence is reported as 100%."""
-        return _calculate_coverage(found=self.found, needed=self.needed)
-
-    def _found_needed_docstr(self):
+    def found_needed_docstr(self):
         """To be called to count a present non-ignored docstring."""
         self.needed += 1
         self.found += 1
 
-    def _missed_needed_docstring(self):
+    def missed_needed_docstring(self):
         """To be called to count a missing non-ignored docstring."""
         self.needed += 1
         self.missing += 1
 
-    def _found_empty_file(self):
+    def found_empty_file(self):
         """To be called to count the presence of an empty file."""
         self.is_empty = True

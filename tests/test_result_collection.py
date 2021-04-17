@@ -177,7 +177,7 @@ class TestFileCount:
             and counter.found == 0
             and counter.is_empty is False
         )
-        counter._found_empty_file()
+        counter.found_empty_file()
         assert (
             counter.needed == 0
             and counter.missing == 0
@@ -194,15 +194,15 @@ class TestFileCount:
             and counter.found == 0
             and counter.is_empty is False
         )
-        counter._found_needed_docstr()
-        counter._found_needed_docstr()
+        counter.found_needed_docstr()
+        counter.found_needed_docstr()
         assert (
             counter.needed == 2
             and counter.missing == 0
             and counter.found == 2
             and counter.is_empty is False
         )
-        counter._missed_needed_docstring()
+        counter.missed_needed_docstring()
         assert (
             counter.needed == 3
             and counter.missing == 1
