@@ -5,7 +5,7 @@ import platform
 import pytest
 
 from docstr_coverage import get_docstring_coverage
-from docstr_coverage.coverage import GRADES
+from docstr_coverage.printers import _GRADES
 
 SAMPLES_DIRECTORY = os.path.join("tests", "sample_files", "subdir_a")
 EMPTY_FILE_PATH = os.path.join(SAMPLES_DIRECTORY, "empty_file.py")
@@ -29,7 +29,7 @@ def test_should_report_for_an_empty_file():
             "module_doc": False,
             "missing_count": 0,
             "needed_count": 0,
-            "coverage": 0,
+            "coverage": 100.0,
             "empty": True,
         }
     }
@@ -109,7 +109,7 @@ def test_should_report_for_multiple_files():
             "module_doc": False,
             "missing_count": 0,
             "needed_count": 0,
-            "coverage": 0,
+            "coverage": 100.0,
             "empty": True,
         },
     }
@@ -141,11 +141,12 @@ def test_should_report_when_no_docs_in_a_file():
             [
                 '\nFile: "tests/sample_files/subdir_a/empty_file.py"',
                 " - File is empty",
-                " Needed: 0; Found: 0; Missing: 0; Coverage: 0.0%",
-                "\n",
+                " Needed: 0; Found: 0; Missing: 0; Coverage: 100.0%",
+                "",
+                "",
                 "Overall statistics (1 files are empty):",
                 "Needed: 0  -  Found: 0  -  Missing: 0",
-                "Total coverage: 100.0%  -  Grade: " + GRADES[0][0],
+                "Total coverage: 100.0%  -  Grade: " + _GRADES[0][0],
             ],
         )
     ],
@@ -170,10 +171,11 @@ def test_logging_empty_file(caplog, expected):
                 " - No docstring for `foo`",
                 " - No docstring for `bar`",
                 " Needed: 4; Found: 1; Missing: 3; Coverage: 25.0%",
-                "\n",
+                "",
+                "",
                 "Overall statistics:",
                 "Needed: 4  -  Found: 1  -  Missing: 3",
-                "Total coverage: 25.0%  -  Grade: " + GRADES[6][0],
+                "Total coverage: 25.0%  -  Grade: " + _GRADES[6][0],
             ],
             3,
             ([".*", "__.+__"],),
@@ -186,10 +188,11 @@ def test_logging_empty_file(caplog, expected):
                 " - No docstring for `foo`",
                 " - No docstring for `bar`",
                 " Needed: 5; Found: 1; Missing: 4; Coverage: 20.0%",
-                "\n",
+                "",
+                "",
                 "Overall statistics:",
                 "Needed: 5  -  Found: 1  -  Missing: 4",
-                "Total coverage: 20.0%  -  Grade: " + GRADES[7][0],
+                "Total coverage: 20.0%  -  Grade: " + _GRADES[7][0],
             ],
             3,
             (),
@@ -198,10 +201,11 @@ def test_logging_empty_file(caplog, expected):
             [
                 '\nFile: "tests/sample_files/subdir_a/partly_documented_file.py"',
                 " Needed: 5; Found: 1; Missing: 4; Coverage: 20.0%",
-                "\n",
+                "",
+                "",
                 "Overall statistics:",
                 "Needed: 5  -  Found: 1  -  Missing: 4",
-                "Total coverage: 20.0%  -  Grade: " + GRADES[7][0],
+                "Total coverage: 20.0%  -  Grade: " + _GRADES[7][0],
             ],
             2,
             (),
@@ -210,7 +214,7 @@ def test_logging_empty_file(caplog, expected):
             [
                 "Overall statistics:",
                 "Needed: 5  -  Found: 1  -  Missing: 4",
-                "Total coverage: 20.0%  -  Grade: " + GRADES[7][0],
+                "Total coverage: 20.0%  -  Grade: " + _GRADES[7][0],
             ],
             1,
             (),
@@ -218,11 +222,11 @@ def test_logging_empty_file(caplog, expected):
         (
             [
                 "Overall statistics:",
-                "Needed: 2  -  Found: 1  -  Missing: 1",
-                "Total coverage: 50.0%  -  Grade: " + GRADES[5][0],
+                "Needed: 1  -  Found: 0  -  Missing: 1",
+                "Total coverage: 0.0%  -  Grade: " + _GRADES[9][0],
             ],
             1,
-            ([".*", ".*"],),
+            ([".*", ".*"],),  # ignore all, except module
         ),
     ],
 )
