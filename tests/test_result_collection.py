@@ -82,9 +82,9 @@ class TestFile:
     def test_set_get_status(self):
         """Default settings and getter / setter of status"""
         file = File()
-        assert file.get_status() == FileStatus.ANALYZED
-        file.set_file_status(FileStatus.EMPTY)
-        assert file.get_status() == FileStatus.EMPTY
+        assert file.status == FileStatus.ANALYZED
+        file.status = FileStatus.EMPTY
+        assert file.status == FileStatus.EMPTY
 
     @pytest.mark.parametrize(
         ["has_docstr", "ignore_reason"],

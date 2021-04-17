@@ -73,7 +73,7 @@ class LegacyPrinter:
 
             # List of missing docstrings
             if self.verbosity >= 3:
-                if file.get_status() == FileStatus.EMPTY:
+                if file.status == FileStatus.EMPTY:
                     print_line(" - File is empty")
                 for expected_docstr in file._expected_docstrings:
                     if not expected_docstr.has_docstring and not expected_docstr.ignore_reason:

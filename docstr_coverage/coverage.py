@@ -205,7 +205,7 @@ def get_docstring_coverage(
                     has_docstring=False, ignore_reason="--skip-file-docstring=True"
                 )
         elif _tree[1]:
-            file_result.set_file_status(FileStatus.EMPTY)
+            file_result.status = FileStatus.EMPTY
         else:
             file_result.collect_module_docstring(bool(_tree[0]))
 
