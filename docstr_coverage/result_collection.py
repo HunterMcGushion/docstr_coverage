@@ -200,6 +200,12 @@ class ExpectedDocstring:
 
 
 class _DocstrCount(abc.ABC):
+    """ABSTRACT superclass of classes used to count docstrings by presence.
+    See subclasses `AggregatedCount` and `FileCount`.
+
+    Do not directly create instances of this abstract superclass (even though
+    it has no abstract methods)."""
+
     def __init__(self, needed: int, found: int, missing: int):
         # Note: In the future, we'll add `self.ignored` here
         self.needed = needed
@@ -248,6 +254,7 @@ class AggregatedCount(_DocstrCount):
                     "Received unexpected DocstrCount subtype ({}). "
                     "Please report to docstr-coverage issue tracker.".format(type(other))
                 )
+            return aggregated
         else:
             # Chosen NotImplementedError over TypeError as specified in
             #   https://docs.python.org/3/reference/datamodel.html#object.__add__ :
