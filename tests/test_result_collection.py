@@ -37,13 +37,13 @@ class TestResultCollection:
         """Sanity checks for conversion of `ResultCollection` objects to the legacy result format"""
         result_collection = ResultCollection()
         file_1 = result_collection.get_file(_path("my", "file.py"))
-        file_1.report_module(False)
-        file_1.report("method_x", True)
-        file_1.report("method_y", True)
+        file_1.collect_module_docstring(False)
+        file_1.collect_docstring("method_x", True)
+        file_1.collect_docstring("method_y", True)
         file_2 = result_collection.get_file(_path("my", "other", "file.py"))
-        file_2.report_module(False)
-        file_2.report("method_x", True)
-        file_2.report("method_y", True, "ignored")
+        file_2.collect_module_docstring(False)
+        file_2.collect_docstring("method_x", True)
+        file_2.collect_docstring("method_y", True, "ignored")
         legacy_file_results, legacy_results = result_collection.to_legacy()
         assert isinstance(legacy_file_results, Dict)
         assert (
@@ -65,15 +65,15 @@ class TestFile:
         """Test that the iterator of expected (i.e., found or missing) docstrings is working, and
         that the counting works as expected (e.g., that it does not count ignored docstrings)"""
         file = File()
-        file.report_module(False)
-        file.report("method_one", True, "ignored_nonetheless")
-        file.report("method_two", False, "ignored")
-        file.report("method_three", False)
-        file.report("Class.method", True)
+        file.collect_module_docstring(False)
+        file.collect_docstring("method_one", True, "ignored_nonetheless")
+        file.collect_docstring("method_two", False, "ignored")
+        file.collect_docstring("method_three", False)
+        file.collect_docstring("Class.method", True)
 
         expected_docstrings = [d for d in file.expected_docstrings()]
         assert len(expected_docstrings) == 5
-        count = file.count()
+        count = file.count_aggregate()
         assert count.is_empty is False
         assert count.found == 1
         assert count.missing == 2
@@ -93,7 +93,7 @@ class TestFile:
     def test_report_module(self, has_docstr, ignore_reason):
         """Tests that 'module' docstrings are recoded correctly"""
         file = File()
-        file.report_module(has_docstring=has_docstr, ignore_reason=ignore_reason)
+        file.collect_module_docstring(has_docstring=has_docstr, ignore_reason=ignore_reason)
         all_docstrings = [d for d in file.expected_docstrings()]
         assert len(all_docstrings) == 1
         assert all_docstrings[0].node_identifier == "module docstring"
@@ -112,7 +112,7 @@ class TestFile:
     def test_report_(self, node_identifier, has_docstr, ignore_reason):
         """Tests that 'non-module' docstrings are recoded correctly"""
         file = File()
-        file.report(
+        file.collect_docstring(
             identifier=node_identifier, has_docstring=has_docstr, ignore_reason=ignore_reason
         )
         all_docstrings = [d for d in file.expected_docstrings()]

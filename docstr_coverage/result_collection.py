@@ -41,7 +41,7 @@ class ResultCollection:
             self._files[file_path] = file
             return file
 
-    def count(self):
+    def count_aggregate(self):
         """Walks through all the tracked files in this result collection, and counts overall
         statistics, such as #missing docstring.
 
@@ -49,7 +49,7 @@ class ResultCollection:
         -------
         AggregatedCount
             A count instance containing a range of docstring counts."""
-        counts = (folder.count() for folder in self._files.values())
+        counts = (folder.count_aggregate() for folder in self._files.values())
         return functools.reduce(operator.add, counts, AggregatedCount())
 
     def files(self):
@@ -61,7 +61,7 @@ class ResultCollection:
         """Converts the information in this `ResultCollection` into the less expressive dictionary
         of counts used since the early versions of docstr-coverage."""
         file_results = dict()
-        for filename, file in self.files():
+        for file_path, file in self.files():
             missing_list = [
                 e.node_identifier
                 for e in file.expected_docstrings()
@@ -79,8 +79,8 @@ class ResultCollection:
                 )
                 > 0
             )
-            count = file.count()
-            file_results[filename] = {
+            count = file.count_aggregate()
+            file_results[file_path] = {
                 "missing": missing_list,
                 "module_doc": has_module_doc,
                 "missing_count": count.missing,
@@ -88,7 +88,7 @@ class ResultCollection:
                 "coverage": count.coverage(),
                 "empty": count.is_empty,
             }
-        total_count = self.count()
+        total_count = self.count_aggregate()
         total_results = {
             "missing_count": total_count.missing,
             "needed_count": total_count.needed,
@@ -114,10 +114,10 @@ class File:
         self._expected_docstrings = []
         self._status = FileStatus.ANALYZED
 
-    def report(self, identifier: str, has_docstring: bool, ignore_reason: str = None):
-        """Used internally by docstr-coverage to report the status of a single, expected docstring.
+    def collect_docstring(self, identifier: str, has_docstring: bool, ignore_reason: str = None):
+        """Used internally by docstr-coverage to collect the status of a single, expected docstring.
 
-        For module docstrings, use `report_module(...)` instead of this method.
+        For module docstrings, use `collect_module_docstring(...)` instead of this method.
 
         Parameters
         ----------
@@ -133,8 +133,8 @@ class File:
             )
         )
 
-    def report_module(self, has_docstring: bool, ignore_reason: str = None):
-        """Used internally by docstr-coverage to report the status of a module docstring.
+    def collect_module_docstring(self, has_docstring: bool, ignore_reason: str = None):
+        """Used internally by docstr-coverage to collect the status of a module docstring.
 
         Parameters
         ----------
@@ -142,7 +142,7 @@ class File:
             True if and only if the docstring was present
         ignore_reason: Optional[str]
             Used to indicate that the docstring should be ignored (independent of its presence)"""
-        self.report(
+        self.collect_docstring(
             identifier="module docstring", has_docstring=has_docstring, ignore_reason=ignore_reason
         )
 
@@ -162,7 +162,7 @@ class File:
             The status for this file to record"""
         self._status = status
 
-    def count(self):
+    def count_aggregate(self):
         """Walks through all docstring reports of this file and counts them by state
         (e.g. the #missing).
 

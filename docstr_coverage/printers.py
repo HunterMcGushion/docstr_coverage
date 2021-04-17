@@ -85,7 +85,7 @@ class LegacyPrinter:
                             )
 
             # Statistics
-            count = file.count()
+            count = file.count_aggregate()
             print_line(
                 " Needed: %s; Found: %s; Missing: %s; Coverage: %.1f%%"
                 % (count.needed, count.found, count.missing, count.coverage(),),
@@ -100,10 +100,7 @@ class LegacyPrinter:
         ----------
         results: ResultCollection
             The information about docstr presence to be printed to stdout."""
-        if self.verbosity < 1:
-            return None
-
-        count = results.count()
+        count = results.count_aggregate()
 
         postfix = ""
         if count.num_empty_files > 0:

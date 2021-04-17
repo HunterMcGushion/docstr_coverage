@@ -174,7 +174,7 @@ def get_docstring_coverage(
 
         ### Set Result
         node_identifier = str(base) + str(name)
-        result_collection.report(
+        result_collection.collect_docstring(
             identifier=node_identifier, has_docstring=has_doc, ignore_reason=ignore_reason
         )
 
@@ -199,15 +199,15 @@ def get_docstring_coverage(
         # _tree contains [<module docstring>, <is_empty: bool>, <symbols: classes and funcs>]
         if (not _tree[0]) and (not _tree[1]):
             if not skip_file_docstring:
-                file_result.report_module(has_docstring=False)
+                file_result.collect_module_docstring(has_docstring=False)
             else:
-                file_result.report_module(
+                file_result.collect_module_docstring(
                     has_docstring=False, ignore_reason="--skip-file-docstring=True"
                 )
         elif _tree[1]:
             file_result.set_file_status(FileStatus.EMPTY)
         else:
-            file_result.report_module(bool(_tree[0]))
+            file_result.collect_module_docstring(bool(_tree[0]))
 
         # Recursively traverse through functions and classes
         for symbol in _tree[-1]:
