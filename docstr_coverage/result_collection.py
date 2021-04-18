@@ -58,7 +58,34 @@ class ResultCollection:
 
     def to_legacy(self):
         """Converts the information in this `ResultCollection` into the less expressive dictionary
-        of counts used since the early versions of docstr-coverage."""
+        of counts used since the early versions of docstr-coverage.
+
+        Returns
+        --------
+        Dict
+            Links filename keys to a dict of stats for that filename. Example:
+
+            >>> {
+            ...     '<filename>': {
+            ...         'missing': ['<method_or_class_name>', '...'],
+            ...         'module_doc': '<Boolean>',
+            ...         'missing_count': '<missing_count int>',
+            ...         'needed_count': '<needed_docstrings_count int>',
+            ...         'coverage': '<percent_of_coverage float>',
+            ...         'empty': '<Boolean>'
+            ...     }, ...
+            ... }
+        Dict
+            Total summary stats for all files analyzed. Example:
+
+            >>> {
+            ...     'missing_count': '<total_missing_count int>',
+            ...     'needed_count': '<total_needed_docstrings_count int>',
+            ...     'coverage': '<total_percent_of_coverage float>'
+            ... }
+
+        """
+
         file_results = dict()
         for file_path, file in self.files():
             missing_list = [

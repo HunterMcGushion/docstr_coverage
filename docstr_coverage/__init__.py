@@ -1,8 +1,6 @@
 ##################################################
 # Set __all__
 ##################################################
-from .coverage import get_docstring_coverage
+from .coverage import analyze, get_docstring_coverage
 
-__all__ = [
-    "get_docstring_coverage",
-]
+__all__ = ["analyze", "get_docstring_coverage"]

@@ -11,7 +11,9 @@ import click
 
 from docstr_coverage.badge import Badge
 from docstr_coverage.config_file import set_config_defaults
-from docstr_coverage.coverage import get_docstring_coverage
+from docstr_coverage.coverage import analyze
+from docstr_coverage.ignore_config import IgnoreConfig
+from docstr_coverage.printers import LegacyPrinter
 
 
 def do_include_filepath(filepath: str, exclude_re: Optional["re.Pattern"]) -> bool:
@@ -152,7 +154,6 @@ def parse_ignore_patterns_from_dict(ignore_patterns_dict) -> tuple:
 
 @click.command()
 @click.option(
-    # TODO: Use counting instead: https://click.palletsprojects.com/en/7.x/options/#counting
     "-v",
     "--verbose",
     type=click.Choice(["0", "1", "2", "3"]),
@@ -310,17 +311,21 @@ def execute(paths, **kwargs):
     else:
         ignore_names = []
 
-    # Calculate docstring coverage
-    file_results, total_results = get_docstring_coverage(
-        all_paths,
+    ignore_config = IgnoreConfig(
         skip_magic=kwargs["skip_magic"],
         skip_file_docstring=kwargs["skip_file_doc"],
         skip_init=kwargs["skip_init"],
         skip_class_def=kwargs["skip_class_def"],
         skip_private=kwargs["skip_private"],
-        verbose=kwargs["verbose"],
         ignore_names=ignore_names,
     )
+
+    # Calculate docstring coverage
+    results = analyze(all_paths, ignore_config=ignore_config)
+
+    LegacyPrinter(verbosity=kwargs["verbose"], ignore_config=ignore_config,).print(results)
+
+    file_results, total_results = results.to_legacy()
 
     # Save badge
     if kwargs["badge"]:
