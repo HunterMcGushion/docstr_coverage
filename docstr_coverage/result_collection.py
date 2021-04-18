@@ -61,7 +61,7 @@ class ResultCollection:
         of counts used since the early versions of docstr-coverage.
 
         Returns
-        --------
+        -------
         Dict
             Links filename keys to a dict of stats for that filename. Example:
 
@@ -83,7 +83,6 @@ class ResultCollection:
             ...     'needed_count': '<total_needed_docstrings_count int>',
             ...     'coverage': '<total_percent_of_coverage float>'
             ... }
-
         """
 
         file_results = dict()
