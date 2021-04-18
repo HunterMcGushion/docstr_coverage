@@ -4,7 +4,12 @@
 from .coverage import analyze, get_docstring_coverage
 from .ignore_config import IgnoreConfig
 from .printers import LegacyPrinter
-from .result_collection import ResultCollection, AggregatedCount, ExpectedDocstring, FileCount
+from .result_collection import (
+    AggregatedCount,
+    ExpectedDocstring,
+    FileCount,
+    ResultCollection,
+)
 
 __all__ = [
     "analyze",
