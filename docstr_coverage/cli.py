@@ -323,7 +323,7 @@ def execute(paths, **kwargs):
     # Calculate docstring coverage
     results = analyze(all_paths, ignore_config=ignore_config)
 
-    LegacyPrinter(verbosity=kwargs["verbose"], ignore_config=ignore_config,).print(results)
+    LegacyPrinter(verbosity=kwargs["verbose"], ignore_config=ignore_config).print(results)
 
     file_results, total_results = results.to_legacy()
 
