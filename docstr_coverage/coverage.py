@@ -1,5 +1,4 @@
-"""This module is the central module for coverage collection,
-responsible for filewalking"""
+"""The central module for coverage collection and file-walking"""
 
 import os
 import re
@@ -27,7 +26,7 @@ def do_ignore_node(filename: str, base_name: str, node_name: str, ignore_names: 
         the case of method names, `node_name` will be only the method's name, while `base_name` will
         be of the form "<class_name>."
     ignore_names: Tuple[List[str], ...]
-        Ignore names. See `IgnoreConfig`
+        Patterns of nodes to ignore. See :class:`docstr_coverage.ignore_config.IgnoreConfig`
 
     Returns
     -------
@@ -83,15 +82,15 @@ def analyze_docstrings(
         else False. `node[3]` is a list containing the node's children
         as triples of the same form (if it had any)
     filename: String
-        String containing a name of file.
+        String containing the name of the file.
     ignore_config: IgnoreConfig
         Information about which docstrings are to be ignored."""
 
     name, has_doc, child_nodes = node
 
-    # ------------------
+    ##################################################
     # Check Current Node
-    # ------------------
+    ##################################################
 
     # Check for ignore status
     ignore_reason = None
@@ -119,9 +118,9 @@ def analyze_docstrings(
         identifier=node_identifier, has_docstring=has_doc, ignore_reason=ignore_reason
     )
 
-    # -----------------
+    ##################################################
     # Check Child Nodes
-    # -----------------
+    ##################################################
     for _symbol in child_nodes:
         analyze_docstrings(file_result, "%s." % name, _symbol, filename, ignore_config)
 
@@ -136,14 +135,13 @@ def get_docstring_coverage(
     verbose: int = 0,
     ignore_names: Tuple[List[str], ...] = (),
 ) -> Tuple[Dict, Dict]:
-    """
-    ***DEPRECATED***
-    This used to be the primary way to access docstr-coverage as software library.
+    """***DEPRECATED***
+
+    This used to be the primary way to access docstr-coverage as a software library.
     It is now replaced by the function `analyze`, which provides
     a slimmer interface and a more informative return value.
 
-    For backwards compatibility of the return value with existing code,
-    call `analyze(...).to_legacy()`."""
+    For backwards compatibility with existing code, call `analyze(...).to_legacy()`"""
     warnings.warn(
         "get_docstring_coverage is deprecated." "See function docstring for details.",
         DeprecationWarning,
@@ -163,30 +161,28 @@ def get_docstring_coverage(
 
 
 def analyze(filenames: list, ignore_config: IgnoreConfig = IgnoreConfig()) -> ResultCollection:
-    """Checks contents of `filenames` for missing docstrings, and produces a report
-        detailing docstring status.
+    """Checks contents of `filenames` for missing docstrings, and produces a report detailing
+    docstring status
 
-        Parameters
-        ----------
-        filenames: List
-            List of filename strings that are absolute or relative paths
+    Parameters
+    ----------
+    filenames: List
+        List of filename strings that are absolute or relative paths
+    ignore_config: IgnoreConfig
+        Information about which docstrings are to be ignored
 
-        ignore_config: IgnoreConfig
-            Information about which docstrings are to be ignored.
-
-        Returns
-        -------
-        ResultCollection:
-            The collected information about docstring presence."""
-
+    Returns
+    -------
+    ResultCollection
+        The collected information about docstring presence"""
     results = ResultCollection()
 
     for filename in filenames:
         file_result = results.get_file(file_path=filename)
 
-        # ---------------------
+        ##################################################
         # Read and Parse Source
-        # ---------------------
+        ##################################################
         with open(filename, "r", encoding="utf-8") as f:
             source_tree = f.read()
 
@@ -194,9 +190,9 @@ def analyze(filenames: list, ignore_config: IgnoreConfig = IgnoreConfig()) -> Re
         doc_visitor.visit(parse(source_tree))
         _tree = doc_visitor.tree[0]
 
-        # ---------------
+        ##################################################
         # Process Results
-        # ---------------
+        ##################################################
 
         # _tree contains [<module docstring>, <is_empty: bool>, <symbols: classes and funcs>]
         if (not _tree[0]) and (not _tree[1]):
