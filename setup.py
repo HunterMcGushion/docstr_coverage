@@ -10,7 +10,7 @@ MAJOR, MINOR, MICRO = 2, 0, 1
 __VERSION__ = "{}.{}.{}".format(MAJOR, MINOR, MICRO)
 
 setup(
-    name="docstr_coverage",
+    name="docstr-coverage",
     version=__VERSION__,
     description=(
         "Utility for examining python source files to ensure proper documentation. "
