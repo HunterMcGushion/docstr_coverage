@@ -2,6 +2,7 @@
 Currently, this module is in BETA and its interface may change in future versions."""
 import logging
 
+from docstr_coverage.ignore_config import IgnoreConfig
 from docstr_coverage.result_collection import FileStatus
 
 _GRADES = (
@@ -38,15 +39,9 @@ class LegacyPrinter:
     will be extracted. Thus, coding against the current interface will require refactorings with
     future versions of docstr-coverage."""
 
-    def __init__(
-        self, verbosity, skip_magic, skip_file_docstring, skip_init, skip_class_def, skip_private,
-    ):
+    def __init__(self, verbosity: int, ignore_config: IgnoreConfig = IgnoreConfig()):
         self.verbosity = verbosity
-        self.skip_magic = skip_magic
-        self.skip_file_docstring = skip_file_docstring
-        self.skip_init = skip_init
-        self.skip_class_def = skip_class_def
-        self.skip_private = skip_private
+        self.ignore_config = ignore_config
 
     def print(self, results):
         """Prints a provided set of results to stdout.
@@ -105,15 +100,15 @@ class LegacyPrinter:
         postfix = ""
         if count.num_empty_files > 0:
             postfix = " (%s files are empty)" % count.num_empty_files
-        if self.skip_magic:
+        if self.ignore_config.skip_magic:
             postfix += " (skipped all non-init magic methods)"
-        if self.skip_file_docstring:
+        if self.ignore_config.skip_file_docstring:
             postfix += " (skipped file-level docstrings)"
-        if self.skip_init:
+        if self.ignore_config.skip_init:
             postfix += " (skipped __init__ methods)"
-        if self.skip_class_def:
+        if self.ignore_config.skip_class_def:
             postfix += " (skipped class definitions)"
-        if self.skip_private:
+        if self.ignore_config.skip_private:
             postfix += " (skipped private methods)"
 
         if count.num_files > 1:
@@ -127,7 +122,7 @@ class LegacyPrinter:
             ),
         )
 
-        #################### Calculate Total Grade ####################
+        # Calculate Total Grade
         grade = next(
             message for message, grade_threshold in _GRADES if grade_threshold <= count.coverage()
         )

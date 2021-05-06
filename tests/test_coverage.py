@@ -4,8 +4,9 @@ import platform
 
 import pytest
 
-from docstr_coverage import get_docstring_coverage
-from docstr_coverage.printers import _GRADES
+from docstr_coverage import analyze
+from docstr_coverage.ignore_config import IgnoreConfig
+from docstr_coverage.printers import _GRADES, LegacyPrinter
 
 SAMPLES_DIRECTORY = os.path.join("tests", "sample_files", "subdir_a")
 EMPTY_FILE_PATH = os.path.join(SAMPLES_DIRECTORY, "empty_file.py")
@@ -22,7 +23,8 @@ PRIVATE_NO_DOCS_PATH = os.path.join(SAMPLES_C_DIRECTORY, "private_undocumented.p
 
 
 def test_should_report_for_an_empty_file():
-    file_results, total_results = get_docstring_coverage([EMPTY_FILE_PATH])
+    result = analyze([EMPTY_FILE_PATH])
+    file_results, total_results = result.to_legacy()
     assert file_results == {
         EMPTY_FILE_PATH: {
             "missing": [],
@@ -40,7 +42,8 @@ def test_should_report_for_an_empty_file():
     ["file_path", "needed_count"], [(DOCUMENTED_FILE_PATH, 9), (FULLY_EXCUSED_FILE_PATH, 8)]
 )
 def test_should_report_full_coverage(file_path, needed_count):
-    file_results, total_results = get_docstring_coverage([file_path])
+    result = analyze([file_path])
+    file_results, total_results = result.to_legacy()
     assert file_results == {
         file_path: {
             "missing": [],
@@ -64,7 +67,8 @@ def test_should_report_full_coverage(file_path, needed_count):
 def test_should_report_partial_coverage(
     file_path, missing, module_doc, missing_count, needed_count, coverage
 ):
-    file_results, total_results = get_docstring_coverage([file_path])
+    result = analyze([file_path])
+    file_results, total_results = result.to_legacy()
     assert file_results == {
         file_path: {
             "missing": missing,
@@ -83,9 +87,8 @@ def test_should_report_partial_coverage(
 
 
 def test_should_report_for_multiple_files():
-    file_results, total_results = get_docstring_coverage(
-        [PARTLY_DOCUMENTED_FILE_PATH, DOCUMENTED_FILE_PATH, EMPTY_FILE_PATH]
-    )
+    result = analyze([PARTLY_DOCUMENTED_FILE_PATH, DOCUMENTED_FILE_PATH, EMPTY_FILE_PATH])
+    file_results, total_results = result.to_legacy()
 
     assert file_results == {
         PARTLY_DOCUMENTED_FILE_PATH: {
@@ -117,7 +120,8 @@ def test_should_report_for_multiple_files():
 
 
 def test_should_report_when_no_docs_in_a_file():
-    file_results, total_results = get_docstring_coverage([SOME_CODE_NO_DOCS_FILE_PATH])
+    result = analyze([SOME_CODE_NO_DOCS_FILE_PATH])
+    file_results, total_results = result.to_legacy()
     assert file_results == {
         SOME_CODE_NO_DOCS_FILE_PATH: {
             "missing": ["foo"],
@@ -153,7 +157,9 @@ def test_should_report_when_no_docs_in_a_file():
 )
 def test_logging_empty_file(caplog, expected):
     with caplog.at_level(logging.DEBUG):
-        _file_results, _total_results = get_docstring_coverage([EMPTY_FILE_PATH], verbose=3)
+        result = analyze([EMPTY_FILE_PATH])
+        LegacyPrinter(verbosity=3).print(result)
+        _file_results, _total_results = result.to_legacy()
 
     if platform.system() == "Windows":
         assert [m.replace("\\", "/") for m in caplog.messages] == expected
@@ -231,10 +237,10 @@ def test_logging_empty_file(caplog, expected):
     ],
 )
 def test_logging_partially_documented_file(caplog, expected, verbose, ignore_names):
+    ignore_config = IgnoreConfig(ignore_names=ignore_names)
     with caplog.at_level(logging.DEBUG):
-        _file_results, _total_results = get_docstring_coverage(
-            [PARTLY_DOCUMENTED_FILE_PATH], verbose=verbose, ignore_names=ignore_names
-        )
+        result = analyze([PARTLY_DOCUMENTED_FILE_PATH], ignore_config=ignore_config)
+        LegacyPrinter(verbosity=verbose, ignore_config=ignore_config).print(result)
 
     if platform.system() == "Windows":
         assert [m.replace("\\", "/") for m in caplog.messages] == expected
@@ -243,7 +249,9 @@ def test_logging_partially_documented_file(caplog, expected, verbose, ignore_nam
 
 
 def test_skip_private():
-    file_results, total_results = get_docstring_coverage([PRIVATE_NO_DOCS_PATH], skip_private=True)
+    ignore_config = IgnoreConfig(skip_private=True)
+    result = analyze([PRIVATE_NO_DOCS_PATH], ignore_config=ignore_config)
+    file_results, total_results = result.to_legacy()
     assert file_results[PRIVATE_NO_DOCS_PATH] == {
         "missing": ["__dunder"],
         "module_doc": True,

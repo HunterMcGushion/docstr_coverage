@@ -172,22 +172,20 @@ class FooBarChild(FooBar):
 
 #### Package in Your Project
 
-You can also use `docstr-coverage` as a part of your project by importing it thusly:
+You can also use `docstr-coverage` as a part of your project by importing it thusly.
+It will supply you with overall and per-file coverages:
 
 ```python
 from docstr_coverage import get_docstring_coverage
 my_coverage = get_docstring_coverage(['some_dir/file_0.py', 'some_dir/file_1.py'])
 ```
 
-##### Arguments
-
-- Required arg: `filenames` \<list of string filenames\>
-- Optional kwargs: `skip_magic` \<bool\>, `skip_file_docstring` \<bool\>, `skip_private` \<bool\>, `verbose` \<int (0-3)\> \* For more info on `get_docstring_coverage` and its parameters, please see its [documentation](https://docstr-coverage.readthedocs.io/en/latest/api_essentials.html#get-docstring-coverage)
-
-##### Results
-
-`get_docstring_coverage` returns two dicts: 1) stats for each file, and 2) total stats.
-For more info, please see the `get_docstring_coverage` [documentation](https://docstr-coverage.readthedocs.io/en/latest/api_essentials.html#get-docstring-coverage)
+If you want more fine grained information, try the experimental `docstr_coverage.analyze()`
+```python
+from docstr_coverage import analyze
+coverage_report = analyze(['some_dir/file_0.py', 'some_dir/file_1.py'])
+coverage = coverage_report.count_aggregate().coverage()
+```
 
 ## Why Should I Use It
 
