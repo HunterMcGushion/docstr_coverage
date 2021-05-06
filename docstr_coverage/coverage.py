@@ -1,5 +1,4 @@
-"""This module is the central module for coverage collection,
-responsible for filewalking"""
+"""The central module for coverage collection and file-walking"""
 
 import os
 import re
@@ -26,7 +25,7 @@ def _do_ignore_node(filename: str, base_name: str, node_name: str, ignore_names:
         the case of method names, `node_name` will be only the method's name, while `base_name` will
         be of the form "<class_name>."
     ignore_names: Tuple[List[str], ...]
-        Ignore names. See `IgnoreConfig`
+        Patterns of nodes to ignore. See :class:`docstr_coverage.ignore_config.IgnoreConfig`
 
     Returns
     -------
@@ -80,7 +79,7 @@ def _analyze_docstrings_on_node(
         else False. `node[3]` is a list containing the node's children
         as triples of the same form (if it had any)
     filename: String
-        String containing a name of file.
+        String containing the name of the file.
     ignore_config: IgnoreConfig
         Information about which docstrings are to be ignored.
     result_storage: File
@@ -89,9 +88,9 @@ def _analyze_docstrings_on_node(
 
     name, has_doc, child_nodes = node
 
-    # ------------------
+    ##################################################
     # Check Current Node
-    # ------------------
+    ##################################################
 
     # Check for ignore status
     ignore_reason = None
@@ -119,9 +118,9 @@ def _analyze_docstrings_on_node(
         identifier=node_identifier, has_docstring=has_doc, ignore_reason=ignore_reason
     )
 
-    # -----------------
+    ##################################################
     # Check Child Nodes
-    # -----------------
+    ##################################################
     for _symbol in child_nodes:
         _analyze_docstrings_on_node("%s." % name, _symbol, filename, ignore_config, result_storage)
 
@@ -213,10 +212,10 @@ def get_docstring_coverage(
 def analyze(filenames: list, ignore_config: IgnoreConfig = IgnoreConfig()) -> ResultCollection:
     """EXPERIMENTAL: More expressive alternative to `get_docstring_coverage`.
 
-        Checks contents of `filenames` for missing docstrings, and produces a report
-        detailing docstring status.
+        Checks contents of `filenames` for missing docstrings, and produces a report detailing
+    docstring status
 
-        Note that this method, as well as its parameters and return types
+    Note that this method, as well as its parameters and return types
         are still experimental and may change in future versions.
 
         Parameters
@@ -225,21 +224,20 @@ def analyze(filenames: list, ignore_config: IgnoreConfig = IgnoreConfig()) -> Re
             List of filename strings that are absolute or relative paths
 
         ignore_config: IgnoreConfig
-            Information about which docstrings are to be ignored.
+            Information about which docstrings are to be ignored
 
-        Returns
-        -------
-        ResultCollection:
-            The collected information about docstring presence."""
-
+    Returns
+    -------
+    ResultCollection
+        The collected information about docstring presence"""
     results = ResultCollection()
 
     for filename in filenames:
         file_result = results.get_file(file_path=filename)
 
-        # ---------------------
+        ##################################################
         # Read and Parse Source
-        # ---------------------
+        ##################################################
         with open(filename, "r", encoding="utf-8") as f:
             source_tree = f.read()
 
@@ -247,9 +245,9 @@ def analyze(filenames: list, ignore_config: IgnoreConfig = IgnoreConfig()) -> Re
         doc_visitor.visit(parse(source_tree))
         _tree = doc_visitor.tree[0]
 
-        # ---------------
+        ##################################################
         # Process Results
-        # ---------------
+        ##################################################
 
         # _tree contains [<module docstring>, <is_empty: bool>, <symbols: classes and funcs>]
         if (not _tree[0]) and (not _tree[1]):
