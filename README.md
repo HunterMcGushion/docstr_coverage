@@ -172,8 +172,15 @@ class FooBarChild(FooBar):
 
 #### Package in Your Project
 
-You can also use `docstr-coverage` as a part of your project by importing it thusly:
+You can also use `docstr-coverage` as a part of your project by importing it thusly.
+It will supply you with overall and per-file coverages:
 
+```python
+from docstr_coverage import get_docstring_coverage
+my_coverage = get_docstring_coverage(['some_dir/file_0.py', 'some_dir/file_1.py'])
+```
+
+If you want more fine grained information, try the experimental `docstr_coverage.analyze()`
 ```python
 from docstr_coverage import analyze
 coverage_report = analyze(['some_dir/file_0.py', 'some_dir/file_1.py'])

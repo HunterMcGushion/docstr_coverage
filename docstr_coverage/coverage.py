@@ -3,7 +3,6 @@ responsible for filewalking"""
 
 import os
 import re
-import warnings
 from ast import parse
 from typing import Dict, List, Tuple
 
@@ -13,7 +12,7 @@ from docstr_coverage.result_collection import File, FileStatus, ResultCollection
 from docstr_coverage.visitor import DocStringCoverageVisitor
 
 
-def do_ignore_node(filename: str, base_name: str, node_name: str, ignore_names: tuple) -> bool:
+def _do_ignore_node(filename: str, base_name: str, node_name: str, ignore_names: tuple) -> bool:
     """Determine whether a node (identified by its file, base, and own names) should be ignored
 
     Parameters
@@ -61,20 +60,18 @@ def do_ignore_node(filename: str, base_name: str, node_name: str, ignore_names: 
     return False
 
 
-def analyze_docstrings(
-    file_result: File,
+def _analyze_docstrings_on_node(
     base: str,
     node: Tuple[str, bool, List],
     filename,
     ignore_config: IgnoreConfig,
+    result_storage: File,
 ):
     """Track the existence of a docstring for `node`, and accumulate stats regarding
     expected and encountered docstrings for `node` and its children (if any).
 
     Parameters
     ----------
-    file_result: File
-        The result-collection file instance on which the docstring presence is recorded.
     base: String
         The name of this node's parent node
     node: Tuple triple of (String, Boolean, List)
@@ -85,7 +82,10 @@ def analyze_docstrings(
     filename: String
         String containing a name of file.
     ignore_config: IgnoreConfig
-        Information about which docstrings are to be ignored."""
+        Information about which docstrings are to be ignored.
+    result_storage: File
+        The result-collection.File instance on which the observed
+        docstring presence should be stored."""
 
     name, has_doc, child_nodes = node
 
@@ -108,14 +108,14 @@ def analyze_docstrings(
         ignore_reason = "skip-class-def set to True"
     elif ignore_config.skip_private and name.startswith("_") and not name.startswith("__"):
         ignore_reason = "skip-private set to True"
-    elif ignore_config.ignore_names and do_ignore_node(
+    elif ignore_config.ignore_names and _do_ignore_node(
         filename, base, name, ignore_config.ignore_names
     ):
         ignore_reason = "matching ignore pattern"
 
     # Set Result
     node_identifier = str(base) + str(name)
-    file_result.collect_docstring(
+    result_storage.collect_docstring(
         identifier=node_identifier, has_docstring=has_doc, ignore_reason=ignore_reason
     )
 
@@ -123,7 +123,7 @@ def analyze_docstrings(
     # Check Child Nodes
     # -----------------
     for _symbol in child_nodes:
-        analyze_docstrings(file_result, "%s." % name, _symbol, filename, ignore_config)
+        _analyze_docstrings_on_node("%s." % name, _symbol, filename, ignore_config, result_storage)
 
 
 def get_docstring_coverage(
@@ -136,19 +136,67 @@ def get_docstring_coverage(
     verbose: int = 0,
     ignore_names: Tuple[List[str], ...] = (),
 ) -> Tuple[Dict, Dict]:
-    """
-    ***DEPRECATED***
-    This used to be the primary way to access docstr-coverage as software library.
-    It is now replaced by the function `analyze`, which provides
-    a slimmer interface and a more informative return value.
+    """Checks contents of `filenames` for missing docstrings, and produces a report
+        detailing docstring status.
 
-    For backwards compatibility of the return value with existing code,
-    call `analyze(...).to_legacy()`."""
-    warnings.warn(
-        "get_docstring_coverage is deprecated." "See function docstring for details.",
-        DeprecationWarning,
-        stacklevel=2,
-    )
+        *Note*:
+        For a method with a more expressive return type,
+        you may want to try the experimental `docstr_coverage.analyze`
+        function.
+
+        Parameters
+        ----------
+        filenames: List
+            List of filename strings that are absolute or relative paths
+        skip_magic: Boolean, default=False
+            If True, skips all magic methods (double-underscore-prefixed),
+            except '__init__' and does not include them in the report
+        skip_file_docstring: Boolean, default=False
+            If True, skips check for a module-level docstring
+        skip_init: Boolean, default=False
+            If True, skips methods named '__init__' and does not include
+            them in the report
+        skip_class_def: Boolean, default=False
+            If True, skips class definitions and does not include them in the report.
+            If this is True, the class's methods will still be checked
+        skip_private: Boolean, default=False
+            If True, skips function definitions beginning with a single underscore and does
+            not include them in the report.
+        verbose: Int in [0, 1, 2, 3], default=0
+            0) No printing.
+            1) Print total stats only.
+            2) Print stats for all files.
+            3) Print missing docstrings for all files.
+        ignore_names: Tuple[List[str], ...], default=()
+            Patterns to ignore when checking documentation. Each list in `ignore_names` defines a
+            different pattern to be ignored. The first element in each list is the regular
+            expression for matching filenames. All remaining arguments in each list are
+            regexes for matching names of functions/classes. A node is ignored if it
+            matches the filename regex and at least one of the remaining regexes
+
+        Returns
+        -------
+        Dict
+            Links filename keys to a dict of stats for that filename. Example:
+
+            >>> {
+            ...     '<filename>': {
+            ...         'missing': ['<method_or_class_name>', '...'],
+            ...         'module_doc': '<Boolean>',
+            ...         'missing_count': '<missing_count int>',
+            ...         'needed_count': '<needed_docstrings_count int>',
+            ...         'coverage': '<percent_of_coverage float>',
+            ...         'empty': '<Boolean>'
+            ...     }, ...
+            ... }
+        Dict
+            Total summary stats for all files analyzed. Example:
+
+            >>> {
+            ...     'missing_count': '<total_missing_count int>',
+            ...     'needed_count': '<total_needed_docstrings_count int>',
+            ...     'coverage': '<total_percent_of_coverage float>'
+            ... }"""
     ignore_config = IgnoreConfig(
         skip_magic=skip_magic,
         skip_file_docstring=skip_file_docstring,
@@ -163,8 +211,13 @@ def get_docstring_coverage(
 
 
 def analyze(filenames: list, ignore_config: IgnoreConfig = IgnoreConfig()) -> ResultCollection:
-    """Checks contents of `filenames` for missing docstrings, and produces a report
+    """EXPERIMENTAL: More expressive alternative to `get_docstring_coverage`.
+
+        Checks contents of `filenames` for missing docstrings, and produces a report
         detailing docstring status.
+
+        Note that this method, as well as its parameters and return types
+        are still experimental and may change in future versions.
 
         Parameters
         ----------
@@ -213,6 +266,6 @@ def analyze(filenames: list, ignore_config: IgnoreConfig = IgnoreConfig()) -> Re
 
         # Recursively traverse through functions and classes
         for symbol in _tree[-1]:
-            analyze_docstrings(file_result, "", symbol, filename, ignore_config)
+            _analyze_docstrings_on_node("", symbol, filename, ignore_config, file_result)
 
     return results
