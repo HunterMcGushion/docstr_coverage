@@ -12,3 +12,7 @@ updates:
     ignore:
       - dependency-name: "click" # No explicit version specified in requirementes as of now.
       - dependency-name: "PyYAML" # No explicit version specified in requirements as of now.
+      - dependency-name: "*" 
+        update-types: ["version-update:semver-patch"]
+      - dependency-name: "black"
+        update-types: ["version-update:semver-minor"]
