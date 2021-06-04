@@ -23,7 +23,7 @@ def bar():
 
 
 class FooBarChild(FooBar):
-    """ Wow! A docstring. Crazy """
+    """Wow! A docstring. Crazy"""
 
     # docstr-coverage:inherited
     def function(self):
