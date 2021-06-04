@@ -27,7 +27,7 @@ setup(
     packages=["docstr_coverage"],
     install_requires=["click", "PyYAML"],
     extras_require={
-        "lint": ["flake8==3.8.2", "black==19.10b0", "isort==5.8.0"],
+        "lint": ["flake8==3.9.2", "black==19.10b0", "isort==5.8.0"],
         "test": ["pytest==5.4.2", "pytest-mock==3.4.0"],
     },
     include_package_data=True,
