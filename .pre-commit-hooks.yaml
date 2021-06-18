@@ -1,0 +1,9 @@
+- id: docstr-coverage
+  name: docstr-coverage
+  entry: docstr-coverage
+  require_serial: true
+  language: python
+  language_version: python3
+  types_or: [cython, pyi, python]
+  minimum_pre_commit_version: "2.9.0"
+  always_run: true
