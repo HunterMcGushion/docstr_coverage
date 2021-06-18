@@ -170,6 +170,16 @@ class FooBarChild(FooBar):
         pass
 ```
 
+#### Pre-commit hook
+
+You can use `docstr-coverage` as a pre-commit hook like so:
+```yaml
+  - repo: https://github.com/HunterMcGushion/docstr_coverage
+    rev: v2.0.2
+    hooks:
+      - id: docstr-coverage
+```
+
 #### Package in Your Project
 
 You can also use `docstr-coverage` as a part of your project by importing it thusly:
