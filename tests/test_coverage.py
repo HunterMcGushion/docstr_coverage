@@ -267,4 +267,4 @@ def test_skip_private():
 
 def test_empty_doc():
     result = analyze([os.path.join(INDIVIDUAL_SAMPLES_DIR, "empty_doc.py")])
-    assert result.count_aggregate().coverage() == 0
+    assert result.count_aggregate().coverage() == 0  # TODO Fix assert
