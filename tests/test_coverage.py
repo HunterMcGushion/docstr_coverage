@@ -21,6 +21,8 @@ PARTLY_EXCUSED_FILE_PATH = os.path.join(EXCUSED_SAMPLES_DIRECTORY, "partially_ex
 SAMPLES_C_DIRECTORY = os.path.join("tests", "extra_samples")
 PRIVATE_NO_DOCS_PATH = os.path.join(SAMPLES_C_DIRECTORY, "private_undocumented.py")
 
+INDIVIDUAL_SAMPLES_DIR = os.path.join("tests", "individual_samples")
+
 
 def test_should_report_for_an_empty_file():
     result = analyze([EMPTY_FILE_PATH])
@@ -261,3 +263,16 @@ def test_skip_private():
         "empty": False,
     }
     assert total_results == {"missing_count": 1, "needed_count": 2, "coverage": 50.0}
+
+
+def test_long_doc():
+    """Regression test on issue 79
+
+    Multiline docstrings can be a smoke test when checking
+    the tokenize tokens (which is based on line numbers)."""
+    result = analyze([os.path.join(INDIVIDUAL_SAMPLES_DIR, "long_doc.py")])
+    assert result.count_aggregate().coverage() == 75.0
+    assert result.count_aggregate().num_files == 1
+    # 2 + 1 inline ignore
+    assert result.count_aggregate().found == 3
+    assert result.count_aggregate().needed == 4
