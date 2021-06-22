@@ -172,7 +172,7 @@ class FooBarChild(FooBar):
 
 #### Pre-commit hook
 
-You can use `docstr-coverage` as a pre-commit hook by adding the following to your .`.pre-commit-config.yaml` file:
+You can use `docstr-coverage` as a pre-commit hook by adding the following to your `.pre-commit-config.yaml` file:
 
 To pass arguments to `docstr-coverage`, add a `.docstr.yaml` config (which is automatically picked up).
  This is preferrable over [pre-commit args](https://pre-commit.com/#config-args), 
