@@ -4,6 +4,17 @@
 ...
 
 
+<a name="2.1.0"></a>
+## [2.1.0] (2021-06-25)
+
+### Features
+- Add pre-commit hook. [#78] by [bjornconstructors]
+- *Experimental:* Expose new `analyze` method, which returns fine-grained coverage reports. [#67] by [MiWeiss]
+
+### Bug Fixes
+- Remove a false AssertionError which was raised for long docstrings. [#82] by [MiWeiss]
+
+
 <a name="2.0.1"></a>
 ## [2.0.1] (2021-03-03)
 
@@ -113,7 +124,8 @@
 * Initial release
 
 
-[Unreleased]: https://github.com/HunterMcGushion/docstr_coverage/compare/v2.0.1...HEAD
+[Unreleased]: https://github.com/HunterMcGushion/docstr_coverage/compare/v2.1.0...HEAD
+[2.1.0]: https://github.com/HunterMcGushion/docstr_coverage/compare/v2.0.1...v2.1.0
 [2.0.1]: https://github.com/HunterMcGushion/docstr_coverage/compare/v2.0.0...v2.0.1
 [2.0.0]: https://github.com/HunterMcGushion/docstr_coverage/compare/v1.4.0...v2.0.0
 [1.4.0]: https://github.com/HunterMcGushion/docstr_coverage/compare/v1.3.0...v1.4.0
@@ -126,6 +138,7 @@
 
 
 [asergeant01]: https://github.com/asergeant01
+[bjornconstructors]: https://github.com/bjornconstructors
 [cthoyt]: https://github.com/cthoyt
 [econchick]: https://github.com/econchick
 [epassaro]: https://github.com/epassaro
@@ -155,3 +168,6 @@
 [#47]: https://github.com/HunterMcGushion/docstr_coverage/issues/47
 [#48]: https://github.com/HunterMcGushion/docstr_coverage/pull/48
 [#57]: https://github.com/HunterMcGushion/docstr_coverage/pull/57
+[#67]: https://github.com/HunterMcGushion/docstr_coverage/pull/67
+[#78]: https://github.com/HunterMcGushion/docstr_coverage/pull/78
+[#82]: https://github.com/HunterMcGushion/docstr_coverage/pull/82
