@@ -5,7 +5,7 @@
 
 
 <a name="2.1.0"></a>
-## [2.1.0] (2021-06-23)
+## [2.1.0] (2021-06-25)
 
 ### Features
 - Add pre-commit hook. [#78] by [bjornconstructors]
