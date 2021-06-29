@@ -107,8 +107,10 @@ docstr-coverage some_project/src
 - _--help, -h_ - Display CLI options
 
 #### Config File
-All options can be saved in a config file named `.docstr.yaml`
-example:
+All options can be saved in a config file. A file named `.docstr.yaml` in the folder from which `docstr-coverage` is picked up automatically. 
+Other locations can be passed using `docstr-coverage -C path/to/config.json` or the long version `--config`.
+
+Example:
 ```yaml
 paths: # list or string
   - docstr_coverage
