@@ -103,55 +103,6 @@ def parse_ignore_names_file(ignore_names_file: str) -> tuple:
     return ignore_names
 
 
-def parse_ignore_patterns_from_dict(ignore_patterns_dict) -> tuple:
-    """Parse dictionary containing (file_name_pattern, exclude_patterns) key value pairs
-    to return an output consistent with ignore patterns parsed by `parse_ignore_names_file`
-
-    Parameters
-    ----------
-    ignore_patterns_dict: Dict
-        A dict where each key is a string and each value is a string or a nonempty list of strings.
-
-    Returns
-    -------
-    Tuple
-        Tuple of iterables of string with the same form as the output of `parse_ignore_names_file`
-
-    Notes
-    -----
-    To align the workflow with `parse_ignore_names_file`, we check that the passed values
-    are of type string, but we do not yet check if they are valid regular expressions"""
-
-    def _assert_valid_key_value(k, v):
-        if not isinstance(k, str):
-            raise TypeError("ignore patterns in config contained non-string key {}".format(k))
-        if len(k.strip()) == 0:
-            raise ValueError("ignore pattern in config contained empty (file name) regex")
-        if not all(isinstance(v, str) for v in v) and len(v) > 0:
-            raise TypeError(
-                "ignore patterns for key {} contained non-string values or was empty.".format(k)
-            )
-        if not all(len(v.strip()) > 0 for v in v):
-            raise ValueError("ignore pattern for key {} contained empty regex".format(k))
-
-    if not isinstance(ignore_patterns_dict, dict):
-        raise TypeError(
-            "ignore patterns in config must have type Dict[str, Union[str, List[str]]],"
-            "but was {}".format(type(ignore_patterns_dict))
-        )
-
-    result_list = []
-    for key, value in ignore_patterns_dict.items():
-        res = [key]
-        if not isinstance(value, list):
-            value = [value]
-        _assert_valid_key_value(key, value)
-        res += value
-        result_list.append(res)
-
-    return tuple(result_list)
-
-
 @click.command()
 @click.option(
     "-v",
@@ -180,6 +131,13 @@ def parse_ignore_patterns_from_dict(ignore_patterns_dict) -> tuple:
 @click.option("-f", "--skip-file-doc", is_flag=True, help="Ignore module docstrings")
 @click.option("-i", "--skip-init", is_flag=True, help="Ignore docstrings of `__init__` methods")
 @click.option("-c", "--skip-class-def", is_flag=True, help="Ignore docstrings of class definitions")
+@click.option(
+    "-dp", "--skip-property", is_flag=True, help="Ignore functions with @property decorator"
+)
+@click.option("-ds", "--skip-setter", is_flag=True, help="Ignore functions with @setter decorator")
+@click.option(
+    "-dd", "--skip-deleter", is_flag=True, help="Ignore functions with @deleter decorator"
+)
 @click.option(
     "-P",
     "--skip-private",
@@ -317,6 +275,9 @@ def execute(paths, **kwargs):
         skip_init=kwargs["skip_init"],
         skip_class_def=kwargs["skip_class_def"],
         skip_private=kwargs["skip_private"],
+        skip_property=kwargs["skip_property"],
+        skip_setter=kwargs["skip_setter"],
+        skip_deleter=kwargs["skip_deleter"],
         ignore_names=ignore_names,
     )
 
@@ -343,6 +304,55 @@ def execute(paths, **kwargs):
         raise SystemExit(1)
 
     raise SystemExit(0)
+
+
+def parse_ignore_patterns_from_dict(ignore_patterns_dict) -> tuple:
+    """Parse dictionary containing (file_name_pattern, exclude_patterns) key value pairs
+    to return an output consistent with ignore patterns parsed by `parse_ignore_names_file`
+
+    Parameters
+    ----------
+    ignore_patterns_dict: Dict
+        A dict where each key is a string and each value is a string or a nonempty list of strings.
+
+    Returns
+    -------
+    Tuple
+        Tuple of iterables of string with the same form as the output of `parse_ignore_names_file`
+
+    Notes
+    -----
+    To align the workflow with `parse_ignore_names_file`, we check that the passed values
+    are of type string, but we do not yet check if they are valid regular expressions"""
+
+    def _assert_valid_key_value(k, v):
+        if not isinstance(k, str):
+            raise TypeError("ignore patterns in config contained non-string key {}".format(k))
+        if len(k.strip()) == 0:
+            raise ValueError("ignore pattern in config contained empty (file name) regex")
+        if not all(isinstance(v, str) for v in v) and len(v) > 0:
+            raise TypeError(
+                "ignore patterns for key {} contained non-string values or was empty.".format(k)
+            )
+        if not all(len(v.strip()) > 0 for v in v):
+            raise ValueError("ignore pattern for key {} contained empty regex".format(k))
+
+    if not isinstance(ignore_patterns_dict, dict):
+        raise TypeError(
+            "ignore patterns in config must have type Dict[str, Union[str, List[str]]],"
+            "but was {}".format(type(ignore_patterns_dict))
+        )
+
+    result_list = []
+    for key, value in ignore_patterns_dict.items():
+        res = [key]
+        if not isinstance(value, list):
+            value = [value]
+        _assert_valid_key_value(key, value)
+        res += value
+        result_list.append(res)
+
+    return tuple(result_list)
 
 
 if __name__ == "__main__":
