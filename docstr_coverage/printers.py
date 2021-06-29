@@ -72,10 +72,20 @@ class LegacyPrinter:
 
             # List of missing docstrings
             if self.verbosity >= 3:
-                if file.status == FileStatus.EMPTY:
+                if file.status == FileStatus.EMPTY and self.verbosity > 3:
                     print_line(" - File is empty")
                 for expected_docstr in file._expected_docstrings:
-                    if not expected_docstr.has_docstring and not expected_docstr.ignore_reason:
+                    if expected_docstr.has_docstring and self.verbosity > 3:
+                        print_line(
+                            " - Found docstring for `{0}`".format(expected_docstr.node_identifier)
+                        )
+                    elif expected_docstr.ignore_reason and self.verbosity > 3:
+                        print_line(
+                            " - Ignored `{0}`: reason: `{1}`".format(
+                                expected_docstr.node_identifier, expected_docstr.ignore_reason
+                            )
+                        )
+                    elif not expected_docstr.has_docstring and not expected_docstr.ignore_reason:
                         if expected_docstr.node_identifier == "module docstring":
                             print_line(" - No module docstring")
                         else:
