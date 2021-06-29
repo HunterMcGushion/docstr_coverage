@@ -63,7 +63,7 @@ class LegacyPrinter:
         results: ResultCollection
             The information about docstr presence to be printed to stdout."""
         for file_path, file in results.files():
-            if file.count_aggregate().missing > 0:
+            if file.count_aggregate().missing > 0 or file.status == FileStatus.EMPTY:
                 # File Header
                 print_line('\nFile: "{}"'.format(file_path))
 
