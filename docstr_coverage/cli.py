@@ -188,15 +188,6 @@ def parse_ignore_patterns_from_dict(ignore_patterns_dict) -> tuple:
 )
 @click.option("-l", "--follow-links", is_flag=True, help="Follow symlinks")
 @click.option(
-    "-d",
-    "--docstr-ignore-file",
-    "ignore_names_file",  # TODO: Remove after deprecating in favor of pyproject.toml `blacklist`
-    type=click.Path(exists=False, resolve_path=True),
-    default=".docstr_coverage",
-    help="Filepath containing list of regex (file-pattern, name-pattern) pairs",
-    show_default=True,
-)
-@click.option(
     "-F",
     "--fail-under",
     type=float,
@@ -247,25 +238,18 @@ def parse_ignore_patterns_from_dict(ignore_patterns_dict) -> tuple:
 @click.option("--skipclassdef", is_flag=True, help="Deprecated. Use --skip-class-def")
 @click.option("--followlinks", is_flag=True, help="Deprecated. Use --follow-links")
 @click.option("--failunder", type=float, help="Deprecated. Use --fail-under")
+@click.option(
+    "-d",
+    "--docstr-ignore-file",
+    "ignore_names_file",
+    type=click.Path(exists=False, resolve_path=True),
+    default=".docstr_coverage",
+    help="Deprecated. Use json config (--config / -C) instead",
+)
 def execute(paths, **kwargs):
     """Measure docstring coverage for `PATHS`"""
-    for deprecated_name, name in [
-        ("skipmagic", "skip_magic"),
-        ("skipfiledoc", "skip_file_doc"),
-        ("skipinit", "skip_init"),
-        ("skipclassdef", "skip_class_def"),
-        ("followlinks", "follow_links"),
-    ]:
-        if kwargs.get(deprecated_name):
-            new_flag = name.replace("_", "-")
-            if kwargs.get(name):
-                raise ValueError(
-                    "Should not set deprecated --{} and new --{}".format(deprecated_name, new_flag)
-                )
-            click.secho(
-                "Using deprecated --{}, should use --{}".format(deprecated_name, new_flag), fg="red"
-            )
-            kwargs[name] = kwargs.pop(deprecated_name)
+
+    _deprecation_alerts(kwargs)
 
     # handle fail under
     if kwargs.get("failunder") is not None:
@@ -343,6 +327,34 @@ def execute(paths, **kwargs):
         raise SystemExit(1)
 
     raise SystemExit(0)
+
+
+def _deprecation_alerts(kwargs):
+    """Warns users if they are using deprecated flags"""
+    for deprecated_name, name in [
+        ("skipmagic", "skip_magic"),
+        ("skipfiledoc", "skip_file_doc"),
+        ("skipinit", "skip_init"),
+        ("skipclassdef", "skip_class_def"),
+        ("followlinks", "follow_links"),
+    ]:
+        if kwargs.get(deprecated_name):
+            new_flag = name.replace("_", "-")
+            if kwargs.get(name):
+                raise ValueError(
+                    "Should not set deprecated --{} and new --{}".format(deprecated_name, new_flag)
+                )
+            click.secho(
+                "Using deprecated --{}, should use --{}".format(deprecated_name, new_flag), fg="red"
+            )
+            kwargs[name] = kwargs.pop(deprecated_name)
+    if kwargs.get("docstr-ignore-file") or kwargs.get("ignore_names_file"):
+        click.secho(
+            "Using deprecated ignore files."
+            "We'll keep them supported for a while, "
+            "but we recommend switching to a proper config file "
+            "(see commands -C / --config)"
+        )
 
 
 if __name__ == "__main__":

@@ -88,16 +88,6 @@ docstr-coverage some_project/src
   - 2 - Also print individual statistics for each file
   - 3 - Also print missing docstrings (function names, class names, etc.)
 - _--fail-under=<int|float>, -F <int|float>_ - Fail if under a certain percentage of coverage (default: 100.0)
-- _--docstr-ignore-file=\<filepath\>, -d \<filepath\>_ - Filepath containing list of patterns to ignore. Patterns are (file-pattern, name-pattern) pairs
-  - File content example:
-
-  ```
-  SomeFile method_to_ignore1 method_to_ignore2 method_to_ignore3
-  FileWhereWeWantToIgnoreAllSpecialMethods __.+__
-  .* method_to_ignore_in_all_files
-  a_very_important_view_file ^get$ ^set$ ^post$
-  detect_.* get_val.*
-  ```
 - _--badge=\<filepath\>, -b \<filepath\>_ - Generate a docstring coverage percent badge as an SVG saved to a given filepath
   - Include the badge in a repo's README using 
   ```[![docstr_coverage](<filepath/of/your/saved/badge.svg>)](https://github.com/HunterMcGushion/docstr_coverage)```,
