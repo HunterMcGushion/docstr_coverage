@@ -63,7 +63,7 @@ class LegacyPrinter:
         results: ResultCollection
             The information about docstr presence to be printed to stdout."""
         for file_path, file in results.files():
-            if file.count_aggregate().missing > 0 or file.status == FileStatus.EMPTY:
+            if self.verbosity < 4 and file.count_aggregate().missing == 0:
                 # Don't print fully documented files
                 continue
 

@@ -87,6 +87,7 @@ docstr-coverage some_project/src
   - 1 - Print overall statistics
   - 2 - Also print individual statistics for each file
   - 3 - Also print missing docstrings (function names, class names, etc.)
+  - 4 - Also print information about present docstrings
 - _--fail-under=<int|float>, -F <int|float>_ - Fail if under a certain percentage of coverage (default: 100.0)
 - _--docstr-ignore-file=\<filepath\>, -d \<filepath\>_ - Filepath containing list of patterns to ignore. Patterns are (file-pattern, name-pattern) pairs
   - File content example:
