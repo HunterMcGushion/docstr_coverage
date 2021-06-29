@@ -64,36 +64,37 @@ class LegacyPrinter:
             The information about docstr presence to be printed to stdout."""
         for file_path, file in results.files():
             if file.count_aggregate().missing > 0 or file.status == FileStatus.EMPTY:
-                # File Header
-                print_line('\nFile: "{}"'.format(file_path))
+                # Don't print fully documented files
+                continue
 
-                # List of missing docstrings
-                if self.verbosity >= 3:
-                    if file.status == FileStatus.EMPTY:
-                        print_line(" - File is empty")
-                    for expected_docstr in file._expected_docstrings:
-                        if not expected_docstr.has_docstring and not expected_docstr.ignore_reason:
-                            if expected_docstr.node_identifier == "module docstring":
-                                print_line(" - No module docstring")
-                            else:
-                                print_line(
-                                    " - No docstring for `{0}`".format(
-                                        expected_docstr.node_identifier
-                                    )
-                                )
+            # File Header
+            print_line('\nFile: "{}"'.format(file_path))
 
-                # Statistics
-                count = file.count_aggregate()
-                print_line(
-                    " Needed: %s; Found: %s; Missing: %s; Coverage: %.1f%%"
-                    % (
-                        count.needed,
-                        count.found,
-                        count.missing,
-                        count.coverage(),
-                    ),
-                )
-                print_line()
+            # List of missing docstrings
+            if self.verbosity >= 3:
+                if file.status == FileStatus.EMPTY:
+                    print_line(" - File is empty")
+                for expected_docstr in file._expected_docstrings:
+                    if not expected_docstr.has_docstring and not expected_docstr.ignore_reason:
+                        if expected_docstr.node_identifier == "module docstring":
+                            print_line(" - No module docstring")
+                        else:
+                            print_line(
+                                " - No docstring for `{0}`".format(expected_docstr.node_identifier)
+                            )
+
+            # Statistics
+            count = file.count_aggregate()
+            print_line(
+                " Needed: %s; Found: %s; Missing: %s; Coverage: %.1f%%"
+                % (
+                    count.needed,
+                    count.found,
+                    count.missing,
+                    count.coverage(),
+                ),
+            )
+            print_line()
         print_line()
 
     def _print_overall_statistics(self, results):
