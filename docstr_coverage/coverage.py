@@ -3,7 +3,7 @@
 import os
 import re
 from ast import parse
-from typing import Dict, List, Tuple, Optional
+from typing import Dict, List, Optional, Tuple
 
 from docstr_coverage.ignore_config import IgnoreConfig
 from docstr_coverage.printers import LegacyPrinter
