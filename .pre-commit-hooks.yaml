@@ -7,3 +7,4 @@
   types_or: [cython, pyi, python]
   minimum_pre_commit_version: "2.9.0"
   always_run: true
+  pass_filenames: false
