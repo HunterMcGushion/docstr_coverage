@@ -160,7 +160,7 @@ def test_should_report_when_no_docs_in_a_file():
 def test_logging_empty_file(caplog, expected):
     with caplog.at_level(logging.DEBUG):
         result = analyze([EMPTY_FILE_PATH])
-        LegacyPrinter(verbosity=3).print(result)
+        LegacyPrinter(verbosity=4).print(result)
         _file_results, _total_results = result.to_legacy()
 
     if platform.system() == "Windows":

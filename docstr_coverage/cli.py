@@ -156,7 +156,7 @@ def parse_ignore_patterns_from_dict(ignore_patterns_dict) -> tuple:
 @click.option(
     "-v",
     "--verbose",
-    type=click.Choice(["0", "1", "2", "3"]),
+    type=click.Choice(["0", "1", "2", "3", "4"]),
     default="3",
     help="Verbosity level",
     show_default=True,

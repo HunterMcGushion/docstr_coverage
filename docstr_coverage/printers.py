@@ -63,15 +63,29 @@ class LegacyPrinter:
         results: ResultCollection
             The information about docstr presence to be printed to stdout."""
         for file_path, file in results.files():
+            if self.verbosity < 4 and file.count_aggregate().missing == 0:
+                # Don't print fully documented files
+                continue
+
             # File Header
             print_line('\nFile: "{}"'.format(file_path))
 
             # List of missing docstrings
             if self.verbosity >= 3:
-                if file.status == FileStatus.EMPTY:
+                if file.status == FileStatus.EMPTY and self.verbosity > 3:
                     print_line(" - File is empty")
                 for expected_docstr in file._expected_docstrings:
-                    if not expected_docstr.has_docstring and not expected_docstr.ignore_reason:
+                    if expected_docstr.has_docstring and self.verbosity > 3:
+                        print_line(
+                            " - Found docstring for `{0}`".format(expected_docstr.node_identifier)
+                        )
+                    elif expected_docstr.ignore_reason and self.verbosity > 3:
+                        print_line(
+                            " - Ignored `{0}`: reason: `{1}`".format(
+                                expected_docstr.node_identifier, expected_docstr.ignore_reason
+                            )
+                        )
+                    elif not expected_docstr.has_docstring and not expected_docstr.ignore_reason:
                         if expected_docstr.node_identifier == "module docstring":
                             print_line(" - No module docstring")
                         else:
