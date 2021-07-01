@@ -1,3 +1,4 @@
+"""Nonfunctional tests regarding manual configuration."""
 import re
 
 
