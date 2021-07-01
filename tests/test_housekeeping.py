@@ -28,5 +28,15 @@ def test_version_consistency():
             if line.startswith("rev:v"):
                 re_result = re.search("rev:v(.*)#mostrecent", line)
                 readme_hook_version = re_result.group(1)
+                break
 
-    assert setup_version == docs_version == readme_hook_version
+    assert (
+        setup_version == docs_version
+    ), "version in docs ({}) does not match setup.py version ({})".format(
+        docs_version, setup_version
+    )
+    assert (
+        setup_version == readme_hook_version
+    ), "version in readme ({}) does not match setup.py version ({})".format(
+        readme_hook_version, setup_version
+    )
