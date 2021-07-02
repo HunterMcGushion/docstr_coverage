@@ -4,6 +4,20 @@
 ...
 
 
+<a name="2.1.1"></a>
+## [2.1.1] (2021-07-02)
+
+### Bug Fixes
+- Fix inconsistent pre-commit hook behavior. [#84] by [killthekitten].
+    - This was caused by the hook being run on different sets of files
+    - If you are experiencing issues with the pre-commit hook, please ensure that you have 
+      properly set the `paths` argument in your config file
+
+### Changes
+- Don't report on fully-documented files by default. [#85] by [MiWeiss].
+    - The new verbosity level of 4 will include fully-documented files in the report
+
+
 <a name="2.1.0"></a>
 ## [2.1.0] (2021-06-25)
 
@@ -124,7 +138,8 @@
 * Initial release
 
 
-[Unreleased]: https://github.com/HunterMcGushion/docstr_coverage/compare/v2.1.0...HEAD
+[Unreleased]: https://github.com/HunterMcGushion/docstr_coverage/compare/v2.1.1...HEAD
+[2.1.1]: https://github.com/HunterMcGushion/docstr_coverage/compare/v2.1.0...v2.1.1
 [2.1.0]: https://github.com/HunterMcGushion/docstr_coverage/compare/v2.0.1...v2.1.0
 [2.0.1]: https://github.com/HunterMcGushion/docstr_coverage/compare/v2.0.0...v2.0.1
 [2.0.0]: https://github.com/HunterMcGushion/docstr_coverage/compare/v1.4.0...v2.0.0
@@ -171,3 +186,5 @@
 [#67]: https://github.com/HunterMcGushion/docstr_coverage/pull/67
 [#78]: https://github.com/HunterMcGushion/docstr_coverage/pull/78
 [#82]: https://github.com/HunterMcGushion/docstr_coverage/pull/82
+[#84]: https://github.com/HunterMcGushion/docstr_coverage/pull/84
+[#85]: https://github.com/HunterMcGushion/docstr_coverage/pull/85
