@@ -190,7 +190,7 @@ def parse_ignore_patterns_from_dict(ignore_patterns_dict) -> tuple:
     help="Include functions with @setter decorator (default: ignored)",
 )
 @click.option(
-    "-id",
+    "-idel",
     "--include-deleter",
     is_flag=True,
     help="Include functions with @deleter decorator (default: ignored)",
