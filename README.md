@@ -117,7 +117,7 @@ paths: # list or string
   - docstr_coverage
 badge: docs # Path
 exclude: .*/test # regex
-verbose: 1 # int (0-3)
+verbose: 3 # int (0-4)
 skip_magic: True # Boolean
 skip_file_doc: True # Boolean
 skip_init: True # Boolean
