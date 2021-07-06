@@ -10,13 +10,17 @@ class FooBar:
     def function(self):
         """This is a regular method docstring"""
 
+    def another_function(self):
+        """This is a second regular method docstring"""
+
     @property
     def prop(self):
         """This is a wrapped method docstring"""
 
     @prop.setter
     def prop(self, value):
-        """This is another wrapped method docstring"""
+        # This is skipped by default
+        pass
 
 
 def foo():

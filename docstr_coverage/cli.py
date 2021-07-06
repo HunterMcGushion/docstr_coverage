@@ -333,8 +333,8 @@ def execute(paths, **kwargs):
         skip_class_def=kwargs["skip_class_def"],
         skip_private=kwargs["skip_private"],
         skip_property=kwargs["skip_property"],
-        skip_setter=kwargs["skip_setter"],
-        skip_deleter=kwargs["skip_deleter"],
+        skip_setter=not kwargs["include_setter"],
+        skip_deleter=not kwargs["include_deleter"],
         ignore_names=ignore_names,
     )
 
