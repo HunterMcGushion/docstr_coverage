@@ -14,8 +14,8 @@ class IgnoreConfig:
         skip_class_def: bool = False,
         skip_private: bool = False,
         skip_property: bool = False,
-        skip_setter: bool = False,
-        skip_deleter: bool = False,
+        skip_setter: bool = True,
+        skip_deleter: bool = True,
     ):
         self._ignore_names = ignore_names
         self._skip_magic = skip_magic

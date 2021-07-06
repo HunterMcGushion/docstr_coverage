@@ -181,11 +181,19 @@ def parse_ignore_patterns_from_dict(ignore_patterns_dict) -> tuple:
 @click.option("-i", "--skip-init", is_flag=True, help="Ignore docstrings of `__init__` methods")
 @click.option("-c", "--skip-class-def", is_flag=True, help="Ignore docstrings of class definitions")
 @click.option(
-    "-dp", "--skip-property", is_flag=True, help="Ignore functions with @property decorator"
+    "-sp", "--skip-property", is_flag=True, help="Ignore functions with @property decorator"
 )
-@click.option("-ds", "--skip-setter", is_flag=True, help="Ignore functions with @setter decorator")
 @click.option(
-    "-dd", "--skip-deleter", is_flag=True, help="Ignore functions with @deleter decorator"
+    "-is",
+    "--include-setter",
+    is_flag=True,
+    help="Include functions with @setter decorator (default: ignored)",
+)
+@click.option(
+    "-id",
+    "--include-deleter",
+    is_flag=True,
+    help="Include functions with @deleter decorator (default: ignored)",
 )
 @click.option(
     "-P",
