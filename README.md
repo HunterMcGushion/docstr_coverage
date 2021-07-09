@@ -78,6 +78,9 @@ docstr-coverage some_project/src
 - _--skip-file-doc, -f_ - Ignore module docstrings (at the top of files)
 - _--skip-private, -P_ - Ignore private functions (starting with a single underscore)
 - _--skip-class-def, -c_ - Ignore docstrings of class definitions
+- _--skip-property, -sp_ - Ignore functions with `@property` decorator
+- _--include-setter, -is_ - Include functions with `@setter` decorator (skipped by default)
+- _--include-deleter, -idel_ - Include functions with `@deleter` decorator (skipped by default)
 - _--accept-empty, -a_ - Exit with code 0 if no Python files are found (default: exit code 1)
 - _--exclude=\<regex\>, -e \<regex\>_ - Filepath pattern to exclude from analysis
   - To exclude the contents of a virtual environment `env` and your `tests` directory, run:

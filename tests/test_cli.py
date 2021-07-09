@@ -505,6 +505,31 @@ def test_accept_empty(
         assert run_result.exit_code == 1
 
 
+@pytest.mark.parametrize(
+    ["flags", "expected_coverage"],
+    [
+        pytest.param([], 75.0, id="default_property_config"),
+        pytest.param(["--skip-property"], 100.0, id="skip-property"),
+        pytest.param(["-sp"], 100.0, id="skip-property (short: -sp)"),
+        pytest.param(["--include-setter"], 60.0, id="include-setter"),
+        pytest.param(["-is"], 60.0, id="include-setter (short: -is)"),
+        pytest.param(["--include-deleter"], 60.0, id="include-deleter"),
+        pytest.param(["-idel"], 60.0, id="include-deleter (short: -idel)"),
+    ],
+)
+@pytest.mark.usefixtures("cd_tests_dir_fixture")
+def test_property_flags(
+    flags: List[str],
+    expected_coverage: float,
+    runner: CliRunner,
+):
+    """Test that the CLI flags for properties work correctly"""
+    paths = [os.path.join("individual_samples", "decorators.py")]
+    flags.append("--percentage-only")
+    run_result = runner.invoke(execute, paths + flags)
+    assert float(run_result.stdout) == expected_coverage
+
+
 ##################################################
 # Deprecation Tests
 ##################################################

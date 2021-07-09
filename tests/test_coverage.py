@@ -266,7 +266,7 @@ def test_skip_private():
 
 
 def test_long_doc():
-    """Regression test on issue 79
+    """Regression test on issue 79.
 
     Multiline docstrings can be a smoke test when checking
     the tokenize tokens (which is based on line numbers)."""
@@ -276,3 +276,24 @@ def test_long_doc():
     # 2 + 1 inline ignore
     assert result.count_aggregate().found == 3
     assert result.count_aggregate().needed == 4
+
+
+@pytest.mark.parametrize(
+    ["ignore_setter", "ignore_deleter", "ignore_property", "coverage"],
+    [
+        (False, False, False, 3 / 6),
+        (True, False, False, 3 / 5),
+        (False, True, False, 3 / 5),
+        (False, False, True, 3 / 5),
+        (True, True, True, 3 / 3),
+    ],
+)
+def test_skip_decorators(ignore_setter, ignore_deleter, ignore_property, coverage):
+    """Tests ignoring of property decorators"""
+    ignore_config = IgnoreConfig(
+        skip_setter=ignore_setter,
+        skip_property=ignore_property,
+        skip_deleter=ignore_deleter,
+    )
+    result = analyze([os.path.join(INDIVIDUAL_SAMPLES_DIR, "decorators.py")], ignore_config)
+    assert result.count_aggregate().coverage() == coverage * 100
