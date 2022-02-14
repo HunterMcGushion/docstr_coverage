@@ -28,7 +28,7 @@ setup(
     install_requires=["click", "PyYAML"],
     extras_require={
         "lint": ["flake8==3.9.2", "black==21.5b2", "isort==5.9.0"],
-        "test": ["pytest==6.2.5", "pytest-mock==3.4.0"],
+        "test": ["pytest==7.0.1", "pytest-mock==3.4.0"],
     },
     include_package_data=True,
     zip_safe=False,
