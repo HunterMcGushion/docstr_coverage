@@ -4,6 +4,15 @@
 ...
 
 
+<a name="2.2.0"></a>
+## [2.2.0] (2022-03-17)
+
+### Features
+- Add `--skip-property` flag to ignore methods with the `@property` decorator. [#86] by [MiWeiss].
+- Add `--include-setter` flag to check methods with the `@setter` decorator. [#86] by [MiWeiss].
+- Add `--include-deleter` flag to check methods with the `@deleter` decorator. [#86] by [MiWeiss].
+
+
 <a name="2.1.1"></a>
 ## [2.1.1] (2021-07-02)
 
@@ -138,7 +147,8 @@
 * Initial release
 
 
-[Unreleased]: https://github.com/HunterMcGushion/docstr_coverage/compare/v2.1.1...HEAD
+[Unreleased]: https://github.com/HunterMcGushion/docstr_coverage/compare/v2.2.0...HEAD
+[2.2.0]: https://github.com/HunterMcGushion/docstr_coverage/compare/v2.1.1...v2.2.0
 [2.1.1]: https://github.com/HunterMcGushion/docstr_coverage/compare/v2.1.0...v2.1.1
 [2.1.0]: https://github.com/HunterMcGushion/docstr_coverage/compare/v2.0.1...v2.1.0
 [2.0.1]: https://github.com/HunterMcGushion/docstr_coverage/compare/v2.0.0...v2.0.1
@@ -188,3 +198,4 @@
 [#82]: https://github.com/HunterMcGushion/docstr_coverage/pull/82
 [#84]: https://github.com/HunterMcGushion/docstr_coverage/pull/84
 [#85]: https://github.com/HunterMcGushion/docstr_coverage/pull/85
+[#86]: https://github.com/HunterMcGushion/docstr_coverage/pull/86

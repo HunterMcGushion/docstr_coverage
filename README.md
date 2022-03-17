@@ -186,7 +186,7 @@ and configuring the `paths` section of the [`.docstr.yaml` config](#config-file)
 ```yaml
 repos:
   - repo: https://github.com/HunterMcGushion/docstr_coverage
-    rev: v2.1.1 # most recent docstr-coverage release or commit sha
+    rev: v2.2.0 # most recent docstr-coverage release or commit sha
     hooks:
       - id: docstr-coverage
         args: ["--verbose", "2"] # override the .docstr.yaml to see less output
