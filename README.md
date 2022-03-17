@@ -160,9 +160,9 @@ Note that `docstr-coverage` can not parse
 dynamically added documentation (e.g. through class extension).
 Thus, some of your code which deliberately has no docstring might be counted as uncovered.
 
-You can override this by adding either ```#docstr_coverage:inherited``` 
+You can override this by adding either ```# docstr-coverage:inherited``` 
 (intended for use if a docstring is provided in the corresponding superclass method)
-or a generic excuse with a reason, like ```#docstr_coverage:excused `My probably bad excuse` ```.
+or a generic excuse with a reason, like ```# docstr-coverage:excused `My probably bad excuse` ```.
 These have to be stated right above any class or function definition 
 (or above the functions annotations, if applicable).
 Such class or function would then be counted as if they had a docstring.
