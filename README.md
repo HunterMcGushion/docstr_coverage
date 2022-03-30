@@ -78,6 +78,9 @@ docstr-coverage some_project/src
 - _--skip-file-doc, -f_ - Ignore module docstrings (at the top of files)
 - _--skip-private, -P_ - Ignore private functions (starting with a single underscore)
 - _--skip-class-def, -c_ - Ignore docstrings of class definitions
+- _--skip-property, -sp_ - Ignore functions with `@property` decorator
+- _--include-setter, -is_ - Include functions with `@setter` decorator (skipped by default)
+- _--include-deleter, -idel_ - Include functions with `@deleter` decorator (skipped by default)
 - _--accept-empty, -a_ - Exit with code 0 if no Python files are found (default: exit code 1)
 - _--exclude=\<regex\>, -e \<regex\>_ - Filepath pattern to exclude from analysis
   - To exclude the contents of a virtual environment `env` and your `tests` directory, run:
@@ -117,7 +120,7 @@ paths: # list or string
   - docstr_coverage
 badge: docs # Path
 exclude: .*/test # regex
-verbose: 1 # int (0-3)
+verbose: 3 # int (0-4)
 skip_magic: True # Boolean
 skip_file_doc: True # Boolean
 skip_init: True # Boolean
@@ -157,9 +160,9 @@ Note that `docstr-coverage` can not parse
 dynamically added documentation (e.g. through class extension).
 Thus, some of your code which deliberately has no docstring might be counted as uncovered.
 
-You can override this by adding either ```#docstr_coverage:inherited``` 
+You can override this by adding either ```# docstr-coverage:inherited``` 
 (intended for use if a docstring is provided in the corresponding superclass method)
-or a generic excuse with a reason, like ```#docstr_coverage:excused `My probably bad excuse` ```.
+or a generic excuse with a reason, like ```# docstr-coverage:excused `My probably bad excuse` ```.
 These have to be stated right above any class or function definition 
 (or above the functions annotations, if applicable).
 Such class or function would then be counted as if they had a docstring.
@@ -183,7 +186,7 @@ and configuring the `paths` section of the [`.docstr.yaml` config](#config-file)
 ```yaml
 repos:
   - repo: https://github.com/HunterMcGushion/docstr_coverage
-    rev: v2.1.0 # most recent docstr-coverage release or commit sha
+    rev: v2.2.0 # most recent docstr-coverage release or commit sha
     hooks:
       - id: docstr-coverage
         args: ["--verbose", "2"] # override the .docstr.yaml to see less output

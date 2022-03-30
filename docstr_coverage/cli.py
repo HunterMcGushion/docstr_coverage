@@ -181,6 +181,21 @@ def parse_ignore_patterns_from_dict(ignore_patterns_dict) -> tuple:
 @click.option("-i", "--skip-init", is_flag=True, help="Ignore docstrings of `__init__` methods")
 @click.option("-c", "--skip-class-def", is_flag=True, help="Ignore docstrings of class definitions")
 @click.option(
+    "-sp", "--skip-property", is_flag=True, help="Ignore functions with @property decorator"
+)
+@click.option(
+    "-is",
+    "--include-setter",
+    is_flag=True,
+    help="Include functions with @setter decorator (default: ignored)",
+)
+@click.option(
+    "-idel",
+    "--include-deleter",
+    is_flag=True,
+    help="Include functions with @deleter decorator (default: ignored)",
+)
+@click.option(
     "-P",
     "--skip-private",
     is_flag=True,
@@ -319,6 +334,9 @@ def execute(paths, **kwargs):
         skip_init=kwargs["skip_init"],
         skip_class_def=kwargs["skip_class_def"],
         skip_private=kwargs["skip_private"],
+        skip_property=kwargs["skip_property"],
+        skip_setter=not kwargs["include_setter"],
+        skip_deleter=not kwargs["include_deleter"],
         ignore_names=ignore_names,
     )
 
