@@ -1,10 +1,15 @@
 repos:
 -   repo: https://github.com/ambv/black
-    rev: 21.5b2
+    rev: 22.3.0
     hooks:
     - id: black
       language_version: python3.7
 -   repo: https://gitlab.com/pycqa/flake8
-    rev: 3.9.2
+    rev: 4.0.1
     hooks:
     -   id: flake8
+-   repo: https://github.com/pycqa/isort
+    rev: 5.10.1
+    hooks:
+      - id: isort
+        name: isort (python)
