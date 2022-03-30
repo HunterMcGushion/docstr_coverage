@@ -25,7 +25,7 @@ setup(
     author_email="hunter@mcgushion.com",
     license="MIT",
     packages=["docstr_coverage"],
-    install_requires=["click", "PyYAML"],
+    install_requires=["click", "PyYAML", "tqdm==4.63.1"],
     extras_require={
         "lint": ["flake8==3.9.2", "black==21.5b2", "isort==5.9.0"],
         "test": ["pytest==5.4.2", "pytest-mock==3.4.0"],
