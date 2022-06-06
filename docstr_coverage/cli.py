@@ -341,7 +341,8 @@ def execute(paths, **kwargs):
     )
 
     # Calculate docstring coverage
-    results = analyze(all_paths, ignore_config=ignore_config)
+    show_progress = not kwargs["percentage_only"]
+    results = analyze(all_paths, ignore_config=ignore_config, show_progress=show_progress)
 
     LegacyPrinter(verbosity=kwargs["verbose"], ignore_config=ignore_config).print(results)
 

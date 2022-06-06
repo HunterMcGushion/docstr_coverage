@@ -5,6 +5,8 @@ import re
 from ast import parse
 from typing import Dict, List, Optional, Tuple
 
+from tqdm import tqdm
+
 from docstr_coverage.ignore_config import IgnoreConfig
 from docstr_coverage.printers import LegacyPrinter
 from docstr_coverage.result_collection import File, FileStatus, ResultCollection
@@ -215,7 +217,9 @@ def get_docstring_coverage(
     return results.to_legacy()
 
 
-def analyze(filenames: list, ignore_config: IgnoreConfig = IgnoreConfig()) -> ResultCollection:
+def analyze(
+    filenames: list, ignore_config: IgnoreConfig = IgnoreConfig(), show_progress=True
+) -> ResultCollection:
     """EXPERIMENTAL: More expressive alternative to `get_docstring_coverage`.
 
         Checks contents of `filenames` for missing docstrings, and produces a report detailing
@@ -232,13 +236,26 @@ def analyze(filenames: list, ignore_config: IgnoreConfig = IgnoreConfig()) -> Re
         ignore_config: IgnoreConfig
             Information about which docstrings are to be ignored
 
+        show_progress: Boolean, default=True
+            If True, prints a progress bar to stdout
+
     Returns
     -------
     ResultCollection
         The collected information about docstring presence"""
     results = ResultCollection()
 
-    for filename in filenames:
+    iterator = iter(filenames)
+    if show_progress:
+        iterator = tqdm(
+            iterator,
+            desc="Checking python files",
+            unit="files",
+            unit_scale=True,
+            total=len(filenames),
+        )
+
+    for filename in iterator:
         file_result = results.get_file(file_path=filename)
 
         ##################################################
