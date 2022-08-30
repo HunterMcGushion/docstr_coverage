@@ -1,7 +1,14 @@
 """This module handles traversing abstract syntax trees to check for docstrings"""
 import re
 import tokenize
-from ast import AsyncFunctionDef, ClassDef, FunctionDef, Module, NodeVisitor, get_docstring
+from ast import (
+    AsyncFunctionDef,
+    ClassDef,
+    FunctionDef,
+    Module,
+    NodeVisitor,
+    get_docstring,
+)
 from typing import Optional
 
 ACCEPTED_EXCUSE_PATTERNS = (
