@@ -112,7 +112,7 @@ docstr-coverage some_project/src
 
 #### Config File
 All options can be saved in a config file. A file named `.docstr.yaml` in the folder in which `docstr-coverage` is executed is picked up automatically. 
-Other locations can be passed using `docstr-coverage -C path/to/config.json` or the long version `--config`.
+Other locations can be passed using `docstr-coverage -C path/to/config.yml` or the long version `--config`.
 
 Example:
 ```yaml
