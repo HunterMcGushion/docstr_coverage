@@ -41,7 +41,7 @@ def test_should_report_for_an_empty_file():
 
 
 @pytest.mark.parametrize(
-    ["file_path", "needed_count"], [(DOCUMENTED_FILE_PATH, 9), (FULLY_EXCUSED_FILE_PATH, 8)]
+    ["file_path", "needed_count"], [(DOCUMENTED_FILE_PATH, 11), (FULLY_EXCUSED_FILE_PATH, 10)]
 )
 def test_should_report_full_coverage(file_path, needed_count):
     result = analyze([file_path])
@@ -105,7 +105,7 @@ def test_should_report_for_multiple_files():
             "missing": [],
             "module_doc": True,
             "missing_count": 0,
-            "needed_count": 9,
+            "needed_count": 11,
             "coverage": 100.0,
             "empty": False,
         },
@@ -118,7 +118,7 @@ def test_should_report_for_multiple_files():
             "empty": True,
         },
     }
-    assert total_results == {"missing_count": 4, "needed_count": 14, "coverage": 71.42857142857143}
+    assert total_results == {"missing_count": 4, "needed_count": 16, "coverage": 75.0}
 
 
 def test_should_report_when_no_docs_in_a_file():
@@ -255,14 +255,14 @@ def test_skip_private():
     result = analyze([PRIVATE_NO_DOCS_PATH], ignore_config=ignore_config)
     file_results, total_results = result.to_legacy()
     assert file_results[PRIVATE_NO_DOCS_PATH] == {
-        "missing": ["__dunder"],
+        "missing": ["__dunder", "__adunder"],
         "module_doc": True,
-        "missing_count": 1,
-        "needed_count": 2,
-        "coverage": 50.0,
+        "missing_count": 2,
+        "needed_count": 3,
+        "coverage": 33.333333333333336,
         "empty": False,
     }
-    assert total_results == {"missing_count": 1, "needed_count": 2, "coverage": 50.0}
+    assert total_results == {"missing_count": 2, "needed_count": 3, "coverage": 33.333333333333336}
 
 
 def test_long_doc():
