@@ -1,7 +1,7 @@
 """This module handles traversing abstract syntax trees to check for docstrings"""
 import re
 import tokenize
-from ast import ClassDef, FunctionDef, Module, NodeVisitor, get_docstring
+from ast import AsyncFunctionDef, ClassDef, FunctionDef, Module, NodeVisitor, get_docstring
 from typing import Optional
 
 ACCEPTED_EXCUSE_PATTERNS = (
@@ -35,6 +35,10 @@ class DocStringCoverageVisitor(NodeVisitor):
 
     def visit_FunctionDef(self, node: FunctionDef):
         """Collect information regarding function/method declaration nodes"""
+        self._visit_helper(node)
+
+    def visit_AsyncFunctionDef(self, node: AsyncFunctionDef):
+        """Collect information regarding async function/method declaration nodes"""
         self._visit_helper(node)
 
     def _visit_helper(self, node):
