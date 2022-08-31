@@ -145,6 +145,10 @@ configured in a config file.
 Exception: If a (deprecated) `--docstr-ignore-file` is present and the yml config contains `ignore_patterns`,
 a `ValueError` is raised.
 
+#### Ignoring by Regex
+In your config files, using `ignore_patterns`, you can specify regex patterns for files names and nodes (methods, ...)
+which should be ignored. See config file example above.
+
 #### Overriding by Comments
 Note that `docstr-coverage` can not parse 
 dynamically added documentation (e.g. through class extension).
