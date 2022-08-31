@@ -156,7 +156,7 @@ def parse_ignore_patterns_from_dict(ignore_patterns_dict) -> tuple:
 @click.option(
     "-v",
     "--verbose",
-    type=click.Choice(["0", "1", "2", "3"]),
+    type=click.Choice(["0", "1", "2", "3", "4"]),
     default="3",
     help="Verbosity level",
     show_default=True,
@@ -180,6 +180,21 @@ def parse_ignore_patterns_from_dict(ignore_patterns_dict) -> tuple:
 @click.option("-f", "--skip-file-doc", is_flag=True, help="Ignore module docstrings")
 @click.option("-i", "--skip-init", is_flag=True, help="Ignore docstrings of `__init__` methods")
 @click.option("-c", "--skip-class-def", is_flag=True, help="Ignore docstrings of class definitions")
+@click.option(
+    "-sp", "--skip-property", is_flag=True, help="Ignore functions with @property decorator"
+)
+@click.option(
+    "-is",
+    "--include-setter",
+    is_flag=True,
+    help="Include functions with @setter decorator (default: ignored)",
+)
+@click.option(
+    "-idel",
+    "--include-deleter",
+    is_flag=True,
+    help="Include functions with @deleter decorator (default: ignored)",
+)
 @click.option(
     "-P",
     "--skip-private",
@@ -274,8 +289,10 @@ def execute(paths, **kwargs):
             sys.exit(0)
         else:
             sys.exit(
-                "No Python files found "
-                "(use `--accept-empty` to exit with code 0 if you expect this case)"
+                "No Python files found. "
+                "Use `--accept-empty` to exit with code 0 if you expect this case, "
+                "or specify the paths you'd like to check "
+                "via command line arguments or the config file."
             )
 
     # Parse ignore names file
@@ -301,11 +318,15 @@ def execute(paths, **kwargs):
         skip_init=kwargs["skip_init"],
         skip_class_def=kwargs["skip_class_def"],
         skip_private=kwargs["skip_private"],
+        skip_property=kwargs["skip_property"],
+        skip_setter=not kwargs["include_setter"],
+        skip_deleter=not kwargs["include_deleter"],
         ignore_names=ignore_names,
     )
 
     # Calculate docstring coverage
-    results = analyze(all_paths, ignore_config=ignore_config)
+    show_progress = not kwargs["percentage_only"]
+    results = analyze(all_paths, ignore_config=ignore_config, show_progress=show_progress)
 
     LegacyPrinter(verbosity=kwargs["verbose"], ignore_config=ignore_config).print(results)
 

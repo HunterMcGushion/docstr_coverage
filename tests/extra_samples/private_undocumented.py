@@ -7,3 +7,11 @@ def _foo():
 
 def __dunder():
     pass
+
+
+async def _afoo():
+    pass
+
+
+async def __adunder():
+    pass

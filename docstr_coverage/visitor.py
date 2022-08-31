@@ -1,7 +1,15 @@
 """This module handles traversing abstract syntax trees to check for docstrings"""
 import re
 import tokenize
-from ast import ClassDef, FunctionDef, Module, NodeVisitor, get_docstring
+from ast import (
+    AsyncFunctionDef,
+    ClassDef,
+    FunctionDef,
+    Module,
+    NodeVisitor,
+    get_docstring,
+)
+from typing import Optional
 
 ACCEPTED_EXCUSE_PATTERNS = (
     re.compile(r"#\s*docstr-coverage\s*:\s*inherit(ed)?\s*"),
@@ -25,7 +33,7 @@ class DocStringCoverageVisitor(NodeVisitor):
         with module-wide node info."""
         has_doc = self._has_docstring(node)
         is_empty = not len(node.body)
-        self.tree.append((has_doc, is_empty, []))
+        self.tree.append((has_doc, is_empty, None, []))
         self.generic_visit(node)
 
     def visit_ClassDef(self, node: ClassDef):
@@ -36,13 +44,18 @@ class DocStringCoverageVisitor(NodeVisitor):
         """Collect information regarding function/method declaration nodes"""
         self._visit_helper(node)
 
+    def visit_AsyncFunctionDef(self, node: AsyncFunctionDef):
+        """Collect information regarding async function/method declaration nodes"""
+        self._visit_helper(node)
+
     def _visit_helper(self, node):
         """Helper method to update :attr:`DocStringCoverageVisitor.tree` with pertinent
         documentation information for `node`, then ensure all child nodes are
         also visited"""
         self.symbol_count += 1
         has_doc = self._has_doc_or_excuse(node)
-        _node = (node.name, has_doc, [])
+        relevant_decorator = self._relevant_decorator(node)
+        _node = (node.name, has_doc, relevant_decorator, [])
         self.tree[-1][-1].append(_node)
         self.tree.append(_node)
         self.generic_visit(node)
@@ -100,3 +113,18 @@ class DocStringCoverageVisitor(NodeVisitor):
     def _has_docstring(node):
         """Uses ast to check if the passed node contains a non-empty docstring"""
         return get_docstring(node) is not None and get_docstring(node).strip() != ""
+
+    @staticmethod
+    def _relevant_decorator(node) -> Optional[str]:
+        if hasattr(node, "decorator_list"):
+            for parsed_decorator in node.decorator_list:
+                if hasattr(parsed_decorator, "id"):
+                    if parsed_decorator.id == "property":
+                        return "@property"
+                if hasattr(parsed_decorator, "attr"):
+                    if parsed_decorator.attr == "setter":
+                        return "@setter"
+                if hasattr(parsed_decorator, "attr"):
+                    if parsed_decorator.attr == "deleter":
+                        return "@deleter"
+        return None

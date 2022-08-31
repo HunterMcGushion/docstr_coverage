@@ -78,6 +78,9 @@ docstr-coverage some_project/src
 - _--skip-file-doc, -f_ - Ignore module docstrings (at the top of files)
 - _--skip-private, -P_ - Ignore private functions (starting with a single underscore)
 - _--skip-class-def, -c_ - Ignore docstrings of class definitions
+- _--skip-property, -sp_ - Ignore functions with `@property` decorator
+- _--include-setter, -is_ - Include functions with `@setter` decorator (skipped by default)
+- _--include-deleter, -idel_ - Include functions with `@deleter` decorator (skipped by default)
 - _--accept-empty, -a_ - Exit with code 0 if no Python files are found (default: exit code 1)
 - _--exclude=\<regex\>, -e \<regex\>_ - Filepath pattern to exclude from analysis
   - To exclude the contents of a virtual environment `env` and your `tests` directory, run:
@@ -87,6 +90,7 @@ docstr-coverage some_project/src
   - 1 - Print overall statistics
   - 2 - Also print individual statistics for each file
   - 3 - Also print missing docstrings (function names, class names, etc.)
+  - 4 - Also print information about present docstrings
 - _--fail-under=<int|float>, -F <int|float>_ - Fail if under a certain percentage of coverage (default: 100.0)
 - _--badge=\<filepath\>, -b \<filepath\>_ - Generate a docstring coverage percent badge as an SVG saved to a given filepath
   - Include the badge in a repo's README using 
@@ -97,14 +101,16 @@ docstr-coverage some_project/src
 - _--help, -h_ - Display CLI options
 
 #### Config File
-All options can be saved in a config file named `.docstr.yaml`
-example:
+All options can be saved in a config file. A file named `.docstr.yaml` in the folder in which `docstr-coverage` is executed is picked up automatically. 
+Other locations can be passed using `docstr-coverage -C path/to/config.yml` or the long version `--config`.
+
+Example:
 ```yaml
 paths: # list or string
   - docstr_coverage
 badge: docs # Path
 exclude: .*/test # regex
-verbose: 1 # int (0-3)
+verbose: 3 # int (0-4)
 skip_magic: True # Boolean
 skip_file_doc: True # Boolean
 skip_init: True # Boolean
@@ -144,9 +150,9 @@ Note that `docstr-coverage` can not parse
 dynamically added documentation (e.g. through class extension).
 Thus, some of your code which deliberately has no docstring might be counted as uncovered.
 
-You can override this by adding either ```#docstr_coverage:inherited``` 
+You can override this by adding either ```# docstr-coverage:inherited``` 
 (intended for use if a docstring is provided in the corresponding superclass method)
-or a generic excuse with a reason, like ```#docstr_coverage:excused `My probably bad excuse` ```.
+or a generic excuse with a reason, like ```# docstr-coverage:excused `My probably bad excuse` ```.
 These have to be stated right above any class or function definition 
 (or above the functions annotations, if applicable).
 Such class or function would then be counted as if they had a docstring.
@@ -162,17 +168,18 @@ class FooBarChild(FooBar):
 
 #### Pre-commit hook
 
-You can use `docstr-coverage` as a pre-commit hook by adding the following to your `.pre-commit-config.yaml` file:
-
-To pass arguments to `docstr-coverage`, add a `.docstr.yaml` config (which is automatically picked up).
+You can use `docstr-coverage` as a pre-commit hook by adding the following to your `.pre-commit-config.yaml` file 
+and configuring the `paths` section of the [`.docstr.yaml` config](#config-file). 
  This is preferrable over [pre-commit args](https://pre-commit.com/#config-args), 
- as it facilitates the use of the same config in ci / pre-commit and manual runs.
+ as it facilitates the use of the same config in CI, pre-commit and manual runs.
 
 ```yaml
-- repo: https://github.com/HunterMcGushion/docstr_coverage
-  rev: <most recent docstr-coverage release or commit sha>
-  hooks:
-    - id: docstr-coverage
+repos:
+  - repo: https://github.com/HunterMcGushion/docstr_coverage
+    rev: v2.2.0 # most recent docstr-coverage release or commit sha
+    hooks:
+      - id: docstr-coverage
+        args: ["--verbose", "2"] # override the .docstr.yaml to see less output
 ```
 
 #### Package in Your Project

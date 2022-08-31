@@ -230,11 +230,11 @@ def test_parse_ignore_names_file(path: str, expected: tuple):
 @pytest.mark.parametrize(
     ["paths", "expected_output"],
     [
-        [[SAMPLES_A.dirpath], "62.5"],
+        [[SAMPLES_A.dirpath], "66.66666666666667"],
         [[SAMPLES_A.partial], "20.0"],
         [[SAMPLES_A.documented], "100.0"],
         [[SAMPLES_A.undocumented], "0.0"],
-        [[SAMPLES_A.undocumented, SAMPLES_A.documented], "81.81818181818181"],
+        [[SAMPLES_A.undocumented, SAMPLES_A.documented], "84.61538461538461"],
     ],
 )
 @pytest.mark.parametrize("verbose_flag", [["-v", "0"], ["-v", "1"], ["-v", "2"], ["-v", "3"]])
@@ -503,6 +503,31 @@ def test_accept_empty(
         assert run_result.exit_code == 0
     else:
         assert run_result.exit_code == 1
+
+
+@pytest.mark.parametrize(
+    ["flags", "expected_coverage"],
+    [
+        pytest.param([], 75.0, id="default_property_config"),
+        pytest.param(["--skip-property"], 100.0, id="skip-property"),
+        pytest.param(["-sp"], 100.0, id="skip-property (short: -sp)"),
+        pytest.param(["--include-setter"], 60.0, id="include-setter"),
+        pytest.param(["-is"], 60.0, id="include-setter (short: -is)"),
+        pytest.param(["--include-deleter"], 60.0, id="include-deleter"),
+        pytest.param(["-idel"], 60.0, id="include-deleter (short: -idel)"),
+    ],
+)
+@pytest.mark.usefixtures("cd_tests_dir_fixture")
+def test_property_flags(
+    flags: List[str],
+    expected_coverage: float,
+    runner: CliRunner,
+):
+    """Test that the CLI flags for properties work correctly"""
+    paths = [os.path.join("individual_samples", "decorators.py")]
+    flags.append("--percentage-only")
+    run_result = runner.invoke(execute, paths + flags)
+    assert float(run_result.stdout) == expected_coverage
 
 
 ##################################################
