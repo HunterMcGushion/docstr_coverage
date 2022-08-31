@@ -301,7 +301,7 @@ def execute(paths, **kwargs):
         raise ValueError(
             (
                 "The docstr-coverage configuration file {} contains ignore_patterns,"
-                " and at the same time an ignore file {} was found."
+                " and at the same time a (deprecated) ignore file {} was found."
                 " Ignore patterns must be specified in only one location at a time."
             ).format(kwargs["config_file"], kwargs["ignore_names_file"])
         )
