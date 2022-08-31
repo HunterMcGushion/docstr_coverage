@@ -142,8 +142,6 @@ docstr-coverage docstr_coverage -e ".*/test" --skip-magic --skip-init --badge="d
 
 Note that options passed as command line arguments have precedence over options 
 configured in a config file.
-Exception: If a (deprecated) `--docstr-ignore-file` is present and the yml config contains `ignore_patterns`,
-a `ValueError` is raised.
 
 #### Ignoring by Regex
 In your config files, using `ignore_patterns`, you can specify regex patterns for files names and nodes (methods, ...)
