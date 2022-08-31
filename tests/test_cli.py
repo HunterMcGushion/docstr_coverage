@@ -230,11 +230,11 @@ def test_parse_ignore_names_file(path: str, expected: tuple):
 @pytest.mark.parametrize(
     ["paths", "expected_output"],
     [
-        [[SAMPLES_A.dirpath], "62.5"],
+        [[SAMPLES_A.dirpath], "66.66666666666667"],
         [[SAMPLES_A.partial], "20.0"],
         [[SAMPLES_A.documented], "100.0"],
         [[SAMPLES_A.undocumented], "0.0"],
-        [[SAMPLES_A.undocumented, SAMPLES_A.documented], "81.81818181818181"],
+        [[SAMPLES_A.undocumented, SAMPLES_A.documented], "84.61538461538461"],
     ],
 )
 @pytest.mark.parametrize("verbose_flag", [["-v", "0"], ["-v", "1"], ["-v", "2"], ["-v", "3"]])

@@ -13,6 +13,9 @@ class FooBar:
     def another_function(self):
         """This is a second regular method docstring"""
 
+    async def an_async_function(self):
+        """This is an async method docstring"""
+
     @property
     def prop(self):
         """This is a wrapped method docstring"""
@@ -32,3 +35,7 @@ def foo():
 
 def bar():
     """This is another function"""
+
+
+async def baz():
+    """This is an async function"""

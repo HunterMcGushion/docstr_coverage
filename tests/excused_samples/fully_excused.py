@@ -19,9 +19,18 @@ class FooBar:
     def prop(self):
         pass
 
+    # docstr-coverage:excuse `...almost as lazy as async functions...`
+    async def async_function(self):
+        pass
+
 
 # docstr-coverage:excuse `... besides: who's checking anyways`
 def bar():
+    pass
+
+
+# docstr-coverage:excuse `... also: setting up async tests suck in general`
+async def baz():
     pass
 
 
