@@ -92,16 +92,6 @@ docstr-coverage some_project/src
   - 3 - Also print missing docstrings (function names, class names, etc.)
   - 4 - Also print information about present docstrings
 - _--fail-under=<int|float>, -F <int|float>_ - Fail if under a certain percentage of coverage (default: 100.0)
-- _--docstr-ignore-file=\<filepath\>, -d \<filepath\>_ - Filepath containing list of patterns to ignore. Patterns are (file-pattern, name-pattern) pairs
-  - File content example:
-
-  ```
-  SomeFile method_to_ignore1 method_to_ignore2 method_to_ignore3
-  FileWhereWeWantToIgnoreAllSpecialMethods __.+__
-  .* method_to_ignore_in_all_files
-  a_very_important_view_file ^get$ ^set$ ^post$
-  detect_.* get_val.*
-  ```
 - _--badge=\<filepath\>, -b \<filepath\>_ - Generate a docstring coverage percent badge as an SVG saved to a given filepath
   - Include the badge in a repo's README using 
   ```[![docstr_coverage](<filepath/of/your/saved/badge.svg>)](https://github.com/HunterMcGushion/docstr_coverage)```,
@@ -152,8 +142,10 @@ docstr-coverage docstr_coverage -e ".*/test" --skip-magic --skip-init --badge="d
 
 Note that options passed as command line arguments have precedence over options 
 configured in a config file.
-Exception: If a `--docstr-ignore-file` is present and the yml config contains `ignore_patterns`,
-a `ValueError` is raised.
+
+#### Ignoring by Regex
+In your config files, using `ignore_patterns`, you can specify regex patterns for files names and nodes (methods, ...)
+which should be ignored. See config file example above.
 
 #### Overriding by Comments
 Note that `docstr-coverage` can not parse 
