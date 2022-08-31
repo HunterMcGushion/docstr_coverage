@@ -46,7 +46,7 @@ def do_include_filepath(filepath: str, exclude_re: Optional["re.Pattern"]) -> bo
 
 
 def collect_filepaths(
-    *paths: str, follow_links: bool = False, exclude: Optional[str] = None
+        *paths: str, follow_links: bool = False, exclude: Optional[str] = None
 ) -> List[str]:
     """Collect filepaths under given `paths` that are not `exclude`-d
 
@@ -369,7 +369,18 @@ def _deprecation_alerts(kwargs):
                 "Using deprecated --{}, should use --{}".format(deprecated_name, new_flag), fg="red"
             )
             kwargs[name] = kwargs.pop(deprecated_name)
-    if kwargs.get("docstr-ignore-file") or kwargs.get("ignore_names_file"):
+
+    # Deprecated old ignore files
+    ignore_file_old_casing = kwargs.get("docstr-ignore-file")
+    ignore_file_new_casing = kwargs.get("ignore_names_file")
+
+    def _nondefault_or_existing_file(path):
+        if path is None:
+            return False
+        return os.path.split(path)[-1] != ".docstr_coverage" or os.path.isfile(path)
+
+    if (_nondefault_or_existing_file(ignore_file_old_casing)
+            or _nondefault_or_existing_file(ignore_file_new_casing)):
         click.secho(
             "Using deprecated ignore files."
             "We'll keep them supported for a while, "
