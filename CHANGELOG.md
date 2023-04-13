@@ -4,6 +4,21 @@
 ...
 
 
+<a name="2.3.0"></a>
+## [2.3.0] (2023-04-13)
+
+### Features
+- Display progress bar during docstring analysis. [#106] by [MiWeiss].
+- Add support for analyzing async functions' docstrings. [#116] by [caffeinatedMike].
+- Add support for Python 3.11. [#117] by [MiWeiss].
+
+### Deprecations
+- Remove support for Python 3.6. [#117] by [MiWeiss].
+- Deprecate `--docstr-ignore-file` flag. [#87] by [MiWeiss].
+  - Going forward, please use the `ignore_patterns` option in your config file
+  - The `--docstr-ignore-file` will be removed in a future release
+
+
 <a name="2.2.0"></a>
 ## [2.2.0] (2022-03-17)
 
@@ -147,7 +162,8 @@
 * Initial release
 
 
-[Unreleased]: https://github.com/HunterMcGushion/docstr_coverage/compare/v2.2.0...HEAD
+[Unreleased]: https://github.com/HunterMcGushion/docstr_coverage/compare/v2.3.0...HEAD
+[2.3.0]: https://github.com/HunterMcGushion/docstr_coverage/compare/v2.2.0...v2.3.0
 [2.2.0]: https://github.com/HunterMcGushion/docstr_coverage/compare/v2.1.1...v2.2.0
 [2.1.1]: https://github.com/HunterMcGushion/docstr_coverage/compare/v2.1.0...v2.1.1
 [2.1.0]: https://github.com/HunterMcGushion/docstr_coverage/compare/v2.0.1...v2.1.0
@@ -164,6 +180,7 @@
 
 [asergeant01]: https://github.com/asergeant01
 [bjornconstructors]: https://github.com/bjornconstructors
+[caffeinatedMike]: https://github.com/caffeinatedMike
 [cthoyt]: https://github.com/cthoyt
 [econchick]: https://github.com/econchick
 [epassaro]: https://github.com/epassaro
@@ -199,3 +216,7 @@
 [#84]: https://github.com/HunterMcGushion/docstr_coverage/pull/84
 [#85]: https://github.com/HunterMcGushion/docstr_coverage/pull/85
 [#86]: https://github.com/HunterMcGushion/docstr_coverage/pull/86
+[#87]: https://github.com/HunterMcGushion/docstr_coverage/pull/87
+[#106]: https://github.com/HunterMcGushion/docstr_coverage/pull/106
+[#116]: https://github.com/HunterMcGushion/docstr_coverage/pull/116
+[#117]: https://github.com/HunterMcGushion/docstr_coverage/pull/117
