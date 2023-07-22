@@ -1,9 +1,14 @@
 """All logic used to print a recorded ResultCollection to stdout.
 Currently, this module is in BETA and its interface may change in future versions."""
+import json
 import logging
+import os
+from abc import ABC, abstractmethod
+from math import floor
 
 from docstr_coverage.ignore_config import IgnoreConfig
-from docstr_coverage.result_collection import FileStatus
+from docstr_coverage.result_collection import FileStatus, ResultCollection
+from tabulate import tabulate
 
 _GRADES = (
     ("AMAZING! Your docstrings are truly a wonder to behold!", 100),
@@ -32,7 +37,19 @@ def print_line(line=""):
     logger.info(line)
 
 
-class LegacyPrinter:
+class Printer(ABC):
+    @abstractmethod
+    def print(self, results: ResultCollection):
+        """Prints a provided set of results to stdout.
+
+        Parameters
+        ----------
+        results: ResultCollection
+            The information about docstr presence to be printed to stdout."""
+        raise NotImplementedError()
+
+
+class LegacyPrinter(Printer):
     """Printing functionality consistent with the original early-versions docstr-coverage outputs.
 
     In future versions, the interface of this class will be refined and an abstract superclass
@@ -147,3 +164,63 @@ class LegacyPrinter:
         )
 
         print_line("Total coverage: {:.1f}%  -  Grade: {}".format(count.coverage(), grade))
+
+
+class JsonPrinter(Printer):
+    def print(self, results):
+        """Prints a provided set of results to stdout in format JSON.
+
+        Parameters
+        ----------
+        results: ResultCollection
+            The information about docstr presence to be printed to stdout."""
+
+        file_results, total_results = results.to_legacy()
+        print(json.dumps({"files": file_results, "result": total_results}))
+
+
+class GitHubCommentPrinter(Printer):
+    def __init__(self, verbosity: int, fail_under: int):
+        self.verbosity = verbosity
+        self.fail_under = fail_under
+
+    def print(self, results: ResultCollection):
+        """Prints a provided set of results to stdout in format JSON.
+
+        Parameters
+        ----------
+        results: ResultCollection
+            The information about docstr presence to be printed to stdout."""
+        file_results, total_results = results.to_legacy()
+
+        success = total_results["coverage"] >= self.fail_under
+
+        print_line("## [:books: docstr_coverage](https://docstr-coverage.readthedocs.io/en/latest/api_essentials.html) status: %s **%s**" % (self._status_icon(success), self._status_text(success)))
+        print_line()
+        print_line("Overall coverage: **`%s%%`** (required **`%s%%`**)" % (floor(total_results["coverage"]), floor(self.fail_under)))
+        print_line()
+
+        result_table = []
+        for file_path, file in results.files():
+            if self.verbosity < 4 and file.count_aggregate().missing == 0:
+                # Don't print fully documented files
+                continue
+
+            count = file.count_aggregate()
+
+            row = []
+            row.append("%s `%s`" % (self._status_icon(count.coverage() >= self.fail_under), os.path.relpath(file_path, start=os.curdir)))
+            row += [count.needed, count.found, count.missing, "%.1f%%" % count.coverage()]
+
+            result_table.append(row)
+
+        print_line("<details><summary>Additional details and impacted files</summary>")
+        print_line()
+        print_line(tabulate(result_table, headers=["Filename", "Needed", "Found", "Missing", "Coverage"], tablefmt="pipe", colalign = ('left','right','right','right','right')))
+        print_line("</details>")
+
+    def _status_icon(self, success: bool) -> str:
+        return ":white_check_mark:" if success else ":x:"
+
+    def _status_text(self, success: bool) -> str:
+        return "SUCCESS" if success else "FAILED"
