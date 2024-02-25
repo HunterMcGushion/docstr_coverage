@@ -84,11 +84,7 @@ class Badge:
         if self._badge is None:
             value = "{:.0f}".format(self.coverage)
             template_path = os.path.join("templates", "flat.svg")
-            template = (
-                files(__package__)
-                .joinpath(template_path)
-                .read_text(encoding="utf-8")
-            )
+            template = files(__package__).joinpath(template_path).read_text(encoding="utf-8")
             self._badge = template.replace("{{ value }}", value).replace("{{ color }}", self.color)
         return self._badge
 
