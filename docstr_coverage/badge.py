@@ -6,8 +6,9 @@ This module is based on the excellent [coverage-badge](https://github.com/dbrgn/
 repository. Thank you to the authors for their fantastic work! Go give
 [coverage-badge](https://github.com/dbrgn/coverage-badge) a star!"""
 
-import importlib.resources
 import os
+
+import pkg_resources
 
 COLORS = {
     "brightgreen": "#4c1",
@@ -79,11 +80,7 @@ class Badge:
         if self._badge is None:
             value = "{:.0f}".format(self.coverage)
             template_path = os.path.join("templates", "flat.svg")
-            template = (
-                importlib.resources.files(__package__)
-                .joinpath(template_path)
-                .read_text(encoding="utf-8")
-            )
+            template = pkg_resources.resource_string(__name__, template_path).decode("utf8")
             self._badge = template.replace("{{ value }}", value).replace("{{ color }}", self.color)
         return self._badge
 
