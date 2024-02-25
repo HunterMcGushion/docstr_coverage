@@ -8,7 +8,7 @@ repository. Thank you to the authors for their fantastic work! Go give
 
 import os
 
-import pkg_resources
+import importlib
 
 COLORS = {
     "brightgreen": "#4c1",
@@ -80,7 +80,11 @@ class Badge:
         if self._badge is None:
             value = "{:.0f}".format(self.coverage)
             template_path = os.path.join("templates", "flat.svg")
-            template = pkg_resources.resource_string(__name__, template_path).decode("utf8")
+            template = (
+                importlib.resources.files(__package__)
+                .joinpath(template_path)
+                .read_text(encoding="utf-8")
+            )
             self._badge = template.replace("{{ value }}", value).replace("{{ color }}", self.color)
         return self._badge
 
