@@ -3,6 +3,15 @@
 
 ...
 
+<a name="2.3.1"></a>
+## [2.3.1] (2024-02-28)
+
+### Features
+- Add support for Python 3.12. [#139] by [MiWeiss].
+
+### Deprecations
+- Remove support for Python 3.7. [#139] by [MiWeiss].
+
 
 <a name="2.3.0"></a>
 ## [2.3.0] (2023-04-13)
@@ -162,7 +171,8 @@
 * Initial release
 
 
-[Unreleased]: https://github.com/HunterMcGushion/docstr_coverage/compare/v2.3.0...HEAD
+[Unreleased]: https://github.com/HunterMcGushion/docstr_coverage/compare/v2.3.1...HEAD
+[2.3.1]: https://github.com/HunterMcGushion/docstr_coverage/compare/v2.3.0...v2.3.1
 [2.3.0]: https://github.com/HunterMcGushion/docstr_coverage/compare/v2.2.0...v2.3.0
 [2.2.0]: https://github.com/HunterMcGushion/docstr_coverage/compare/v2.1.1...v2.2.0
 [2.1.1]: https://github.com/HunterMcGushion/docstr_coverage/compare/v2.1.0...v2.1.1
@@ -220,3 +230,4 @@
 [#106]: https://github.com/HunterMcGushion/docstr_coverage/pull/106
 [#116]: https://github.com/HunterMcGushion/docstr_coverage/pull/116
 [#117]: https://github.com/HunterMcGushion/docstr_coverage/pull/117
+[#139]: https://github.com/HunterMcGushion/docstr_coverage/pull/139
