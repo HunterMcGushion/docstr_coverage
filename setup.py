@@ -25,7 +25,12 @@ setup(
     author_email="hunter@mcgushion.com",
     license="MIT",
     packages=["docstr_coverage"],
-    install_requires=["click", "PyYAML", "tqdm==4.63.1"],
+    install_requires=[
+        "click",
+        "PyYAML",
+        "tqdm==4.63.1",
+        "importlib_resources; python_version < '3.9'",
+    ],
     extras_require={
         "lint": ["flake8==4.0.1", "black==22.3.0", "isort==5.10.1"],
         "test": ["pytest==6.2.5", "pytest-mock==3.4.0"],
@@ -35,11 +40,11 @@ setup(
     entry_points=dict(console_scripts=["docstr-coverage=docstr_coverage.cli:execute"]),
     classifiers=[
         "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: 3.10",
         "Programming Language :: Python :: 3.11",
+        "Programming Language :: Python :: 3.12",
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
         "Topic :: Documentation",

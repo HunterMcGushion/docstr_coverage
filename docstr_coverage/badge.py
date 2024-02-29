@@ -7,8 +7,12 @@ repository. Thank you to the authors for their fantastic work! Go give
 [coverage-badge](https://github.com/dbrgn/coverage-badge) a star!"""
 
 import os
+import sys
 
-import pkg_resources
+if sys.version_info >= (3, 9):
+    from importlib.resources import files
+else:
+    from importlib_resources import files
 
 COLORS = {
     "brightgreen": "#4c1",
@@ -80,7 +84,7 @@ class Badge:
         if self._badge is None:
             value = "{:.0f}".format(self.coverage)
             template_path = os.path.join("templates", "flat.svg")
-            template = pkg_resources.resource_string(__name__, template_path).decode("utf8")
+            template = files(__package__).joinpath(template_path).read_text(encoding="utf-8")
             self._badge = template.replace("{{ value }}", value).replace("{{ color }}", self.color)
         return self._badge
 
