@@ -28,7 +28,7 @@ setup(
     install_requires=[
         "click",
         "PyYAML",
-        "tqdm==4.63.1",
+        "tqdm~~4.0",
         "importlib_resources; python_version < '3.9'",
     ],
     extras_require={
