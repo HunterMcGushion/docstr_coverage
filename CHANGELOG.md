@@ -3,6 +3,12 @@
 
 ...
 
+<a name="2.3.2"></a>
+## [2.3.2] (2024-05-07)
+
+### Changes
+- Unpin TQDM version requirement. [#142] by [MiWeiss].
+
 <a name="2.3.1"></a>
 ## [2.3.1] (2024-02-28)
 
@@ -171,7 +177,8 @@
 * Initial release
 
 
-[Unreleased]: https://github.com/HunterMcGushion/docstr_coverage/compare/v2.3.1...HEAD
+[Unreleased]: https://github.com/HunterMcGushion/docstr_coverage/compare/v2.3.2...HEAD
+[2.3.2]: https://github.com/HunterMcGushion/docstr_coverage/compare/v2.3.1...v2.3.2
 [2.3.1]: https://github.com/HunterMcGushion/docstr_coverage/compare/v2.3.0...v2.3.1
 [2.3.0]: https://github.com/HunterMcGushion/docstr_coverage/compare/v2.2.0...v2.3.0
 [2.2.0]: https://github.com/HunterMcGushion/docstr_coverage/compare/v2.1.1...v2.2.0
@@ -231,3 +238,4 @@
 [#116]: https://github.com/HunterMcGushion/docstr_coverage/pull/116
 [#117]: https://github.com/HunterMcGushion/docstr_coverage/pull/117
 [#139]: https://github.com/HunterMcGushion/docstr_coverage/pull/139
+[#142]: https://github.com/HunterMcGushion/docstr_coverage/pull/142
