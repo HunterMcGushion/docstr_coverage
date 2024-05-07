@@ -6,7 +6,7 @@ def readme():
         return f.read()
 
 
-MAJOR, MINOR, MICRO = 2, 3, 1
+MAJOR, MINOR, MICRO = 2, 3, 2
 __VERSION__ = "{}.{}.{}".format(MAJOR, MINOR, MICRO)
 
 setup(
