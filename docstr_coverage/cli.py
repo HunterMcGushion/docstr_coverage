@@ -13,7 +13,7 @@ from docstr_coverage.badge import Badge
 from docstr_coverage.config_file import set_config_defaults
 from docstr_coverage.coverage import analyze
 from docstr_coverage.ignore_config import IgnoreConfig
-from docstr_coverage.printers import LegacyPrinter
+from docstr_coverage.printers import LegacyPrinter, MarkdownPrinter
 
 
 def do_include_filepath(filepath: str, exclude_re: Optional["re.Pattern"]) -> bool:
@@ -261,6 +261,15 @@ def parse_ignore_patterns_from_dict(ignore_patterns_dict) -> tuple:
     default=".docstr_coverage",
     help="Deprecated. Use json config (--config / -C) instead",
 )
+@click.option(
+    "-o",
+    "--output",
+    type=click.Choice(["text", "markdown"]),
+    default="text",
+    help="Formatting style of the output (text, markdown)",
+    show_default=True,
+    metavar="FORMAT",
+)
 def execute(paths, **kwargs):
     """Measure docstring coverage for `PATHS`"""
 
@@ -327,7 +336,12 @@ def execute(paths, **kwargs):
     # Calculate docstring coverage
     show_progress = not kwargs["percentage_only"]
     results = analyze(all_paths, ignore_config=ignore_config, show_progress=show_progress)
-    LegacyPrinter(results, verbosity=kwargs["verbose"], ignore_config=ignore_config).print()
+
+    if kwargs["output"] == "markdown":
+        printer = MarkdownPrinter(results, verbosity=kwargs["verbose"], ignore_config=ignore_config)
+    else:
+        printer = LegacyPrinter(results, verbosity=kwargs["verbose"], ignore_config=ignore_config)
+    printer.print()
 
     file_results, total_results = results.to_legacy()
 

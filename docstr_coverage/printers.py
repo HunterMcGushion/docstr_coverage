@@ -297,3 +297,167 @@ class LegacyPrinter(Printer):
 
             self._print_line()
         self._print_line()
+
+
+class MarkdownPrinter(Printer):
+
+    def _print_line(self, line: str = ""):
+        """Prints `line`
+
+        Parameters
+        ----------
+        line: String
+            The text to print"""
+        logger.info(line)
+
+    def _print_title_line(self, content: str | int | float):
+        """Print Markdown 2nd title (`## ...`).
+
+        Parameters
+        ----------
+        content : str | int | float
+            Title content
+        """
+        logger.info("## {}".format(content))
+
+    def _print_table(
+        self,
+        cols: tuple[str, ...],
+        rows: tuple[tuple[str | int | float], ...],
+    ):
+        """Print markdown table.
+
+        Using:
+        >>> self._print_table(
+        ...     cols=("Needed", "Found", "Missing"),
+        ...     vals=(
+        ...         (10, 20, "65.5%"),
+        ...         (30, 40, "99.9%")
+        ...     )
+        ... )
+        | Needed | Found | Missing |
+        |---|---|---|
+        | 10 | 20 | 65.5% |
+        | 30 | 40 | 99.9% |
+
+        Parameters
+        ----------
+        cols: tuple[str, ...]
+            Table columns
+        rows: tuple[tuple[str  |  int  |  float], ...]
+            Column values
+        """
+        assert all(len(v) == len(cols) for v in rows), "Col num not equal to cols value"
+
+        col_line = ""
+        for col in cols:
+            col_line += "| {} ".format(col)
+        self._print_line(col_line + "|")
+
+        sep_line = ""
+        for _ in range(len(cols)):
+            sep_line += "|---"
+        self._print_line(sep_line + "|")
+
+        for row in rows:
+            row_line = ""
+            for value in row:
+                row_line += "| {} ".format(value)
+            self._print_line(row_line + "|")
+
+    def print(self) -> None:
+        if self.verbosity >= 2:
+            self._print_files_statistic()
+        if self.verbosity >= 1:
+            self._print_overall_statistics()
+
+    def _print_files_statistic(self):
+        for file_info in self.overall_coverage_stat.files_info:
+            if self.verbosity < 4 and file_info.missing == 0:
+                continue
+
+            self._print_line('**File**: `{0}`'.format(file_info.path))
+
+            if self.verbosity > 3:
+                if file_info.is_empty:
+                    self._print_line("- File is empty")
+                for node_identifier in file_info.nodes_with_docstring:
+                    self._print_line(
+                        "- Found docstring for `{0}`".format(
+                            node_identifier,
+                        )
+                    )
+                for ignored_node in file_info.ignored_nodes:
+                    self._print_line(
+                        "- Ignored `{0}`: reason: `{1}`".format(
+                            ignored_node.identifier,
+                            ignored_node.reason,
+                        )
+                    )
+
+            if self.verbosity >= 3:
+                for node_identifier in file_info.nodes_without_docstring:
+                    if node_identifier == "module docstring":
+                        self._print_line("- No module docstring")
+                    else:
+                        self._print_line("- No docstring for `{0}`".format(node_identifier))
+
+            self._print_line()
+
+            self._print_table(
+                ("Needed", "Found", "Missing", "Coverage"),
+                ((
+                    file_info.needed,
+                    file_info.found,
+                    file_info.missing,
+                    "{:.1f}%".format(file_info.coverage),
+                ),)
+            )
+            self._print_line()
+
+        self._print_line()
+
+    def _print_overall_statistics(self):
+        self._print_title_line("Overall statistic")
+
+        if self.overall_coverage_stat.num_files > 1:
+            self._print_line("Files number: **{}**".format(self.overall_coverage_stat.num_files))
+        self._print_line()
+        self._print_line(
+            "Total coverage: **{:.1f}%**".format(
+                self.overall_coverage_stat.total_coverage,
+            )
+        )
+        self._print_line()
+        self._print_line(
+            "Grade: **{}**".format(self.overall_coverage_stat.grade)
+        )
+
+        if self.overall_coverage_stat.num_empty_files > 0:
+            self._print_line("- %s files are empty" % self.overall_coverage_stat.num_empty_files)
+
+        if self.overall_coverage_stat.is_skip_magic:
+            self._print_line("- skipped all non-init magic methods")
+
+        if self.overall_coverage_stat.is_skip_file_docstring:
+            self._print_line("- skipped file-level docstrings")
+
+        if self.overall_coverage_stat.is_skip_init:
+            self._print_line("- skipped __init__ methods")
+
+        if self.overall_coverage_stat.is_skip_class_def:
+            self._print_line("- skipped class definitions")
+
+        if self.overall_coverage_stat.is_skip_private:
+            self._print_line("- skipped private methods")
+
+        self._print_line()
+
+        self._print_table(
+                ("Needed", "Found", "Missing"),
+                ((
+                    self.overall_coverage_stat.needed,
+                    self.overall_coverage_stat.found,
+                    self.overall_coverage_stat.missing,
+                ),)
+            )

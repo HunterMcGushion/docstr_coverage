@@ -6,7 +6,7 @@ import pytest
 
 from docstr_coverage import analyze
 from docstr_coverage.ignore_config import IgnoreConfig
-from docstr_coverage.printers import _GRADES, LegacyPrinter
+from docstr_coverage.printers import _GRADES, LegacyPrinter, MarkdownPrinter
 
 SAMPLES_DIRECTORY = os.path.join("tests", "sample_files", "subdir_a")
 EMPTY_FILE_PATH = os.path.join(SAMPLES_DIRECTORY, "empty_file.py")
@@ -157,10 +157,49 @@ def test_should_report_when_no_docs_in_a_file():
         )
     ],
 )
-def test_logging_empty_file(caplog, expected):
+def test_legacy_printer_logging_empty_file(caplog, expected):
     with caplog.at_level(logging.DEBUG):
         result = analyze([EMPTY_FILE_PATH])
         LegacyPrinter(result, verbosity=4).print()
+        _file_results, _total_results = result.to_legacy()
+
+    if platform.system() == "Windows":
+        assert [m.replace("\\", "/") for m in caplog.messages] == expected
+    else:
+        assert caplog.messages == expected
+
+
+@pytest.mark.parametrize(
+    ["expected"],
+    [
+        (
+            [
+                '**File**: `tests/sample_files/subdir_a/empty_file.py`',
+                "- File is empty",
+                "",
+                "| Needed | Found | Missing | Coverage |",
+                "|---|---|---|---|",
+                "| 0 | 0 | 0 | 100.0% |",
+                "",
+                "",
+                "## Overall statistic",
+                "",
+                "Total coverage: **100.0%**",
+                "",
+                "Grade: **" + _GRADES[0][0] + "**",
+                "- 1 files are empty",
+                "",
+                "| Needed | Found | Missing |",
+                "|---|---|---|",
+                "| 0 | 0 | 0 |",
+            ],
+        )
+    ],
+)
+def test_markdown_printer_logging_empty_file(caplog, expected):
+    with caplog.at_level(logging.DEBUG):
+        result = analyze([EMPTY_FILE_PATH])
+        MarkdownPrinter(result, verbosity=4).print()
         _file_results, _total_results = result.to_legacy()
 
     if platform.system() == "Windows":
@@ -238,7 +277,7 @@ def test_logging_empty_file(caplog, expected):
         ),
     ],
 )
-def test_logging_partially_documented_file(caplog, expected, verbose, ignore_names):
+def test_legacy_printer_logging_partially_documented_file(caplog, expected, verbose, ignore_names):
     ignore_config = IgnoreConfig(ignore_names=ignore_names)
     with caplog.at_level(logging.DEBUG):
         result = analyze([PARTLY_DOCUMENTED_FILE_PATH], ignore_config=ignore_config)
