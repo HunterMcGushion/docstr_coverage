@@ -213,7 +213,7 @@ def get_docstring_coverage(
         ignore_names=ignore_names,
     )
     results = analyze(filenames, ignore_config)
-    LegacyPrinter(verbosity=verbose, ignore_config=ignore_config).print(results)
+    LegacyPrinter(results, verbosity=verbose, ignore_config=ignore_config).print()
     return results.to_legacy()
 
 

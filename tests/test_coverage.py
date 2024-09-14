@@ -160,7 +160,7 @@ def test_should_report_when_no_docs_in_a_file():
 def test_logging_empty_file(caplog, expected):
     with caplog.at_level(logging.DEBUG):
         result = analyze([EMPTY_FILE_PATH])
-        LegacyPrinter(verbosity=4).print(result)
+        LegacyPrinter(result, verbosity=4).print()
         _file_results, _total_results = result.to_legacy()
 
     if platform.system() == "Windows":
@@ -242,7 +242,7 @@ def test_logging_partially_documented_file(caplog, expected, verbose, ignore_nam
     ignore_config = IgnoreConfig(ignore_names=ignore_names)
     with caplog.at_level(logging.DEBUG):
         result = analyze([PARTLY_DOCUMENTED_FILE_PATH], ignore_config=ignore_config)
-        LegacyPrinter(verbosity=verbose, ignore_config=ignore_config).print(result)
+        LegacyPrinter(result, verbosity=verbose, ignore_config=ignore_config).print()
 
     if platform.system() == "Windows":
         assert [m.replace("\\", "/") for m in caplog.messages] == expected
