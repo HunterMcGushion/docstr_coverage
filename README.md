@@ -73,6 +73,9 @@ docstr-coverage some_project/src
 
 #### Options
 
+- _--output=\<type\>, -o \<type\>_ - Set output style (default text)
+  - text - Output in simple style.
+  - markdown - Output in Markdown notation.
 - _--skip-magic, -m_ - Ignore all magic methods (except `__init__`)
 - _--skip-init, -i_ - Ignore all `__init__` methods
 - _--skip-file-doc, -f_ - Ignore module docstrings (at the top of files)
