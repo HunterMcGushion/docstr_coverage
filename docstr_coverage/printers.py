@@ -288,7 +288,7 @@ class LegacyPrinter(Printer):
 
             final_string += "\n" + file_string + "\n"
 
-        return final_string
+        return final_string + "\n"
 
     def _generate_overall_stat_string(self) -> str:
         if isinstance(self.overall_coverage_stat, float):
