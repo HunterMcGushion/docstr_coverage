@@ -201,7 +201,7 @@ def test_legacy_save_to_file_printer_empty_file(tmpdir, expected):
     [
         (
             [
-                '**File**: `tests/sample_files/subdir_a/empty_file.py`',
+                "**File**: `tests/sample_files/subdir_a/empty_file.py`",
                 "- File is empty",
                 "",
                 "| Needed | Found | Missing | Coverage |",
@@ -240,7 +240,7 @@ def test_markdown_printer_logging_empty_file(caplog, expected):
     [
         (
             [
-                '**File**: `tests/sample_files/subdir_a/empty_file.py`\n',
+                "**File**: `tests/sample_files/subdir_a/empty_file.py`\n",
                 "- File is empty\n",
                 "\n",
                 "| Needed | Found | Missing | Coverage |\n",
@@ -359,7 +359,7 @@ def test_legacy_printer_logging_partially_documented_file(caplog, expected, verb
     [
         (
             [
-                '**File**: `tests/sample_files/subdir_a/partly_documented_file.py`',
+                "**File**: `tests/sample_files/subdir_a/partly_documented_file.py`",
                 "- No module docstring",
                 "- No docstring for `foo`",
                 "- No docstring for `bar`",
@@ -384,7 +384,7 @@ def test_legacy_printer_logging_partially_documented_file(caplog, expected, verb
         ),
         (
             [
-                '**File**: `tests/sample_files/subdir_a/partly_documented_file.py`',
+                "**File**: `tests/sample_files/subdir_a/partly_documented_file.py`",
                 "- No module docstring",
                 "- No docstring for `FooBar.__init__`",
                 "- No docstring for `foo`",
@@ -410,7 +410,7 @@ def test_legacy_printer_logging_partially_documented_file(caplog, expected, verb
         ),
         (
             [
-                '**File**: `tests/sample_files/subdir_a/partly_documented_file.py`',
+                "**File**: `tests/sample_files/subdir_a/partly_documented_file.py`",
                 "",
                 "| Needed | Found | Missing | Coverage |",
                 "|---|---|---|---|",
@@ -462,7 +462,9 @@ def test_legacy_printer_logging_partially_documented_file(caplog, expected, verb
         ),
     ],
 )
-def test_markdown_printer_logging_partially_documented_file(caplog, expected, verbose, ignore_names):
+def test_markdown_printer_logging_partially_documented_file(
+    caplog, expected, verbose, ignore_names
+):
     ignore_config = IgnoreConfig(ignore_names=ignore_names)
     with caplog.at_level(logging.DEBUG):
         result = analyze([PARTLY_DOCUMENTED_FILE_PATH], ignore_config=ignore_config)

@@ -106,7 +106,7 @@ class Printer(ABC):
         self.__overall_files_coverage_stat = None
 
     @property
-    def overall_coverage_stat(self) -> OverallCoverageStat | float:
+    def overall_coverage_stat(self) -> Union[OverallCoverageStat, float]:
         """Getting full coverage statistic.
 
         For `verbosity` with value:
@@ -165,8 +165,8 @@ class Printer(ABC):
                     nodes_without_docstring = tuple(
                         expected_docstring.node_identifier
                         for expected_docstring in file_info._expected_docstrings
-                        if not expected_docstring.has_docstring and
-                        not expected_docstring.ignore_reason
+                        if not expected_docstring.has_docstring
+                        and not expected_docstring.ignore_reason
                     )
                 else:
                     nodes_without_docstring = None
@@ -176,8 +176,7 @@ class Printer(ABC):
                     nodes_with_docstring = tuple(
                         expected_docstring.node_identifier
                         for expected_docstring in file_info._expected_docstrings
-                        if expected_docstring.has_docstring and
-                        not expected_docstring.ignore_reason
+                        if expected_docstring.has_docstring and not expected_docstring.ignore_reason
                     )
                     ignored_nodes = tuple(
                         IgnoredNode(
@@ -221,7 +220,7 @@ class Printer(ABC):
 
         Parameters
         ----------
-        path: str | None
+        path: Union[str, None]
             Path to file with coverage results.
         """
         pass
@@ -351,7 +350,7 @@ class MarkdownPrinter(LegacyPrinter):
         final_string = ""
         for file_coverage_stat in self.overall_files_coverage_stat:
 
-            file_string = '**File**: `{0}`\n'.format(file_coverage_stat.path)
+            file_string = "**File**: `{0}`\n".format(file_coverage_stat.path)
 
             if file_coverage_stat.is_empty is not None and file_coverage_stat.is_empty is True:
                 file_string += "- File is empty\n"
@@ -380,12 +379,14 @@ class MarkdownPrinter(LegacyPrinter):
 
             file_string += self._generate_markdown_table(
                 ("Needed", "Found", "Missing", "Coverage"),
-                ((
-                    file_coverage_stat.needed,
-                    file_coverage_stat.found,
-                    file_coverage_stat.missing,
-                    "{:.1f}%".format(file_coverage_stat.coverage),
-                ),)
+                (
+                    (
+                        file_coverage_stat.needed,
+                        file_coverage_stat.found,
+                        file_coverage_stat.missing,
+                        "{:.1f}%".format(file_coverage_stat.coverage),
+                    ),
+                ),
             )
 
             if final_string == "":
@@ -435,13 +436,15 @@ class MarkdownPrinter(LegacyPrinter):
         final_string += "\n"
 
         final_string += self._generate_markdown_table(
-                ("Needed", "Found", "Missing"),
-                ((
+            ("Needed", "Found", "Missing"),
+            (
+                (
                     self.overall_coverage_stat.needed,
                     self.overall_coverage_stat.found,
                     self.overall_coverage_stat.missing,
-                ),)
-            )
+                ),
+            ),
+        )
 
         return final_string
 
