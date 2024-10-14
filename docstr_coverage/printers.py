@@ -3,9 +3,10 @@ Currently, this module is in BETA and its interface may change in future version
 import logging
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
+from typing import Optional, Union
 
 from docstr_coverage.ignore_config import IgnoreConfig
-from docstr_coverage.result_collection import File, FileStatus, ResultCollection
+from docstr_coverage.result_collection import FileStatus, ResultCollection
 
 _GRADES = (
     ("AMAZING! Your docstrings are truly a wonder to behold!", 100),
@@ -34,43 +35,53 @@ class IgnoredNode:
 
 @dataclass(frozen=True)
 class FileCoverageStat:
-    """Data Structure of coverage info about one file."""
+    """Data Structure of coverage info about one file.
 
-    path: str
-    is_empty: bool
-    nodes_with_docstring: tuple[str, ...]
-    nodes_without_docstring: tuple[str, ...]
-    ignored_nodes: tuple[IgnoredNode, ...]
-    needed: int
+    For `verbosity` with value:
+        * `2` - Fields `coverage`, `found`, `missing`, `needed` and `path`.
+        * `3` - Fields with `verbosity` `2` and `nodes_without_docstring`.
+        * `4` - Fields with `verbosity` `3` and `is_empty`, `nodes_with_docstring`,
+          `ignored_nodes`
+    """
+
+    coverage: float
     found: int
     missing: int
-    coverage: float
+    needed: int
+    path: str
+    ignored_nodes: tuple[IgnoredNode, ...]
+    is_empty: Union[bool, None]
+    nodes_with_docstring: Union[tuple[str, ...], None]
+    nodes_without_docstring: Union[tuple[str, ...], None]
 
 
 @dataclass(frozen=True)
 class OverallCoverageStat:
-    """Data Structure of coverage statistic"""
+    """Data Structure of coverage statistic."""
 
-    num_empty_files: int
-    num_files: int
-    is_skip_magic: bool
+    found: int
+    grade: str
+    is_skip_class_def: bool
     is_skip_file_docstring: bool
     is_skip_init: bool
-    is_skip_class_def: bool
+    is_skip_magic: bool
     is_skip_private: bool
-    files_info: tuple[FileCoverageStat, ...]
-    needed: int
-    found: int
     missing: int
+    needed: int
+    num_empty_files: int
+    num_files: int
     total_coverage: float
-    grade: str
 
 
 class Printer(ABC):
     """Base abstract superclass for printing coverage results.
 
-    It provides parsers of coverage results into data structures and abstract methods for
-    implementing printers, file writers or whatever in heir classes."""
+    It provides coverage results in data structures (`OverallCoverageStat`, `FileCoverageStat` and
+    `IgnoredNode`) and abstract methods for implementing type of displaying and saving in file
+    statistic data.
+
+    In heir classes you can use `overall_coverage_stat` and `overall_files_coverage_stat`
+    attributes. Depends of given `verbosity` some data can be `None`."""
 
     def __init__(
         self,
@@ -90,245 +101,359 @@ class Printer(ABC):
         """
         self.verbosity = verbosity
         self.ignore_config = ignore_config
-        self.overall_coverage_stat = self._collect_overall_coverage_stat(results)
+        self.results = results
+        self.__overall_coverage_stat = None
+        self.__overall_files_coverage_stat = None
 
-    def _collect_overall_coverage_stat(self, results: ResultCollection) -> OverallCoverageStat:
-        """Collecting overall coverage statistic.
+    @property
+    def overall_coverage_stat(self) -> OverallCoverageStat | float:
+        """Getting full coverage statistic.
 
-        Parameters
-        ----------
-        results : ResultCollection
-            Result of coverage analyze.
+        For `verbosity` with value:
+            * `0` - Only `total_coverage` value returning.
+            * `1` - All fields, except `files_info`.
+            * `2` - All fields."""
+        if self.__overall_coverage_stat is None:
+            count = self.results.count_aggregate()
 
-        Returns
-        -------
-        OverallCoverageStat
-            Data structure with coverage statistic.
-        """
-        count = results.count_aggregate()
+            if self.verbosity >= 1:
 
-        return OverallCoverageStat(
-            num_empty_files=count.num_empty_files,
-            num_files=count.num_files,
-            is_skip_magic=self.ignore_config.skip_magic,
-            is_skip_file_docstring=self.ignore_config.skip_file_docstring,
-            is_skip_init=self.ignore_config.skip_init,
-            is_skip_class_def=self.ignore_config.skip_class_def,
-            is_skip_private=self.ignore_config.skip_private,
-            files_info=tuple(
-                self._collect_file_coverage_stat(file_path, file_info)
-                for file_path, file_info in results.files()
-            ),
-            needed=count.needed,
-            found=count.found,
-            missing=count.missing,
-            total_coverage=count.coverage(),
-            grade=next(
-                message
-                for message, grade_threshold in _GRADES
-                if grade_threshold <= count.coverage()
-            ),
-        )
-
-    def _collect_file_coverage_stat(self, file_path: str, file_info: File) -> FileCoverageStat:
-        """Collecting coverage statistic for one file.
-
-        Parameters
-        ----------
-        file_path: str
-            Path to checking file
-        file_info: File
-            Info about docstring in one file.
-
-        Returns
-        -------
-        FileCoverageStat
-            Data structure with file coverage statistic.
-        """
-        count = file_info.count_aggregate()
-
-        return FileCoverageStat(
-            path=file_path,
-            is_empty=file_info.status == FileStatus.EMPTY,
-            nodes_with_docstring=tuple(
-                expected_docstring.node_identifier
-                for expected_docstring in file_info._expected_docstrings
-                if expected_docstring.has_docstring and not expected_docstring.ignore_reason
-            ),
-            nodes_without_docstring=tuple(
-                expected_docstring.node_identifier
-                for expected_docstring in file_info._expected_docstrings
-                if not expected_docstring.has_docstring and not expected_docstring.ignore_reason
-            ),
-            ignored_nodes=tuple(
-                IgnoredNode(
-                    identifier=expected_docstring.node_identifier,
-                    reason=expected_docstring.ignore_reason,
+                self.__overall_coverage_stat = OverallCoverageStat(
+                    found=count.found,
+                    grade=next(
+                        message
+                        for message, grade_threshold in _GRADES
+                        if grade_threshold <= count.coverage()
+                    ),
+                    is_skip_class_def=self.ignore_config.skip_class_def,
+                    is_skip_file_docstring=self.ignore_config.skip_file_docstring,
+                    is_skip_init=self.ignore_config.skip_init,
+                    is_skip_magic=self.ignore_config.skip_magic,
+                    is_skip_private=self.ignore_config.skip_private,
+                    missing=count.missing,
+                    needed=count.needed,
+                    num_empty_files=count.num_empty_files,
+                    num_files=count.num_files,
+                    total_coverage=count.coverage(),
                 )
-                for expected_docstring in file_info._expected_docstrings
-                if expected_docstring.ignore_reason is not None
-            ),
-            needed=count.needed,
-            found=count.found,
-            missing=count.missing,
-            coverage=count.coverage(),
-        )
+
+            else:
+                self.__overall_coverage_stat = count.coverage()
+
+        return self.__overall_coverage_stat
+
+    @property
+    def overall_files_coverage_stat(self) -> Union[list[FileCoverageStat], None]:
+        """Getting coverage statistics for files.
+
+        For `verbosity` with value:
+            * `2` - Fields `coverage`, `found`, `missing`, `needed` and `path`.
+            * `3` - Fields with `verbosity` `2` and `nodes_without_docstring`.
+            * `4` - Fields with `verbosity` `3` and `is_empty`, `nodes_with_docstring`,
+              `ignored_nodes`
+
+        Returns
+        -------
+        list[FileCoverageStat]
+            Coverage info about all checked files."""
+        if self.__overall_files_coverage_stat is None and self.verbosity >= 2:
+
+            overall_files_coverage_stat: list[FileCoverageStat] = []
+            for file_path, file_info in self.results.files():
+
+                if self.verbosity >= 3:
+                    nodes_without_docstring = tuple(
+                        expected_docstring.node_identifier
+                        for expected_docstring in file_info._expected_docstrings
+                        if not expected_docstring.has_docstring and
+                        not expected_docstring.ignore_reason
+                    )
+                else:
+                    nodes_without_docstring = None
+
+                if self.verbosity >= 4:
+                    is_empty = file_info.status == FileStatus.EMPTY
+                    nodes_with_docstring = tuple(
+                        expected_docstring.node_identifier
+                        for expected_docstring in file_info._expected_docstrings
+                        if expected_docstring.has_docstring and
+                        not expected_docstring.ignore_reason
+                    )
+                    ignored_nodes = tuple(
+                        IgnoredNode(
+                            identifier=expected_docstring.node_identifier,
+                            reason=expected_docstring.ignore_reason,
+                        )
+                        for expected_docstring in file_info._expected_docstrings
+                        if expected_docstring.ignore_reason is not None
+                    )
+                else:
+                    is_empty = None
+                    nodes_with_docstring = None
+                    ignored_nodes = None
+
+                count = file_info.count_aggregate()
+                overall_files_coverage_stat.append(
+                    FileCoverageStat(
+                        coverage=count.coverage(),
+                        found=count.found,
+                        missing=count.missing,
+                        needed=count.needed,
+                        path=file_path,
+                        ignored_nodes=ignored_nodes,
+                        is_empty=is_empty,
+                        nodes_with_docstring=nodes_with_docstring,
+                        nodes_without_docstring=nodes_without_docstring,
+                    )
+                )
+            self.__overall_files_coverage_stat = overall_files_coverage_stat
+
+        return self.__overall_files_coverage_stat
 
     @abstractmethod
-    def print(self) -> None:
-        """Providing how to print coverage results.
+    def print_to_stdout(self) -> None:
+        """Providing how to print coverage results."""
+        pass
 
-        In heir classes you can use `overall_coverage_stat` and `verbosity` attribute to create
-        special result printers. The `verbosity` points on what info will be displayed. Here the
-        rules:
-        * `verbosity` equal `1` - prints all overall coverage statistic.
-        * `verbosity` equal `2` - prints all overall coverage statistic and *needed*, *found*,
-          *missing* and *coverage* file statistics.
-        * `verbosity` equal `3` - prints all overall coverage statistic, information about *nodes
-          without docstrings*, *needed*, *found*, *missing* and *coverage* file statistics.
-        * `verbosity` equal `4` - prints all overall coverage statistic, information about *empty
-          files*, *nodes with docstrings*, *ignored nodes*, *nodes without docstrings*, *needed*,
-          *found*, *missing* and *coverage* file statistics.
+    @abstractmethod
+    def save_to_file(self, path: Optional[str] = None) -> None:
+        """Providing how to save coverage results in file.
+
+        Parameters
+        ----------
+        path: str | None
+            Path to file with coverage results.
         """
         pass
 
 
 class LegacyPrinter(Printer):
-    """Print in simple format to output"""
+    """Printer for legacy format."""
 
-    def _print_line(self, line: str = ""):
-        """Prints `line`
+    def print_to_stdout(self) -> None:
+        for line in self._generate_string().split("\n"):
+            logger.info(line)
 
-        Parameters
-        ----------
-        line: String
-            The text to print"""
-        logger.info(line)
+    def save_to_file(self, path: Optional[str] = None) -> None:
+        if path is None:
+            path = "./coverage-results.txt"
+        with open(path, "w") as wf:
+            wf.write(self._generate_string())
 
-    def print(self):
-        if self.verbosity >= 2:
-            self._print_files_statistic()
-        if self.verbosity >= 1:
-            self._print_overall_statistics()
+    def _generate_string(self) -> str:
+        final_string = ""
 
-    def _print_overall_statistics(self):
-        """Printing overall coverage statistics."""
-        postfix = ""
+        if self.overall_files_coverage_stat is not None:
+            final_string += self._generate_file_stat_string()
+            final_string += "\n"
+        final_string += self._generate_overall_stat_string()
+
+        return final_string
+
+    def _generate_file_stat_string(self):
+        final_string = ""
+        for file_coverage_stat in self.overall_files_coverage_stat:
+
+            file_string = 'File: "{0}"\n'.format(file_coverage_stat.path)
+
+            if file_coverage_stat.is_empty is not None and file_coverage_stat.is_empty is True:
+                file_string += " - File is empty\n"
+
+            if file_coverage_stat.nodes_with_docstring is not None:
+                for node_identifier in file_coverage_stat.nodes_with_docstring:
+                    file_string += " - Found docstring for `{0}`\n".format(
+                        node_identifier,
+                    )
+
+            if file_coverage_stat.ignored_nodes is not None:
+                for ignored_node in file_coverage_stat.ignored_nodes:
+                    file_string += " - Ignored `{0}`: reason: `{1}`\n".format(
+                        ignored_node.identifier,
+                        ignored_node.reason,
+                    )
+
+            if file_coverage_stat.nodes_without_docstring is not None:
+                for node_identifier in file_coverage_stat.nodes_without_docstring:
+                    if node_identifier == "module docstring":
+                        file_string += " - No module docstring\n"
+                    else:
+                        file_string += " - No docstring for `{0}`\n".format(node_identifier)
+
+            file_string += " Needed: %s; Found: %s; Missing: %s; Coverage: %.1f%%" % (
+                file_coverage_stat.needed,
+                file_coverage_stat.found,
+                file_coverage_stat.missing,
+                file_coverage_stat.coverage,
+            )
+
+            final_string += "\n" + file_string + "\n"
+
+        return final_string
+
+    def _generate_overall_stat_string(self) -> str:
+        if isinstance(self.overall_coverage_stat, float):
+            return str(self.overall_coverage_stat)
+
+        prefix = ""
+
         if self.overall_coverage_stat.num_empty_files > 0:
-            postfix = " (%s files are empty)" % self.overall_coverage_stat.num_empty_files
+            prefix = " (%s files are empty)" % self.overall_coverage_stat.num_empty_files
+
         if self.overall_coverage_stat.is_skip_magic:
-            postfix += " (skipped all non-init magic methods)"
+            prefix += " (skipped all non-init magic methods)"
+
         if self.overall_coverage_stat.is_skip_file_docstring:
-            postfix += " (skipped file-level docstrings)"
+            prefix += " (skipped file-level docstrings)"
+
         if self.overall_coverage_stat.is_skip_init:
-            postfix += " (skipped __init__ methods)"
+            prefix += " (skipped __init__ methods)"
+
         if self.overall_coverage_stat.is_skip_class_def:
-            postfix += " (skipped class definitions)"
+            prefix += " (skipped class definitions)"
+
         if self.overall_coverage_stat.is_skip_private:
-            postfix += " (skipped private methods)"
+            prefix += " (skipped private methods)"
+
+        final_string = ""
 
         if self.overall_coverage_stat.num_files > 1:
-            self._print_line(
-                "Overall statistics for %s files%s:"
-                % (
-                    self.overall_coverage_stat.num_files,
-                    postfix,
-                )
+            final_string += "Overall statistics for %s files%s:\n" % (
+                self.overall_coverage_stat.num_files,
+                prefix,
             )
         else:
-            self._print_line("Overall statistics%s:" % postfix)
+            final_string += "Overall statistics%s:\n" % prefix
 
-        self._print_line(
-            "Needed: {}  -  Found: {}  -  Missing: {}".format(
-                self.overall_coverage_stat.needed,
-                self.overall_coverage_stat.found,
-                self.overall_coverage_stat.missing,
-            ),
+        final_string += "Needed: {}  -  Found: {}  -  Missing: {}\n".format(
+            self.overall_coverage_stat.needed,
+            self.overall_coverage_stat.found,
+            self.overall_coverage_stat.missing,
         )
 
-        self._print_line(
-            "Total coverage: {:.1f}%  -  Grade: {}".format(
-                self.overall_coverage_stat.total_coverage,
-                self.overall_coverage_stat.grade,
-            )
+        final_string += "Total coverage: {:.1f}%  -  Grade: {}".format(
+            self.overall_coverage_stat.total_coverage,
+            self.overall_coverage_stat.grade,
         )
 
-    def _print_files_statistic(self):
-        """Print coverage file statistic."""
-        for file_info in self.overall_coverage_stat.files_info:
-            if self.verbosity < 4 and file_info.missing == 0:
-                continue
+        return final_string
 
-            self._print_line('\nFile: "{0}"'.format(file_info.path))
 
-            if self.verbosity > 3:
-                if file_info.is_empty:
-                    self._print_line(" - File is empty")
-                for node_identifier in file_info.nodes_with_docstring:
-                    self._print_line(
-                        " - Found docstring for `{0}`".format(
-                            node_identifier,
-                        )
+class MarkdownPrinter(LegacyPrinter):
+    """Printer for Markdown format."""
+
+    def save_to_file(self, path: Optional[str] = None) -> None:
+        if path is None:
+            path = "./coverage-results.md"
+        with open(path, "w") as wf:
+            wf.write(self._generate_string())
+
+    def _generate_file_stat_string(self) -> str:
+        final_string = ""
+        for file_coverage_stat in self.overall_files_coverage_stat:
+
+            file_string = '**File**: `{0}`\n'.format(file_coverage_stat.path)
+
+            if file_coverage_stat.is_empty is not None and file_coverage_stat.is_empty is True:
+                file_string += "- File is empty\n"
+
+            if file_coverage_stat.nodes_with_docstring is not None:
+                for node_identifier in file_coverage_stat.nodes_with_docstring:
+                    file_string += "- Found docstring for `{0}`\n".format(
+                        node_identifier,
                     )
-                for ignored_node in file_info.ignored_nodes:
-                    self._print_line(
-                        " - Ignored `{0}`: reason: `{1}`".format(
-                            ignored_node.identifier,
-                            ignored_node.reason,
-                        )
+
+            if file_coverage_stat.ignored_nodes is not None:
+                for ignored_node in file_coverage_stat.ignored_nodes:
+                    file_string += "- Ignored `{0}`: reason: `{1}`\n".format(
+                        ignored_node.identifier,
+                        ignored_node.reason,
                     )
 
-            if self.verbosity >= 3:
-                for node_identifier in file_info.nodes_without_docstring:
+            if file_coverage_stat.nodes_without_docstring is not None:
+                for node_identifier in file_coverage_stat.nodes_without_docstring:
                     if node_identifier == "module docstring":
-                        self._print_line(" - No module docstring")
+                        file_string += "- No module docstring\n"
                     else:
-                        self._print_line(" - No docstring for `{0}`".format(node_identifier))
+                        file_string += "- No docstring for `{0}`\n".format(node_identifier)
 
-            self._print_line(
-                " Needed: %s; Found: %s; Missing: %s; Coverage: %.1f%%"
-                % (
-                    file_info.needed,
-                    file_info.found,
-                    file_info.missing,
-                    file_info.coverage,
-                )
+            file_string += "\n"
+
+            file_string += self._generate_markdown_table(
+                ("Needed", "Found", "Missing", "Coverage"),
+                ((
+                    file_coverage_stat.needed,
+                    file_coverage_stat.found,
+                    file_coverage_stat.missing,
+                    "{:.1f}%".format(file_coverage_stat.coverage),
+                ),)
             )
 
-            self._print_line()
-        self._print_line()
+            if final_string == "":
+                final_string += file_string + "\n"
+            else:
+                final_string += "\n" + file_string + "\n"
 
+        return final_string + "\n"
 
-class MarkdownPrinter(Printer):
+    def _generate_overall_stat_string(self) -> str:
+        if isinstance(self.overall_coverage_stat, float):
+            return str(self.overall_coverage_stat)
 
-    def _print_line(self, line: str = ""):
-        """Prints `line`
+        final_string = "## Overall statistics\n"
 
-        Parameters
-        ----------
-        line: String
-            The text to print"""
-        logger.info(line)
+        if self.overall_coverage_stat.num_files > 1:
+            final_string += "Files number: **{}**\n".format(self.overall_coverage_stat.num_files)
 
-    def _print_title_line(self, content: str | int | float):
-        """Print Markdown 2nd title (`## ...`).
+        final_string += "\n"
 
-        Parameters
-        ----------
-        content : str | int | float
-            Title content
-        """
-        logger.info("## {}".format(content))
+        final_string += "Total coverage: **{:.1f}%**\n".format(
+            self.overall_coverage_stat.total_coverage,
+        )
 
-    def _print_table(
+        final_string += "\n"
+
+        final_string += "Grade: **{}**\n".format(self.overall_coverage_stat.grade)
+
+        if self.overall_coverage_stat.num_empty_files > 0:
+            final_string += "- %s files are empty\n" % self.overall_coverage_stat.num_empty_files
+
+        if self.overall_coverage_stat.is_skip_magic:
+            final_string += "- skipped all non-init magic methods\n"
+
+        if self.overall_coverage_stat.is_skip_file_docstring:
+            final_string += "- skipped file-level docstrings\n"
+
+        if self.overall_coverage_stat.is_skip_init:
+            final_string += "- skipped __init__ methods\n"
+
+        if self.overall_coverage_stat.is_skip_class_def:
+            final_string += "- skipped class definitions\n"
+
+        if self.overall_coverage_stat.is_skip_private:
+            final_string += "- skipped private methods\n"
+
+        final_string += "\n"
+
+        final_string += self._generate_markdown_table(
+                ("Needed", "Found", "Missing"),
+                ((
+                    self.overall_coverage_stat.needed,
+                    self.overall_coverage_stat.found,
+                    self.overall_coverage_stat.missing,
+                ),)
+            )
+
+        return final_string
+
+    def _generate_markdown_table(
         self,
         cols: tuple[str, ...],
-        rows: tuple[tuple[str | int | float], ...],
-    ):
-        """Print markdown table.
+        rows: tuple[tuple[Union[str, int, float]], ...],
+    ) -> str:
+        """Generate markdown table.
 
         Using:
-        >>> self._print_table(
+        >>> self._generate_markdown_table(
         ...     cols=("Needed", "Found", "Missing"),
         ...     vals=(
         ...         (10, 20, "65.5%"),
@@ -344,120 +469,28 @@ class MarkdownPrinter(Printer):
         ----------
         cols: tuple[str, ...]
             Table columns
-        rows: tuple[tuple[str  |  int  |  float], ...]
+        rows: tuple[tuple[Union[str, int, float]], ...]
             Column values
+
+        Returns
+        -------
+        str
+            Generated table.
         """
         assert all(len(v) == len(cols) for v in rows), "Col num not equal to cols value"
+        final_string = ""
 
-        col_line = ""
         for col in cols:
-            col_line += "| {} ".format(col)
-        self._print_line(col_line + "|")
+            final_string += "| {} ".format(col)
+        final_string += "|\n"
 
-        sep_line = ""
         for _ in range(len(cols)):
-            sep_line += "|---"
-        self._print_line(sep_line + "|")
+            final_string += "|---"
+        final_string += "|\n"
 
         for row in rows:
-            row_line = ""
             for value in row:
-                row_line += "| {} ".format(value)
-            self._print_line(row_line + "|")
+                final_string += "| {} ".format(value)
+            final_string += "|"
 
-    def print(self) -> None:
-        if self.verbosity >= 2:
-            self._print_files_statistic()
-        if self.verbosity >= 1:
-            self._print_overall_statistics()
-
-    def _print_files_statistic(self):
-        for file_info in self.overall_coverage_stat.files_info:
-            if self.verbosity < 4 and file_info.missing == 0:
-                continue
-
-            self._print_line('**File**: `{0}`'.format(file_info.path))
-
-            if self.verbosity > 3:
-                if file_info.is_empty:
-                    self._print_line("- File is empty")
-                for node_identifier in file_info.nodes_with_docstring:
-                    self._print_line(
-                        "- Found docstring for `{0}`".format(
-                            node_identifier,
-                        )
-                    )
-                for ignored_node in file_info.ignored_nodes:
-                    self._print_line(
-                        "- Ignored `{0}`: reason: `{1}`".format(
-                            ignored_node.identifier,
-                            ignored_node.reason,
-                        )
-                    )
-
-            if self.verbosity >= 3:
-                for node_identifier in file_info.nodes_without_docstring:
-                    if node_identifier == "module docstring":
-                        self._print_line("- No module docstring")
-                    else:
-                        self._print_line("- No docstring for `{0}`".format(node_identifier))
-
-            self._print_line()
-
-            self._print_table(
-                ("Needed", "Found", "Missing", "Coverage"),
-                ((
-                    file_info.needed,
-                    file_info.found,
-                    file_info.missing,
-                    "{:.1f}%".format(file_info.coverage),
-                ),)
-            )
-            self._print_line()
-
-        self._print_line()
-
-    def _print_overall_statistics(self):
-        self._print_title_line("Overall statistic")
-
-        if self.overall_coverage_stat.num_files > 1:
-            self._print_line("Files number: **{}**".format(self.overall_coverage_stat.num_files))
-        self._print_line()
-        self._print_line(
-            "Total coverage: **{:.1f}%**".format(
-                self.overall_coverage_stat.total_coverage,
-            )
-        )
-        self._print_line()
-        self._print_line(
-            "Grade: **{}**".format(self.overall_coverage_stat.grade)
-        )
-
-        if self.overall_coverage_stat.num_empty_files > 0:
-            self._print_line("- %s files are empty" % self.overall_coverage_stat.num_empty_files)
-
-        if self.overall_coverage_stat.is_skip_magic:
-            self._print_line("- skipped all non-init magic methods")
-
-        if self.overall_coverage_stat.is_skip_file_docstring:
-            self._print_line("- skipped file-level docstrings")
-
-        if self.overall_coverage_stat.is_skip_init:
-            self._print_line("- skipped __init__ methods")
-
-        if self.overall_coverage_stat.is_skip_class_def:
-            self._print_line("- skipped class definitions")
-
-        if self.overall_coverage_stat.is_skip_private:
-            self._print_line("- skipped private methods")
-
-        self._print_line()
-
-        self._print_table(
-                ("Needed", "Found", "Missing"),
-                ((
-                    self.overall_coverage_stat.needed,
-                    self.overall_coverage_stat.found,
-                    self.overall_coverage_stat.missing,
-                ),)
-            )
+        return final_string

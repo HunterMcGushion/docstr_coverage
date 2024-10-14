@@ -145,10 +145,10 @@ def test_should_report_when_no_docs_in_a_file():
     [
         (
             [
-                '\nFile: "tests/sample_files/subdir_a/empty_file.py"',
+                "",
+                'File: "tests/sample_files/subdir_a/empty_file.py"',
                 " - File is empty",
                 " Needed: 0; Found: 0; Missing: 0; Coverage: 100.0%",
-                "",
                 "",
                 "Overall statistics (1 files are empty):",
                 "Needed: 0  -  Found: 0  -  Missing: 0",
@@ -160,13 +160,38 @@ def test_should_report_when_no_docs_in_a_file():
 def test_legacy_printer_logging_empty_file(caplog, expected):
     with caplog.at_level(logging.DEBUG):
         result = analyze([EMPTY_FILE_PATH])
-        LegacyPrinter(result, verbosity=4).print()
+        LegacyPrinter(result, verbosity=4).print_to_stdout()
         _file_results, _total_results = result.to_legacy()
 
     if platform.system() == "Windows":
         assert [m.replace("\\", "/") for m in caplog.messages] == expected
     else:
         assert caplog.messages == expected
+
+
+@pytest.mark.parametrize(
+    ["expected"],
+    [
+        (
+            [
+                "\n",
+                'File: "tests/sample_files/subdir_a/empty_file.py"\n',
+                " - File is empty\n",
+                " Needed: 0; Found: 0; Missing: 0; Coverage: 100.0%\n",
+                "\n",
+                "Overall statistics (1 files are empty):\n",
+                "Needed: 0  -  Found: 0  -  Missing: 0\n",
+                "Total coverage: 100.0%  -  Grade: " + _GRADES[0][0],
+            ],
+        )
+    ],
+)
+def test_legacy_save_to_file_printer_empty_file(tmpdir, expected):
+    path = tmpdir.join("coverage-result.txt")
+    result = analyze([EMPTY_FILE_PATH])
+    LegacyPrinter(result, verbosity=4).save_to_file(path.strpath)
+
+    assert path.readlines() == expected
 
 
 @pytest.mark.parametrize(
@@ -182,7 +207,7 @@ def test_legacy_printer_logging_empty_file(caplog, expected):
                 "| 0 | 0 | 0 | 100.0% |",
                 "",
                 "",
-                "## Overall statistic",
+                "## Overall statistics",
                 "",
                 "Total coverage: **100.0%**",
                 "",
@@ -199,7 +224,7 @@ def test_legacy_printer_logging_empty_file(caplog, expected):
 def test_markdown_printer_logging_empty_file(caplog, expected):
     with caplog.at_level(logging.DEBUG):
         result = analyze([EMPTY_FILE_PATH])
-        MarkdownPrinter(result, verbosity=4).print()
+        MarkdownPrinter(result, verbosity=4).print_to_stdout()
         _file_results, _total_results = result.to_legacy()
 
     if platform.system() == "Windows":
@@ -209,16 +234,51 @@ def test_markdown_printer_logging_empty_file(caplog, expected):
 
 
 @pytest.mark.parametrize(
+    ["expected"],
+    [
+        (
+            [
+                '**File**: `tests/sample_files/subdir_a/empty_file.py`\n',
+                "- File is empty\n",
+                "\n",
+                "| Needed | Found | Missing | Coverage |\n",
+                "|---|---|---|---|\n",
+                "| 0 | 0 | 0 | 100.0% |\n",
+                "\n",
+                "\n",
+                "## Overall statistics\n",
+                "\n",
+                "Total coverage: **100.0%**\n",
+                "\n",
+                "Grade: **" + _GRADES[0][0] + "**\n",
+                "- 1 files are empty\n",
+                "\n",
+                "| Needed | Found | Missing |\n",
+                "|---|---|---|\n",
+                "| 0 | 0 | 0 |",
+            ],
+        )
+    ],
+)
+def test_markdown_save_to_file_printer_empty_file(tmpdir, expected):
+    path = tmpdir.join("coverage-result.md")
+    result = analyze([EMPTY_FILE_PATH])
+    MarkdownPrinter(result, verbosity=4).save_to_file(path.strpath)
+
+    assert path.readlines() == expected
+
+
+@pytest.mark.parametrize(
     ["expected", "verbose", "ignore_names"],
     [
         (
             [
-                '\nFile: "tests/sample_files/subdir_a/partly_documented_file.py"',
+                "",
+                'File: "tests/sample_files/subdir_a/partly_documented_file.py"',
                 " - No module docstring",
                 " - No docstring for `foo`",
                 " - No docstring for `bar`",
                 " Needed: 4; Found: 1; Missing: 3; Coverage: 25.0%",
-                "",
                 "",
                 "Overall statistics:",
                 "Needed: 4  -  Found: 1  -  Missing: 3",
@@ -229,13 +289,13 @@ def test_markdown_printer_logging_empty_file(caplog, expected):
         ),
         (
             [
-                '\nFile: "tests/sample_files/subdir_a/partly_documented_file.py"',
+                "",
+                'File: "tests/sample_files/subdir_a/partly_documented_file.py"',
                 " - No module docstring",
                 " - No docstring for `FooBar.__init__`",
                 " - No docstring for `foo`",
                 " - No docstring for `bar`",
                 " Needed: 5; Found: 1; Missing: 4; Coverage: 20.0%",
-                "",
                 "",
                 "Overall statistics:",
                 "Needed: 5  -  Found: 1  -  Missing: 4",
@@ -246,9 +306,9 @@ def test_markdown_printer_logging_empty_file(caplog, expected):
         ),
         (
             [
-                '\nFile: "tests/sample_files/subdir_a/partly_documented_file.py"',
-                " Needed: 5; Found: 1; Missing: 4; Coverage: 20.0%",
                 "",
+                'File: "tests/sample_files/subdir_a/partly_documented_file.py"',
+                " Needed: 5; Found: 1; Missing: 4; Coverage: 20.0%",
                 "",
                 "Overall statistics:",
                 "Needed: 5  -  Found: 1  -  Missing: 4",
@@ -281,7 +341,127 @@ def test_legacy_printer_logging_partially_documented_file(caplog, expected, verb
     ignore_config = IgnoreConfig(ignore_names=ignore_names)
     with caplog.at_level(logging.DEBUG):
         result = analyze([PARTLY_DOCUMENTED_FILE_PATH], ignore_config=ignore_config)
-        LegacyPrinter(result, verbosity=verbose, ignore_config=ignore_config).print()
+        LegacyPrinter(result, verbosity=verbose, ignore_config=ignore_config).print_to_stdout()
+
+    if platform.system() == "Windows":
+        assert [m.replace("\\", "/") for m in caplog.messages] == expected
+    else:
+        assert caplog.messages == expected
+
+
+@pytest.mark.parametrize(
+    ["expected", "verbose", "ignore_names"],
+    [
+        (
+            [
+                '**File**: `tests/sample_files/subdir_a/partly_documented_file.py`',
+                "- No module docstring",
+                "- No docstring for `foo`",
+                "- No docstring for `bar`",
+                "",
+                "| Needed | Found | Missing | Coverage |",
+                "|---|---|---|---|",
+                "| 4 | 1 | 3 | 25.0% |",
+                "",
+                "",
+                "## Overall statistics",
+                "",
+                "Total coverage: **25.0%**",
+                "",
+                "Grade: **" + _GRADES[6][0] + "**",
+                "",
+                "| Needed | Found | Missing |",
+                "|---|---|---|",
+                "| 4 | 1 | 3 |",
+            ],
+            3,
+            ([".*", "__.+__"],),
+        ),
+        (
+            [
+                '**File**: `tests/sample_files/subdir_a/partly_documented_file.py`',
+                "- No module docstring",
+                "- No docstring for `FooBar.__init__`",
+                "- No docstring for `foo`",
+                "- No docstring for `bar`",
+                "",
+                "| Needed | Found | Missing | Coverage |",
+                "|---|---|---|---|",
+                "| 5 | 1 | 4 | 20.0% |",
+                "",
+                "",
+                "## Overall statistics",
+                "",
+                "Total coverage: **20.0%**",
+                "",
+                "Grade: **" + _GRADES[7][0] + "**",
+                "",
+                "| Needed | Found | Missing |",
+                "|---|---|---|",
+                "| 5 | 1 | 4 |",
+            ],
+            3,
+            (),
+        ),
+        (
+            [
+                '**File**: `tests/sample_files/subdir_a/partly_documented_file.py`',
+                "",
+                "| Needed | Found | Missing | Coverage |",
+                "|---|---|---|---|",
+                "| 5 | 1 | 4 | 20.0% |",
+                "",
+                "",
+                "## Overall statistics",
+                "",
+                "Total coverage: **20.0%**",
+                "",
+                "Grade: **" + _GRADES[7][0] + "**",
+                "",
+                "| Needed | Found | Missing |",
+                "|---|---|---|",
+                "| 5 | 1 | 4 |",
+            ],
+            2,
+            (),
+        ),
+        (
+            [
+                "## Overall statistics",
+                "",
+                "Total coverage: **20.0%**",
+                "",
+                "Grade: **" + _GRADES[7][0] + "**",
+                "",
+                "| Needed | Found | Missing |",
+                "|---|---|---|",
+                "| 5 | 1 | 4 |",
+            ],
+            1,
+            (),
+        ),
+        (
+            [
+                "## Overall statistics",
+                "",
+                "Total coverage: **0.0%**",
+                "",
+                "Grade: **" + _GRADES[9][0] + "**",
+                "",
+                "| Needed | Found | Missing |",
+                "|---|---|---|",
+                "| 1 | 0 | 1 |",
+            ],
+            1,
+            ([".*", ".*"],),  # ignore all, except module
+        ),
+    ],
+)
+def test_markdown_printer_logging_partially_documented_file(caplog, expected, verbose, ignore_names):
+    ignore_config = IgnoreConfig(ignore_names=ignore_names)
+    with caplog.at_level(logging.DEBUG):
+        result = analyze([PARTLY_DOCUMENTED_FILE_PATH], ignore_config=ignore_config)
+        MarkdownPrinter(result, verbosity=verbose, ignore_config=ignore_config).print_to_stdout()
 
     if platform.system() == "Windows":
         assert [m.replace("\\", "/") for m in caplog.messages] == expected

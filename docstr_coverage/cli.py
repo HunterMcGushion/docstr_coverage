@@ -264,9 +264,18 @@ def parse_ignore_patterns_from_dict(ignore_patterns_dict) -> tuple:
 @click.option(
     "-o",
     "--output",
+    type=click.Choice(["stdout", "file"]),
+    default="stdout",
+    help="Format of output",
+    show_default=True,
+    metavar="FORMAT",
+)
+@click.option(
+    "-r",
+    "--format",
     type=click.Choice(["text", "markdown"]),
     default="text",
-    help="Formatting style of the output (text, markdown)",
+    help="Format of output",
     show_default=True,
     metavar="FORMAT",
 )
@@ -337,11 +346,21 @@ def execute(paths, **kwargs):
     show_progress = not kwargs["percentage_only"]
     results = analyze(all_paths, ignore_config=ignore_config, show_progress=show_progress)
 
-    if kwargs["output"] == "markdown":
+    report_format = kwargs["format"]
+    if report_format == "markdown":
         printer = MarkdownPrinter(results, verbosity=kwargs["verbose"], ignore_config=ignore_config)
-    else:
+    elif report_format == "text":
         printer = LegacyPrinter(results, verbosity=kwargs["verbose"], ignore_config=ignore_config)
-    printer.print()
+    else:
+        raise SystemError("Unknown report format: {0}".format(report_format))
+
+    output_type = kwargs["output"]
+    if output_type == "file":
+        printer.save_to_file()
+    elif output_type == "stdout":
+        printer.print_to_stdout()
+    else:
+        raise SystemError("Unknown output type: {0}".format(output_type))
 
     file_results, total_results = results.to_legacy()
 
