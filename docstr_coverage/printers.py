@@ -3,7 +3,7 @@ Currently, this module is in BETA and its interface may change in future version
 import logging
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import Optional, Union
+from typing import List, Optional, Tuple, Union
 
 from docstr_coverage.ignore_config import IgnoreConfig
 from docstr_coverage.result_collection import FileStatus, ResultCollection
@@ -49,10 +49,10 @@ class FileCoverageStat:
     missing: int
     needed: int
     path: str
-    ignored_nodes: tuple[IgnoredNode, ...]
+    ignored_nodes: Tuple[IgnoredNode, ...]
     is_empty: Union[bool, None]
-    nodes_with_docstring: Union[tuple[str, ...], None]
-    nodes_without_docstring: Union[tuple[str, ...], None]
+    nodes_with_docstring: Union[Tuple[str, ...], None]
+    nodes_without_docstring: Union[Tuple[str, ...], None]
 
 
 @dataclass(frozen=True)
@@ -143,7 +143,7 @@ class Printer(ABC):
         return self.__overall_coverage_stat
 
     @property
-    def overall_files_coverage_stat(self) -> Union[list[FileCoverageStat], None]:
+    def overall_files_coverage_stat(self) -> Union[List[FileCoverageStat], None]:
         """Getting coverage statistics for files.
 
         For `verbosity` with value:
@@ -154,11 +154,11 @@ class Printer(ABC):
 
         Returns
         -------
-        list[FileCoverageStat]
+        List[FileCoverageStat]
             Coverage info about all checked files."""
         if self.__overall_files_coverage_stat is None and self.verbosity >= 2:
 
-            overall_files_coverage_stat: list[FileCoverageStat] = []
+            overall_files_coverage_stat: List[FileCoverageStat] = []
             for file_path, file_info in self.results.files():
 
                 if self.verbosity >= 3:
@@ -450,8 +450,8 @@ class MarkdownPrinter(LegacyPrinter):
 
     def _generate_markdown_table(
         self,
-        cols: tuple[str, ...],
-        rows: tuple[tuple[Union[str, int, float]], ...],
+        cols: Tuple[str, ...],
+        rows: Tuple[Tuple[Union[str, int, float]], ...],
     ) -> str:
         """Generate markdown table.
 
@@ -470,9 +470,9 @@ class MarkdownPrinter(LegacyPrinter):
 
         Parameters
         ----------
-        cols: tuple[str, ...]
+        cols: Tuple[str, ...]
             Table columns
-        rows: tuple[tuple[Union[str, int, float]], ...]
+        rows: Tuple[Tuple[Union[str, int, float]], ...]
             Column values
 
         Returns
