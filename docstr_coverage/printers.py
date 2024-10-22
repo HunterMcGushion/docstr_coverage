@@ -6,7 +6,12 @@ from dataclasses import dataclass
 from typing import List, Optional, Tuple, Union
 
 from docstr_coverage.ignore_config import IgnoreConfig
-from docstr_coverage.result_collection import FileStatus, ResultCollection
+from docstr_coverage.result_collection import (
+    AggregatedCount,
+    File,
+    FileStatus,
+    ResultCollection,
+)
 
 _GRADES = (
     ("AMAZING! Your docstrings are truly a wonder to behold!", 100),
@@ -49,10 +54,10 @@ class FileCoverageStat:
     missing: int
     needed: int
     path: str
-    ignored_nodes: Tuple[IgnoredNode, ...]
-    is_empty: Union[bool, None]
-    nodes_with_docstring: Union[Tuple[str, ...], None]
-    nodes_without_docstring: Union[Tuple[str, ...], None]
+    ignored_nodes: Optional[Tuple[IgnoredNode, ...]]
+    is_empty: Optional[Union[bool]]
+    nodes_with_docstring: Optional[Tuple[str, ...]]
+    nodes_without_docstring: Optional[Tuple[str, ...]]
 
 
 @dataclass(frozen=True)
@@ -99,11 +104,11 @@ class Printer(ABC):
         ignore_config: IgnoreConfig
             Config with ignoring setups.
         """
-        self.verbosity = verbosity
-        self.ignore_config = ignore_config
-        self.results = results
-        self.__overall_coverage_stat = None
-        self.__overall_files_coverage_stat = None
+        self.verbosity: int = verbosity
+        self.ignore_config: IgnoreConfig = ignore_config
+        self.results: ResultCollection = results
+        self.__overall_coverage_stat: Optional[Union[OverallCoverageStat, float]] = None
+        self.__overall_files_coverage_stat: Optional[List[FileCoverageStat]] = None
 
     @property
     def overall_coverage_stat(self) -> Union[OverallCoverageStat, float]:
@@ -114,7 +119,7 @@ class Printer(ABC):
             * `1` - All fields, except `files_info`.
             * `2` - All fields."""
         if self.__overall_coverage_stat is None:
-            count = self.results.count_aggregate()
+            count: AggregatedCount = self.results.count_aggregate()
 
             if self.verbosity >= 1:
 
@@ -143,7 +148,7 @@ class Printer(ABC):
         return self.__overall_coverage_stat
 
     @property
-    def overall_files_coverage_stat(self) -> Union[List[FileCoverageStat], None]:
+    def overall_files_coverage_stat(self) -> Optional[List[FileCoverageStat]]:
         """Getting coverage statistics for files.
 
         For `verbosity` with value:
@@ -157,9 +162,15 @@ class Printer(ABC):
         List[FileCoverageStat]
             Coverage info about all checked files."""
         if self.__overall_files_coverage_stat is None and self.verbosity >= 2:
-
             overall_files_coverage_stat: List[FileCoverageStat] = []
             for file_path, file_info in self.results.files():
+
+                file_path: str
+                file_info: File
+                nodes_without_docstring: Optional[Tuple[str, ...]]
+                is_empty: Optional[bool]
+                nodes_with_docstring: Optional[Tuple[str, ...]]
+                ignored_nodes: Optional[Tuple[IgnoredNode, ...]]
 
                 if self.verbosity >= 3:
                     nodes_without_docstring = tuple(
@@ -220,7 +231,7 @@ class Printer(ABC):
 
         Parameters
         ----------
-        path: Union[str, None]
+        path: Optional[str]
             Path to file with coverage results.
         """
         pass
@@ -240,7 +251,7 @@ class LegacyPrinter(Printer):
             wf.write(self._generate_string())
 
     def _generate_string(self) -> str:
-        final_string = ""
+        final_string: str = ""
 
         if self.overall_files_coverage_stat is not None:
             final_string += self._generate_file_stat_string()
@@ -250,10 +261,10 @@ class LegacyPrinter(Printer):
         return final_string
 
     def _generate_file_stat_string(self):
-        final_string = ""
+        final_string: str = ""
         for file_coverage_stat in self.overall_files_coverage_stat:
 
-            file_string = 'File: "{0}"\n'.format(file_coverage_stat.path)
+            file_string: str = 'File: "{0}"\n'.format(file_coverage_stat.path)
 
             if file_coverage_stat.is_empty is not None and file_coverage_stat.is_empty is True:
                 file_string += " - File is empty\n"
@@ -293,10 +304,10 @@ class LegacyPrinter(Printer):
         if isinstance(self.overall_coverage_stat, float):
             return str(self.overall_coverage_stat)
 
-        prefix = ""
+        prefix: str = ""
 
         if self.overall_coverage_stat.num_empty_files > 0:
-            prefix = " (%s files are empty)" % self.overall_coverage_stat.num_empty_files
+            prefix += " (%s files are empty)" % self.overall_coverage_stat.num_empty_files
 
         if self.overall_coverage_stat.is_skip_magic:
             prefix += " (skipped all non-init magic methods)"
@@ -313,7 +324,7 @@ class LegacyPrinter(Printer):
         if self.overall_coverage_stat.is_skip_private:
             prefix += " (skipped private methods)"
 
-        final_string = ""
+        final_string: str = ""
 
         if self.overall_coverage_stat.num_files > 1:
             final_string += "Overall statistics for %s files%s:\n" % (
@@ -347,10 +358,10 @@ class MarkdownPrinter(LegacyPrinter):
             wf.write(self._generate_string())
 
     def _generate_file_stat_string(self) -> str:
-        final_string = ""
+        final_string: str = ""
         for file_coverage_stat in self.overall_files_coverage_stat:
 
-            file_string = "**File**: `{0}`\n".format(file_coverage_stat.path)
+            file_string: str = "**File**: `{0}`\n".format(file_coverage_stat.path)
 
             if file_coverage_stat.is_empty is not None and file_coverage_stat.is_empty is True:
                 file_string += "- File is empty\n"
@@ -400,7 +411,7 @@ class MarkdownPrinter(LegacyPrinter):
         if isinstance(self.overall_coverage_stat, float):
             return str(self.overall_coverage_stat)
 
-        final_string = "## Overall statistics\n"
+        final_string: str = "## Overall statistics\n"
 
         if self.overall_coverage_stat.num_files > 1:
             final_string += "Files number: **{}**\n".format(self.overall_coverage_stat.num_files)
@@ -480,8 +491,9 @@ class MarkdownPrinter(LegacyPrinter):
         str
             Generated table.
         """
-        assert all(len(v) == len(cols) for v in rows), "Col num not equal to cols value"
-        final_string = ""
+        if not all(len(v) == len(cols) for v in rows):
+            raise ValueError("Col num not equal to cols value")
+        final_string: str = ""
 
         for col in cols:
             final_string += "| {} ".format(col)

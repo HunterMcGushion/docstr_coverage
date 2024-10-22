@@ -346,7 +346,7 @@ def execute(paths, **kwargs):
     show_progress = not kwargs["percentage_only"]
     results = analyze(all_paths, ignore_config=ignore_config, show_progress=show_progress)
 
-    report_format = kwargs["format"]
+    report_format: str = kwargs["format"]
     if report_format == "markdown":
         printer = MarkdownPrinter(results, verbosity=kwargs["verbose"], ignore_config=ignore_config)
     elif report_format == "text":
@@ -354,7 +354,7 @@ def execute(paths, **kwargs):
     else:
         raise SystemError("Unknown report format: {0}".format(report_format))
 
-    output_type = kwargs["output"]
+    output_type: str = kwargs["output"]
     if output_type == "file":
         printer.save_to_file()
     elif output_type == "stdout":
