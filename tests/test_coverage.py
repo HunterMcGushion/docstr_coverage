@@ -193,7 +193,11 @@ def test_legacy_save_to_file_printer_empty_file(tmpdir, expected):
     result = analyze([EMPTY_FILE_PATH])
     LegacyPrinter(result, verbosity=4).save_to_file(path.strpath)
 
-    assert path.readlines() == expected
+    lines = path.readlines()
+    if platform.system() == "Windows":
+        assert [m.replace("\\", "/") for m in lines] == expected
+    else:
+        assert lines == expected
 
 
 @pytest.mark.parametrize(
@@ -267,7 +271,11 @@ def test_markdown_save_to_file_printer_empty_file(tmpdir, expected):
     result = analyze([EMPTY_FILE_PATH])
     MarkdownPrinter(result, verbosity=4).save_to_file(path.strpath)
 
-    assert path.readlines() == expected
+    lines = path.readlines()
+    if platform.system() == "Windows":
+        assert [m.replace("\\", "/") for m in lines] == expected
+    else:
+        assert lines == expected
 
 
 @pytest.mark.parametrize(
