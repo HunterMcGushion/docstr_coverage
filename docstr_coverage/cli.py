@@ -262,16 +262,16 @@ def parse_ignore_patterns_from_dict(ignore_patterns_dict) -> tuple:
     help="Deprecated. Use json config (--config / -C) instead",
 )
 @click.option(
-    "-o",
-    "--output",
+    "-dst",
+    "--destination",
     type=click.Choice(["stdout", "file"]),
     default="stdout",
-    help="Format of output",
+    help="Results output destination",
     show_default=True,
-    metavar="FORMAT",
+    metavar="DESTINATION",
 )
 @click.option(
-    "-r",
+    "-frm",
     "--format",
     type=click.Choice(["text", "markdown"]),
     default="text",
@@ -354,13 +354,13 @@ def execute(paths, **kwargs):
     else:
         raise SystemError("Unknown report format: {0}".format(report_format))
 
-    output_type: str = kwargs["output"]
-    if output_type == "file":
+    destination: str = kwargs["destination"]
+    if destination == "file":
         printer.save_to_file()
-    elif output_type == "stdout":
+    elif destination == "stdout":
         printer.print_to_stdout()
     else:
-        raise SystemError("Unknown output type: {0}".format(output_type))
+        raise SystemError("Unknown output type: {0}".format(destination))
 
     file_results, total_results = results.to_legacy()
 
