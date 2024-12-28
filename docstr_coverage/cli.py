@@ -13,7 +13,7 @@ from docstr_coverage.badge import Badge
 from docstr_coverage.config_file import set_config_defaults
 from docstr_coverage.coverage import analyze
 from docstr_coverage.ignore_config import IgnoreConfig
-from docstr_coverage.printers import LegacyPrinter
+from docstr_coverage.printers import LegacyPrinter, MarkdownPrinter
 
 
 def do_include_filepath(filepath: str, exclude_re: Optional["re.Pattern"]) -> bool:
@@ -261,6 +261,24 @@ def parse_ignore_patterns_from_dict(ignore_patterns_dict) -> tuple:
     default=".docstr_coverage",
     help="Deprecated. Use json config (--config / -C) instead",
 )
+@click.option(
+    "-dst",
+    "--destination",
+    type=click.Choice(["stdout", "file"]),
+    default="stdout",
+    help="Results output destination",
+    show_default=True,
+    metavar="DESTINATION",
+)
+@click.option(
+    "-frm",
+    "--format",
+    type=click.Choice(["text", "markdown"]),
+    default="text",
+    help="Format of output",
+    show_default=True,
+    metavar="FORMAT",
+)
 def execute(paths, **kwargs):
     """Measure docstring coverage for `PATHS`"""
 
@@ -328,7 +346,21 @@ def execute(paths, **kwargs):
     show_progress = not kwargs["percentage_only"]
     results = analyze(all_paths, ignore_config=ignore_config, show_progress=show_progress)
 
-    LegacyPrinter(verbosity=kwargs["verbose"], ignore_config=ignore_config).print(results)
+    report_format: str = kwargs["format"]
+    if report_format == "markdown":
+        printer = MarkdownPrinter(results, verbosity=kwargs["verbose"], ignore_config=ignore_config)
+    elif report_format == "text":
+        printer = LegacyPrinter(results, verbosity=kwargs["verbose"], ignore_config=ignore_config)
+    else:
+        raise SystemError("Unknown report format: {0}".format(report_format))
+
+    destination: str = kwargs["destination"]
+    if destination == "file":
+        printer.save_to_file()
+    elif destination == "stdout":
+        printer.print_to_stdout()
+    else:
+        raise SystemError("Unknown output type: {0}".format(destination))
 
     file_results, total_results = results.to_legacy()
 
