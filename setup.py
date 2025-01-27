@@ -33,7 +33,7 @@ setup(
     ],
     extras_require={
         "lint": ["flake8==4.0.1", "black==22.3.0", "isort==5.10.1"],
-        "test": ["pytest==6.2.5", "pytest-mock==3.4.0"],
+        "test": ["pytest==6.2.5", "pytest-mock==3.10.0"],
     },
     include_package_data=True,
     zip_safe=False,
