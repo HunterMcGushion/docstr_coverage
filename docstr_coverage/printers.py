@@ -71,6 +71,7 @@ class OverallCoverageStat:
     is_skip_init: bool
     is_skip_magic: bool
     is_skip_private: bool
+    is_skip_mangled: bool
     missing: int
     needed: int
     num_empty_files: int
@@ -135,6 +136,7 @@ class Printer(ABC):
                     is_skip_init=self.ignore_config.skip_init,
                     is_skip_magic=self.ignore_config.skip_magic,
                     is_skip_private=self.ignore_config.skip_private,
+                    is_skip_mangled=self.ignore_config.skip_mangled,
                     missing=count.missing,
                     needed=count.needed,
                     num_empty_files=count.num_empty_files,
@@ -324,6 +326,9 @@ class LegacyPrinter(Printer):
         if self.overall_coverage_stat.is_skip_private:
             prefix += " (skipped private methods)"
 
+        if self.overall_coverage_stat.is_skip_mangled:
+            prefix += " (skipped mangled method names)"
+
         final_string: str = ""
 
         if self.overall_coverage_stat.num_files > 1:
@@ -443,6 +448,9 @@ class MarkdownPrinter(LegacyPrinter):
 
         if self.overall_coverage_stat.is_skip_private:
             final_string += "- skipped private methods\n"
+
+        if self.overall_coverage_stat.is_skip_mangled:
+            final_string += "- skipped mangled method names\n"
 
         final_string += "\n"
 

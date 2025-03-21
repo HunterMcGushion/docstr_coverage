@@ -13,6 +13,7 @@ class IgnoreConfig:
         skip_init: bool = False,
         skip_class_def: bool = False,
         skip_private: bool = False,
+        skip_mangled: bool = False,
         skip_property: bool = False,
         skip_setter: bool = True,
         skip_deleter: bool = True,
@@ -23,6 +24,7 @@ class IgnoreConfig:
         self._skip_init = skip_init
         self._skip_class_def = skip_class_def
         self._skip_private = skip_private
+        self._skip_mangled = skip_mangled
         self._skip_property = skip_property
         self._skip_setter = skip_setter
         self._skip_deleter = skip_deleter
@@ -62,6 +64,11 @@ class IgnoreConfig:
     def skip_private(self):
         """If True, skip function definitions beginning with a single underscore."""
         return self._skip_private
+    
+    @property
+    def skip_mangled(self):
+        """If True, skip function definitions beginning with a double underscore."""
+        return self._skip_mangled
 
     @property
     def skip_property(self):

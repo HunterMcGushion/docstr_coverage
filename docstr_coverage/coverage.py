@@ -109,6 +109,8 @@ def _analyze_docstrings_on_node(
         ignore_reason = "skip-class-def set to True"
     elif ignore_config.skip_private and name.startswith("_") and not name.startswith("__"):
         ignore_reason = "skip-private set to True"
+    elif ignore_config.skip_mangled and name.startswith("__"):
+        ignore_reason = "skip-mangled set to True"
     elif ignore_config.ignore_names and _do_ignore_node(
         filename, base, name, ignore_config.ignore_names
     ):
@@ -140,6 +142,7 @@ def get_docstring_coverage(
     skip_init: bool = False,
     skip_class_def: bool = False,
     skip_private: bool = False,
+    skip_mangled: bool = False,
     verbose: int = 0,
     ignore_names: Tuple[List[str], ...] = (),
 ) -> Tuple[Dict, Dict]:
@@ -168,6 +171,9 @@ def get_docstring_coverage(
         If this is True, the class's methods will still be checked
     skip_private: Boolean, default=False
         If True, skips function definitions beginning with a single underscore and does
+        not include them in the report.
+    skip_mangled: Boolean, default=False
+        If True, skips function definitions beginning with a double underscore and does
         not include them in the report.
     verbose: Int in [0, 1, 2, 3], default=0
         0) No printing.
@@ -210,6 +216,7 @@ def get_docstring_coverage(
         skip_init=skip_init,
         skip_class_def=skip_class_def,
         skip_private=skip_private,
+        skip_mangled=skip_mangled,
         ignore_names=ignore_names,
     )
     results = analyze(filenames, ignore_config)
