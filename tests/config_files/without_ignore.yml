@@ -6,4 +6,5 @@ skip_file_doc: true
 skip_init: true
 skip_magic: true
 skip_private: true
+skip_mangled: true
 verbose: '2'

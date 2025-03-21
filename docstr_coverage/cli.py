@@ -201,6 +201,12 @@ def parse_ignore_patterns_from_dict(ignore_patterns_dict) -> tuple:
     is_flag=True,
     help="Ignore docstrings of functions starting with a single underscore",
 )
+@click.option(
+    "-M",
+    "--skip-mangled",
+    is_flag=True,
+    help="Ignore docstrings of functions starting with a double underscore",
+)
 @click.option("-l", "--follow-links", is_flag=True, help="Follow symlinks")
 @click.option(
     "-F",
@@ -336,6 +342,7 @@ def execute(paths, **kwargs):
         skip_init=kwargs["skip_init"],
         skip_class_def=kwargs["skip_class_def"],
         skip_private=kwargs["skip_private"],
+        skip_mangled=kwargs["skip_mangled"],
         skip_property=kwargs["skip_property"],
         skip_setter=not kwargs["include_setter"],
         skip_deleter=not kwargs["include_deleter"],

@@ -83,6 +83,7 @@ docstr-coverage some_project/src
 - _--skip-init, -i_ - Ignore all `__init__` methods
 - _--skip-file-doc, -f_ - Ignore module docstrings (at the top of files)
 - _--skip-private, -P_ - Ignore private functions (starting with a single underscore)
+- _--skip-mangled, -M_ - Ignore mangled functions (starting with a double underscore)
 - _--skip-class-def, -c_ - Ignore docstrings of class definitions
 - _--skip-property, -sp_ - Ignore functions with `@property` decorator
 - _--include-setter, -is_ - Include functions with `@setter` decorator (skipped by default)
@@ -122,6 +123,7 @@ skip_file_doc: True # Boolean
 skip_init: True # Boolean
 skip_class_def: True # Boolean
 skip_private: True # Boolean
+skip_mangled: True # Boolean
 follow_links: True # Boolean
 accept_empty: True # Boolean
 ignore_names_file: .*/test # regex

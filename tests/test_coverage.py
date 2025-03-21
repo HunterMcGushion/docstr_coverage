@@ -498,6 +498,20 @@ def test_skip_private():
     }
     assert total_results == {"missing_count": 2, "needed_count": 3, "coverage": 33.333333333333336}
 
+def test_skip_mangled():
+    ignore_config = IgnoreConfig(skip_mangled=True)
+    result = analyze([PRIVATE_NO_DOCS_PATH], ignore_config=ignore_config)
+    file_results, total_results = result.to_legacy()
+    assert file_results[PRIVATE_NO_DOCS_PATH] == {
+        "missing": ["_foo", "_afoo"],
+        "module_doc": True,
+        "missing_count": 2,
+        "needed_count": 3,
+        "coverage": 33.333333333333336,
+        "empty": False,
+    }
+    assert total_results == {"missing_count": 2, "needed_count": 3, "coverage": 33.333333333333336}
+
 
 def test_long_doc():
     """Regression test on issue 79.
